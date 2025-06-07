@@ -8,6 +8,13 @@
 import SwiftUI
 import CoreData
 
+
+
+// for last screen:
+//.onAppear {
+//    UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
+//}
+
 // Основное представление онбординга
 struct OnboardingView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -18,6 +25,8 @@ struct OnboardingView: View {
     
     @State private var currentPage = 0
     @State private var selectedLanguage: ShopLanguages? = nil
+    @State private var selectedStudyTime: Int? = nil
+    @State private var selectedAgeRange: String? = nil
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
     
@@ -25,15 +34,62 @@ struct OnboardingView: View {
         if !UserDefaults.standard.bool(forKey: isOnboardingCompletedKey) {
             VStack {
                 HeaderView(currentPage: $currentPage)
-                SwitchView(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages)
+                SwitchView(currentPage: $currentPage, selectedLanguage: $selectedLanguage, selectedStudyTime: $selectedStudyTime, selectedAgeRange: $selectedAgeRange, languages: languages)
                 Spacer()
             }
             .background(Color(.systemBackground).ignoresSafeArea())
+            .onAppear {
+                InitialDataSetup.setupInitialData(context: viewContext)
+                print("Языки загружены: \(languages.count)")
+                for language in languages {
+                    print("Язык: \(language.name_language ?? ""), Коллекции: \(language.language_collections?.count ?? 0)")
+                }
+            }
         } else {
             ContentView() // Переход на основное представление после онбординга
         }
     }
 }
+
+// Основное содержимое онбординга
+struct SwitchView: View {
+    @Binding var currentPage: Int
+    @Binding var selectedLanguage: ShopLanguages?
+    @Binding var selectedStudyTime: Int?
+    @Binding var selectedAgeRange: String?
+    let languages: FetchedResults<ShopLanguages>
+    
+    var body: some View {
+        if currentPage == 0 {
+            FirstScreen(currentPage: $currentPage)
+        } else if currentPage == 1 {
+            SecondScreen(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages)
+        } else if currentPage == 2 {
+            ThirdScreen(currentPage: $currentPage)
+        } else if currentPage == 3 {
+            FourthScreen(currentPage: $currentPage, selectedStudyTime: $selectedStudyTime)
+        } else if currentPage == 4 {
+            FifthScreen(currentPage: $currentPage, selectedAgeRange: $selectedAgeRange)
+        } else if currentPage == 5 {
+            SixthScreen(currentPage: $currentPage)
+        } else if currentPage == 6 {
+            SeventhScreen(currentPage: $currentPage)
+        }else if currentPage == 7 {
+            EighthScreen(currentPage: $currentPage)
+        }else if currentPage == 8 {
+            //NineScreen(currentPage: $currentPage)
+        }else if currentPage == 9 {
+            //TenScreen(currentPage: $currentPage)
+        }else if currentPage == 10 {
+            //ElevenScreen(currentPage: $currentPage)
+        }else if currentPage == 11 {
+            SeventhScreen(currentPage: $currentPage)
+        }
+    }
+}
+
+
+
 
 // Представление заголовка с прогресс-баром и кнопкой назад
 struct HeaderView: View {
@@ -55,7 +111,7 @@ struct HeaderView: View {
                 Spacer()
                     .frame(width: 40)
             }
-            ProgressView(value: Float(currentPage + 1), total: 2)
+            ProgressView(value: Float(currentPage + 1), total: 11)
                 .progressViewStyle(LinearProgressViewStyle())
                 .frame(height: 5)
             Spacer()
@@ -63,179 +119,6 @@ struct HeaderView: View {
         .padding()
     }
 }
-
-// Основное содержимое онбординга
-struct SwitchView: View {
-    @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    let languages: FetchedResults<ShopLanguages>
-    
-    var body: some View {
-        if currentPage == 0 {
-            FirstScreen(currentPage: $currentPage)
-        } else if currentPage == 1 {
-            SecondScreen(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages)
-        } else if currentPage == 2 {
-            ContentView() // Переход на основное представление после онбординга
-                .transition(.opacity)
-        }
-    }
-}
-
-// Первый экран онбординга
-struct FirstScreen: View {
-    @Binding var currentPage: Int
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Image("onboardingImage1")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 300)
-            
-            Text("Anki Flashcards")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.blue)
-            
-            Text("Remember More, Forget Less.")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-            
-            Button(action: {
-                withAnimation {
-                    currentPage += 1
-                }
-            }) {
-                Text("Get started")
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }
-            .padding(.horizontal)
-        }
-    }
-}
-
-// Второй экран онбординга
-struct SecondScreen: View {
-    @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    let languages: FetchedResults<ShopLanguages>
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            TitleView()
-            LanguageSelectionView(languages: languages, selectedLanguage: $selectedLanguage)
-            NextButtonView(currentPage: $currentPage, selectedLanguage: $selectedLanguage)
-        }
-        .padding(.horizontal)
-    }
-}
-
-// Подкомпонент для заголовка
-private struct TitleView: View {
-    var body: some View {
-        Text("Which language do you want to learn?")
-            .font(.title2)
-            .fontWeight(.bold)
-            .foregroundColor(.blue)
-    }
-}
-
-// Подкомпонент для выбора языка
-private struct LanguageSelectionView: View {
-    let languages: FetchedResults<ShopLanguages>
-    @Binding var selectedLanguage: ShopLanguages?
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(languages, id: \.self) { language in
-                    Button(action: {
-                        selectedLanguage = language
-                    }) {
-                        LanguageItemView(language: language, isSelected: selectedLanguage == language)
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Подкомпонент для элемента языка
-private struct LanguageItemView: View {
-    let language: ShopLanguages
-    let isSelected: Bool
-    
-    var body: some View {
-        HStack {
-            Image(uiImage: flagImage(for: language.name_language ?? ""))
-                .resizable()
-                .frame(width: 30, height: 20)
-            Text(language.name_language ?? "")
-                .font(.headline)
-                .foregroundColor(.black)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray, lineWidth: 1)
-        )
-    }
-    
-    private func flagImage(for language: String) -> UIImage {
-        switch language.lowercased() {
-        case "english": return UIImage(named: "flag_uk") ?? UIImage()
-        case "spanish": return UIImage(named: "flag_spain") ?? UIImage()
-        case "japanese": return UIImage(named: "flag_japan") ?? UIImage()
-        case "french": return UIImage(named: "flag_france") ?? UIImage()
-        case "portuguese": return UIImage(named: "flag_portugal") ?? UIImage()
-        case "german": return UIImage(named: "flag_germany") ?? UIImage()
-        case "italian": return UIImage(named: "flag_italy") ?? UIImage()
-        case "korean": return UIImage(named: "flag_southkorea") ?? UIImage()
-        case "russian": return UIImage(named: "flag_russia") ?? UIImage()
-        default: return UIImage()
-        }
-    }
-}
-
-// Подкомпонент для кнопки "Next"
-private struct NextButtonView: View {
-    @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    
-    var body: some View {
-        Button(action: {
-            if selectedLanguage != nil {
-                withAnimation {
-                    currentPage += 1
-                    UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
-                }
-            }
-        }) {
-            Text("Next")
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(selectedLanguage != nil ? Color.blue : Color.gray)
-                .cornerRadius(10)
-        }
-        .disabled(selectedLanguage == nil)
-    }
-}
-
-// Стиль прогресс-бара
 struct LinearProgressViewStyle: ProgressViewStyle {
     func makeBody(configuration: Configuration) -> some View {
         GeometryReader { geometry in
@@ -250,4 +133,3 @@ struct LinearProgressViewStyle: ProgressViewStyle {
         }
     }
 }
-

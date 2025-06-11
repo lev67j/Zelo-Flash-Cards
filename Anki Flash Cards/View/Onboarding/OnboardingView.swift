@@ -77,13 +77,9 @@ struct SwitchView: View {
         }else if currentPage == 7 {
             EighthScreen(currentPage: $currentPage)
         }else if currentPage == 8 {
-            //NineScreen(currentPage: $currentPage)
+            NineScreen(currentPage: $currentPage)
         }else if currentPage == 9 {
-            //TenScreen(currentPage: $currentPage)
-        }else if currentPage == 10 {
-            //ElevenScreen(currentPage: $currentPage)
-        }else if currentPage == 11 {
-            SeventhScreen(currentPage: $currentPage)
+            TenScreen(currentPage: $currentPage)
         }
     }
 }

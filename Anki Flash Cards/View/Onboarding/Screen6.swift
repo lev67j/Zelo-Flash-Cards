@@ -12,14 +12,17 @@ import CoreData
 struct SixthScreen: View {
     @Binding var currentPage: Int
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
-            Text("Anki Flashcards helps you learn faster and remember everything")
-                .font(.title2)
+            Text("Zelo Flashcards helps you learn faster and remember everything")
+                .font(.system(size: vm.caption_font_size))
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
-                .multilineTextAlignment(.center)
+                .foregroundColor(Color(hex: "#546a50"))
+                .multilineTextAlignment(.leading)
                 .padding(.horizontal)
+                .padding(.top)
             
             Image("image for six screen") // Изображение в полном размере без искажений
                 .resizable()
@@ -36,7 +39,7 @@ struct SixthScreen: View {
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color(hex: "#546a50"))
                     .cornerRadius(10)
             }
             .padding(.horizontal)

@@ -13,16 +13,19 @@ import CoreData
 struct EighthScreen: View {
     @Binding var currentPage: Int
     @State private var showAlert = false
-
+    
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Leave a rating to help us improve!")
-                .font(.title2)
+                .font(.system(size: 30))
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
+                .foregroundColor(Color(hex: "#546a50"))
+                .multilineTextAlignment(.leading)
+                .padding()
+                
+             
             // Блок с отзывом
             VStack {
                 Image("image 1 for eight screen")
@@ -33,7 +36,7 @@ struct EighthScreen: View {
             }
             .padding()
             .padding(.horizontal)
-
+            
             // Блок с App Store рейтингом
             HStack {
                 Image("image 2 for eight screen")
@@ -42,13 +45,15 @@ struct EighthScreen: View {
                     .frame(height: 75)
             }
             .padding(.horizontal)
-
+            
             Button(action: {
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                     SKStoreReviewController.requestReview(in: windowScene)
                 }
-                withAnimation {
-                    currentPage += 1
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
+                    withAnimation {
+                        currentPage += 1
+                    }
                 }
             }) {
                 Text("Continue")
@@ -56,11 +61,11 @@ struct EighthScreen: View {
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color(hex: "#546a50"))
                     .cornerRadius(10)
             }
             .padding(.horizontal)
-
+            
             Spacer()
         }
     }

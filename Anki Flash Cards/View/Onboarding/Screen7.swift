@@ -12,6 +12,8 @@ import CoreData
 struct SeventhScreen: View {
     @Binding var currentPage: Int
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
        
@@ -31,7 +33,7 @@ struct SeventhScreen: View {
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color(hex: "#546a50"))
                     .cornerRadius(10)
             }
             .padding(.horizontal)

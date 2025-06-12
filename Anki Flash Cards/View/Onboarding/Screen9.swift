@@ -12,21 +12,24 @@ struct NineScreen: View {
     @Binding var currentPage: Int
     @State private var mouseOffset: CGFloat = 0
 
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 24) {
             // Заголовок
             VStack(alignment: .leading, spacing: 10) {
                 Text("Daily reminders make staying consistent easier!")
-                    .font(.title2)
+                    .font(.system(size: vm.caption_font_size))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#546a50"))
                 
                 // Подпись со смайликом лампочки
                 Text("💡Users who set reminders are 78% more likely to achieve a 30-day streak")
-                    .font(.body)
+                    .font(.system(size: 17))
                     .foregroundColor(Color(UIColor.systemGray))
             }
             .padding(.horizontal)
+            .padding(.top)
             .padding(.top)
         
             VStack {
@@ -58,8 +61,10 @@ struct NineScreen: View {
             // Кнопка "Continue" + запрос разрешения на уведомления
             Button(action: {
                 requestNotificationPermission {
-                    withAnimation {
-                        currentPage += 1
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+                        withAnimation {
+                            currentPage += 1
+                        }
                     }
                 }
             }) {
@@ -68,7 +73,7 @@ struct NineScreen: View {
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color(hex: "#546a50"))
                     .cornerRadius(12)
             }
             .padding(.horizontal)

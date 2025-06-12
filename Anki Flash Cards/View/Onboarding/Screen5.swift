@@ -14,12 +14,15 @@ struct FifthScreen: View {
     @Binding var selectedAgeRange: String?
     @Environment(\.managedObjectContext) private var viewContext
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("How old are you?")
-                .font(.title2)
+                .font(.system(size: vm.caption_font_size))
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
+                .foregroundColor(Color(hex: "#546a50"))
+                .padding(.top)
             
             VStack(spacing: 10) {
                 AgeButton(ageRange: "From 13 to 17 years old", color: Color(red: 1.0, green: 0.8, blue: 0.8), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
@@ -34,7 +37,7 @@ struct FifthScreen: View {
             
             Spacer()
         }
-        .onChange(of: selectedAgeRange) { _ in
+        .onChange(of: selectedAgeRange) {
             saveAge()
         }
     }
@@ -81,10 +84,15 @@ private struct AgeButton: View {
             HStack {
                 Circle()
                     .fill(color)
-                    .frame(width: 10, height: 10)
+                    .frame(width: 28, height: 28)
+                
                 Text(ageRange)
-                    .font(.headline)
+                    .font(.system(size: 16))
+                    .foregroundColor(.black)
+                    .padding(.leading)
+                
                 Spacer()
+                
                 Image(systemName: "chevron.right")
                     .foregroundColor(.gray)
             }
@@ -94,7 +102,7 @@ private struct AgeButton: View {
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 1)
+                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
             )
         }
     }

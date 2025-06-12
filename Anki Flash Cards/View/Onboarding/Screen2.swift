@@ -14,11 +14,12 @@ struct SecondScreen: View {
     @Binding var selectedLanguage: ShopLanguages?
     let languages: FetchedResults<ShopLanguages>
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
-            TitleView()
-            LanguageSelectionView(languages: languages, selectedLanguage: $selectedLanguage)
-            NextButtonView(currentPage: $currentPage, selectedLanguage: $selectedLanguage)
+            TitleView(vm: vm)
+            LanguageSelectionView(languages: languages, selectedLanguage: $selectedLanguage, currentPage: $currentPage)
         }
         .padding(.horizontal)
     }
@@ -26,11 +27,17 @@ struct SecondScreen: View {
 
 // Подкомпонент для заголовка
 private struct TitleView: View {
+    
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
-        Text("Which language do you want to learn?")
-            .font(.title2)
-            .fontWeight(.bold)
-            .foregroundColor(.blue)
+        VStack(alignment: .leading) {
+            Text("Which language do you want to learn?")
+                .font(.system(size: vm.caption_font_size))
+                .fontWeight(.bold)
+                .foregroundColor(Color(hex: "#546a50"))
+                .padding()
+        }
     }
 }
 
@@ -38,19 +45,31 @@ private struct TitleView: View {
 private struct LanguageSelectionView: View {
     let languages: FetchedResults<ShopLanguages>
     @Binding var selectedLanguage: ShopLanguages?
+    @Binding var currentPage: Int
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(languages, id: \.self) { language in
+        VStack(spacing: 0) { // Убраны промежутки между элементами
+            ScrollView(showsIndicators: false) {
+                ForEach(languages.indices, id: \.self) { index in
                     Button(action: {
-                        selectedLanguage = language
+                        selectedLanguage = languages[index]
+                        
+                        withAnimation {
+                            currentPage += 1
+                        }
                     }) {
-                        LanguageItemView(language: language, isSelected: selectedLanguage == language)
+                        LanguageItemView(
+                            language: languages[index],
+                            isSelected: selectedLanguage == languages[index],
+                            showDivider: index < languages.count - 1
+                        )
                     }
                 }
             }
         }
+        .background(Color.white)
+        .cornerRadius(20)
+        .padding(.bottom)
     }
 }
 
@@ -58,27 +77,31 @@ private struct LanguageSelectionView: View {
 private struct LanguageItemView: View {
     let language: ShopLanguages
     let isSelected: Bool
+    let showDivider: Bool
     
     var body: some View {
-        HStack {
-            Image(uiImage: flagImage(for: language.name_language ?? ""))
-                .resizable()
-                .frame(width: 30, height: 20)
-            Text(language.name_language ?? "")
-                .font(.headline)
-                .foregroundColor(.black)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+        VStack(spacing: 0) {
+            HStack {
+                Image(uiImage: flagImage(for: language.name_language ?? ""))
+                    .resizable()
+                    .frame(width: 30, height: 20)
+                Text(language.name_language ?? "")
+                    .font(.headline)
+                    .foregroundColor(isSelected ? .white : .black)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(isSelected ? .white : .gray)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Color(hex: "#546a50") : Color.clear)
+            
+            if showDivider {
+                Divider()
+                    .background(Color.gray.opacity(0.2))
+                    .padding(.horizontal) // Разделитель с отступом под флаг
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(isSelected ? Color.blue : Color.white)
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray, lineWidth: 1)
-        )
     }
     
     private func flagImage(for language: String) -> UIImage {
@@ -94,30 +117,5 @@ private struct LanguageItemView: View {
         case "russian": return UIImage(named: "flag_russia") ?? UIImage()
         default: return UIImage()
         }
-    }
-}
-
-// Подкомпонент для кнопки "Next"
-private struct NextButtonView: View {
-    @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    
-    var body: some View {
-        Button(action: {
-            if selectedLanguage != nil {
-                withAnimation {
-                    currentPage += 1
-                }
-            }
-        }) {
-            Text("Next")
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(selectedLanguage != nil ? Color.blue : Color.gray)
-                .cornerRadius(10)
-        }
-        .disabled(selectedLanguage == nil)
     }
 }

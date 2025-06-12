@@ -11,37 +11,55 @@ import CoreData
 // Первый экран онбординга
 struct FirstScreen: View {
     @Binding var currentPage: Int
+    @ObservedObject var vm: OnboardingVM
     
     var body: some View {
-        VStack(spacing: 20) {
-            Image("onboardingImage1")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 300)
-            
-            Text("Anki Flashcards")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.blue)
-            
-            Text("Remember More, Forget Less.")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-            
-            Button(action: {
-                withAnimation {
-                    currentPage += 1
+        VStack {
+            ZStack {
+                Color(hex: "#ddead1")
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    
+                    // App Icon
+                    Image("icon_image")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 80)
+                        .cornerRadius(20)
+                    
+                    // App Icon
+                    Image("onboardingImage1")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 300)
+                    
+                    Text("Zelo Flashcards")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color(hex: "#546a50"))
+                    
+                    Text("Remember More, Forget Less.")
+                        .font(.system(size: 21).bold())
+                        .foregroundColor(.gray)
+                        .padding(.bottom)
+                    
+                    Button(action: {
+                        withAnimation {
+                            currentPage += 1
+                        }
+                    }) {
+                        Text("Get started")
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color(hex: "#546a50"))
+                            .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
                 }
-            }) {
-                Text("Get started")
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
             }
-            .padding(.horizontal)
         }
     }
 }

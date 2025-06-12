@@ -14,12 +14,15 @@ struct FourthScreen: View {
     @Binding var selectedStudyTime: Int?
     @Environment(\.managedObjectContext) private var viewContext
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("How much time do you want to study per day?")
-                .font(.title2)
+                .font(.system(size: vm.caption_font_size))
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
+                .foregroundColor(Color(hex: "#546a50"))
+                .padding()
             
             VStack(spacing: 10) {
                 StudyTimeButton(timeInMinutes: 10, label: "Relaxed", emoji: "😊", selectedStudyTime: $selectedStudyTime, currentPage: $currentPage)
@@ -31,7 +34,7 @@ struct FourthScreen: View {
             
             Spacer()
         }
-        .onChange(of: selectedStudyTime) { _ in
+        .onChange(of: selectedStudyTime) {
             saveStudyTime()
         }
     }
@@ -69,6 +72,8 @@ private struct StudyTimeButton: View {
                 VStack(alignment: .leading) {
                     Text("\(timeInMinutes) minutes")
                         .font(.headline)
+                        .foregroundColor(.black)
+                    
                     Text(label)
                         .font(.subheadline)
                         .foregroundColor(.gray)
@@ -83,7 +88,7 @@ private struct StudyTimeButton: View {
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 1)
+                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
             )
         }
     }

@@ -29,15 +29,23 @@ struct OnboardingView: View {
     @State private var selectedAgeRange: String? = nil
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
+    @ObservedObject private var vm = OnboardingVM()
     
     var body: some View {
         if !UserDefaults.standard.bool(forKey: isOnboardingCompletedKey) {
             VStack {
                 HeaderView(currentPage: $currentPage)
-                SwitchView(currentPage: $currentPage, selectedLanguage: $selectedLanguage, selectedStudyTime: $selectedStudyTime, selectedAgeRange: $selectedAgeRange, languages: languages)
-                Spacer()
+                SwitchView(currentPage: $currentPage,
+                           selectedLanguage: $selectedLanguage,
+                           selectedStudyTime: $selectedStudyTime,
+                           selectedAgeRange: $selectedAgeRange,
+                           languages: languages,
+                           vm: vm
+                )
             }
-            .background(Color(.systemBackground).ignoresSafeArea())
+            .background(
+                Color(hex: "#ddead1")
+                .ignoresSafeArea())
             .onAppear {
                 InitialDataSetup.setupInitialData(context: viewContext)
                 print("Языки загружены: \(languages.count)")
@@ -59,60 +67,72 @@ struct SwitchView: View {
     @Binding var selectedAgeRange: String?
     let languages: FetchedResults<ShopLanguages>
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
-        if currentPage == 0 {
-            FirstScreen(currentPage: $currentPage)
-        } else if currentPage == 1 {
-            SecondScreen(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages)
-        } else if currentPage == 2 {
-            ThirdScreen(currentPage: $currentPage)
-        } else if currentPage == 3 {
-            FourthScreen(currentPage: $currentPage, selectedStudyTime: $selectedStudyTime)
-        } else if currentPage == 4 {
-            FifthScreen(currentPage: $currentPage, selectedAgeRange: $selectedAgeRange)
-        } else if currentPage == 5 {
-            SixthScreen(currentPage: $currentPage)
-        } else if currentPage == 6 {
-            SeventhScreen(currentPage: $currentPage)
-        }else if currentPage == 7 {
-            EighthScreen(currentPage: $currentPage)
-        }else if currentPage == 8 {
-            NineScreen(currentPage: $currentPage)
-        }else if currentPage == 9 {
-            TenScreen(currentPage: $currentPage)
+        VStack {
+            // current onboarding screen
+            VStack {
+                if currentPage == 0 {
+                    FirstScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 1 {
+                    SecondScreen(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages, vm: vm)
+                } else if currentPage == 2 {
+                    ThirdScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 3 {
+                    FourthScreen(currentPage: $currentPage, selectedStudyTime: $selectedStudyTime, vm: vm)
+                } else if currentPage == 4 {
+                    FifthScreen(currentPage: $currentPage, selectedAgeRange: $selectedAgeRange, vm: vm)
+                } else if currentPage == 5 {
+                    SixthScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 6 {
+                    SeventhScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 7 {
+                    EighthScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 8 {
+                    NineScreen(currentPage: $currentPage, vm: vm)
+                } else if currentPage == 9 {
+                    TenScreen(currentPage: $currentPage, vm: vm)
+                }
+            }
         }
     }
 }
-
-
-
 
 // Представление заголовка с прогресс-баром и кнопкой назад
 struct HeaderView: View {
     @Binding var currentPage: Int
     
     var body: some View {
-        HStack {
-            if currentPage > 0 {
-                Button(action: {
-                    withAnimation {
-                        currentPage -= 1
+        VStack {
+             if currentPage < 9 {
+                HStack {
+                    
+                    // Back Button
+                    if currentPage > 1 {
+                        VStack {
+                            Button {
+                                withAnimation {
+                                    currentPage -= 1
+                                }
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(Color(hex: "#546a50"))
+                                    .bold()
+                            }
+                        }
+                        .padding(.trailing)
                     }
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.blue)
-                        .padding()
+                    
+                    VStack {
+                        ProgressView(value: Float(currentPage + 1), total: 10)
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .frame(width: 300, height: 5)
+                    }
                 }
-            } else {
-                Spacer()
-                    .frame(width: 40)
+                .padding(.top)
             }
-            ProgressView(value: Float(currentPage + 1), total: 11)
-                .progressViewStyle(LinearProgressViewStyle())
-                .frame(height: 5)
-            Spacer()
         }
-        .padding()
     }
 }
 struct LinearProgressViewStyle: ProgressViewStyle {
@@ -120,11 +140,13 @@ struct LinearProgressViewStyle: ProgressViewStyle {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .frame(height: 5)
+                    .frame(height: 8)
                     .foregroundColor(Color.gray.opacity(0.3))
+                    .cornerRadius(5)
                 Rectangle()
-                    .frame(width: geometry.size.width * (configuration.fractionCompleted ?? 0), height: 5)
-                    .foregroundColor(.blue)
+                    .frame(width: geometry.size.width * (configuration.fractionCompleted ?? 0), height: 8)
+                    .foregroundColor(Color(hex: "#546a50"))
+                    .cornerRadius(5)
             }
         }
     }

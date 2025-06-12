@@ -12,12 +12,15 @@ import CoreData
 struct ThirdScreen: View {
     @Binding var currentPage: Int
     
+    @ObservedObject var vm: OnboardingVM
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Select your language level")
-                .font(.title2)
+                .font(.system(size: vm.caption_font_size))
                 .fontWeight(.bold)
-                .foregroundColor(.blue)
+                .foregroundColor(Color(hex: "#546a50"))
+                .padding(.top)
             
             VStack(spacing: 10) {
                 LevelButton(level: "Beginner", currentPage: $currentPage)
@@ -37,18 +40,39 @@ private struct LevelButton: View {
     @Binding var currentPage: Int
     
     var body: some View {
-        Button(action: {
+        Button {
             withAnimation {
                 currentPage += 1
             }
-        }) {
-            Text(level)
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.blue)
-                .cornerRadius(10)
+        } label: {
+            HStack {
+                ZStack {
+                    HStack {
+                        Image("language_level_\(level)")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                        
+                        Spacer()
+                    }
+                    
+                    
+                    HStack {
+                        Text(level)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.leading, 80)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color(hex: "#9caf88"))
+            .cornerRadius(10)
         }
     }
 }

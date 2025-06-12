@@ -21,7 +21,7 @@ struct AddNoteView: View {
                 
                 
                 VStack {
-                    TextEditor(text: $text)
+                   TextEditor(text: $text)
                         .padding()
                         .background(Color.white.opacity(0.3))
                         .overlay(

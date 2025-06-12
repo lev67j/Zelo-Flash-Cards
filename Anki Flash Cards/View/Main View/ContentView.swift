@@ -43,7 +43,7 @@ struct ContentView: View {
                             .background(Color(hex: "#E6A7FA")) // PINK HEX
                             .cornerRadius(8)
                         
-                        Text("Collections")
+                        Text("Zelo Cards")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.black)

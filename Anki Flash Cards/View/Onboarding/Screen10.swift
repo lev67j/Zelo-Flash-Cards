@@ -4,14 +4,6 @@
 //
 //  Created by Lev Vlasov on 2025-06-07.
 //
-// Loader on 3 sec
-// Text "Personalizing your app experience"
-// Switch on Content View
-// With a suggestion to select a collection of cards
-// according to the language selected by the user
-//
-// For switch on Content View need set true on:
-// UserDefaults.standard.bool(forKey: isOnboardingCompletedKey)
 
 
 import SwiftUI
@@ -22,6 +14,9 @@ struct TenScreen: View {
     @State private var progress: CGFloat = 0.0
     @State private var showChecks = Array(repeating: false, count: 3)
     
+    private let isOnboardingCompletedKey = "isOnboardingCompleted"
+    @AppStorage("isOnboardingCompletedKey") private var isOnboardingCompleted = false
+  
     var body: some View {
         ZStack {
             Color(hex: "#ddead1")
@@ -78,15 +73,19 @@ struct TenScreen: View {
                         }
                     }
                 }
-                
-                Spacer()
             }
             .padding()
         }
         .onAppear {
-            // Анимация прогресса и пунктов
-            withAnimation(.easeInOut(duration: 2.0)) {
-                progress = 0.71
+            // Запускаем таймер для плавного обновления прогресса
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { timer in
+                withAnimation(.linear(duration: 0.03)) {
+                    if progress < 1.0 {
+                        progress += 0.01 // Увеличиваем прогресс на 1% каждые 0.03 сек (100 шагов за 3 сек)
+                    } else {
+                        timer.invalidate() // Останавливаем таймер, когда достигаем 100%
+                    }
+                }
             }
             
             // Последовательное появление галочек
@@ -108,9 +107,10 @@ struct TenScreen: View {
             
             // Завершение онбординга через 3 секунды
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
+                withAnimation() {
+                    isOnboardingCompleted = true
+                }
             }
         }
     }
 }
-

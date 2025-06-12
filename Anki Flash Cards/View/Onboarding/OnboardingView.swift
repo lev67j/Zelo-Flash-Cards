@@ -29,10 +29,11 @@ struct OnboardingView: View {
     @State private var selectedAgeRange: String? = nil
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
+    @AppStorage("isOnboardingCompletedKey") private var isOnboardingCompleted = false
     @ObservedObject private var vm = OnboardingVM()
     
     var body: some View {
-        if !UserDefaults.standard.bool(forKey: isOnboardingCompletedKey) {
+        if !isOnboardingCompleted {
             VStack {
                 HeaderView(currentPage: $currentPage)
                 SwitchView(currentPage: $currentPage,

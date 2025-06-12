@@ -23,39 +23,52 @@ struct NotesView: View {
         NavigationStack {
             ZStack {
                 VStack(spacing: 0) {
+                    
                     // List of notes
-                    ScrollView {
-                        ForEach(notes) { note in
-                            Button(action: {
-                                selectedNote = note
-                                showingEditNote = true
-                            }) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(note.text ?? "")
-                                        .foregroundColor(.black)
-                                        .lineLimit(3)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    
-                                    Text(formattedDate(note.creationDate))
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
+                    if notes.isEmpty {
+                        
+                        // No Notes
+                        Image("no_notes_image")
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                            .padding(.bottom, 100)
+                            .shadow(radius: 40)
+                        
+                    } else {
+                        ScrollView {
+                            ForEach(notes) { note in
+                                Button(action: {
+                                    selectedNote = note
+                                    showingEditNote = true
+                                }) {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(note.text ?? "")
+                                            .foregroundColor(.black)
+                                            .lineLimit(3)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        
+                                        Text(formattedDate(note.creationDate))
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding()
+                                    .background(Color(hex: "#9FD8D8"))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.black, lineWidth: 2)
+                                    )
+                                    .cornerRadius(12)
+                                    .padding(.horizontal)
                                 }
-                                .padding()
-                                .background(Color(hex: "#9FD8D8"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.black, lineWidth: 2)
-                                )
-                                .cornerRadius(12)
-                                .padding(.horizontal)
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .sheet(item: $selectedNote) { note in
+                            EditNoteView(note: note)
+                                .environment(\.managedObjectContext, viewContext)
                         }
                     }
-                    .sheet(item: $selectedNote) { note in
-                        EditNoteView(note: note)
-                            .environment(\.managedObjectContext, viewContext)
-                     }
                 }
                 
                 // Add Note Button
@@ -102,7 +115,7 @@ struct NotesView_Previews: PreviewProvider {
         
         // Добавим пример данных для превью
         let exampleNote1 = Note(context: context)
-        exampleNote1.text = "Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки."
+        exampleNote1.text = "Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки.Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки.Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки."
         exampleNote1.creationDate = Date()
 
         let exampleNote2 = Note(context: context)

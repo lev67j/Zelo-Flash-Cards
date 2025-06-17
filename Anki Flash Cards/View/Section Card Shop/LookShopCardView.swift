@@ -26,7 +26,7 @@ struct LookShopCardView: View {
     
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack {
@@ -68,8 +68,7 @@ struct LookShopCardView: View {
                     .cornerRadius(12) // Закругленные углы для всего списка
                     .padding(.horizontal, 20)
                 }
-                .background(Color(hex: "#4A6C5A"))
-                .navigationTitle("\(collection.name ?? "Language") Cards")
+               .navigationTitle("\(collection.name ?? "Language") Cards")
             }
         }
     }

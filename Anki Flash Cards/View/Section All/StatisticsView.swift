@@ -26,7 +26,7 @@ struct StatisticsView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(hex: "#4A6C5A")
+                Color(hex: "#ddead1")
                 .ignoresSafeArea()
            
                 
@@ -100,7 +100,7 @@ struct StatisticsView: View {
                                 .padding()
                             
                             Picker("Number of cards", selection: $selectedCardCount) {
-                                ForEach(Array(stride(from: 10, through: 300, by: 10)), id: \.self) { number in
+                                ForEach(Array(stride(from: 5, through: 1000, by: 5)), id: \.self) { number in
                                     Text("\(number)").tag(number)
                                 }
                             }

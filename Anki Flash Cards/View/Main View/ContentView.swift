@@ -186,74 +186,73 @@ struct ContentView: View {
 struct CollectionCardView: View {
         let collection: CardCollection
         
-        var body: some View {
-            ZStack {
-                 VStack(alignment: .leading) {
-                    Text(collection.name ?? "Unnamed")
-                        .font(.title3)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 70)
-                     
-                    
-                    HStack {
-                        Image(systemName: "calendar")
-                            .foregroundColor(.gray)
-                        
-                        Text(formattedDate(collection.creationDate))
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 150)
-                .background(Color(hex: "#546a50").opacity(0.2))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
-                )
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .padding(.vertical, 4)
-                 
-                VStack {
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: EditCollectionView(collection: collection)) {
-                            Image(systemName: "ellipsis")
-                                .foregroundColor(.black)
-                                .bold()
-                                .padding(10)
-                        }
-                    }
-                    Spacer()
-                }
-                .padding(.top, 20)
-                .padding(.trailing, 25)
+    var body: some View {
+        ZStack {
+            VStack(alignment: .leading) {
+                Text(collection.name ?? "Unnamed")
+                    .font(.title3)
+                    .foregroundColor(.black)
+                    .padding(.bottom, 70)
                 
-                VStack {
+                
+                HStack {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.gray)
+                    
+                    Text(formattedDate(collection.creationDate))
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: 150)
+            .background(Color(hex: "#546a50").opacity(0.2))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
+            )
+            .cornerRadius(12)
+            .padding(.horizontal)
+            .padding(.vertical, 4)
+            
+            VStack {
+                HStack {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: StatisticsView(collection: collection)) {
-                            Image(systemName: "play.fill")
-                                .foregroundColor(Color(hex: "#ddead1"))
-                                .font(.system(size: 20, weight: .bold))
-                                .frame(width: 43, height: 43)
-                                .background(Color(hex: "#546a90").opacity(0.5))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
-                                )
-                                .cornerRadius(12)
-                        }
+                    NavigationLink(destination: EditCollectionView(collection: collection)) {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.black)
+                            .bold()
+                            .padding(10)
                     }
                 }
-                .padding(.bottom, 15)
-                .padding(.trailing, 25)
+                Spacer()
             }
+            .padding(.top, 20)
+            .padding(.trailing, 25)
             
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    NavigationLink(destination: StatisticsView(collection: collection)) {
+                        Image(systemName: "play.fill")
+                            .foregroundColor(Color(hex: "#ddead1"))
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 43, height: 43)
+                            .background(Color(hex: "#546a90").opacity(0.5))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
+                            )
+                            .cornerRadius(12)
+                    }
+                }
+            }
+            .padding(.bottom, 15)
+            .padding(.trailing, 25)
         }
+    }
         
         private func formattedDate(_ date: Date?) -> String {
             guard let date = date else { return "" }

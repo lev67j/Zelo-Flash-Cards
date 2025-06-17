@@ -8,5 +8,5 @@
 import SwiftUI
 
 final class ShopVM: ObservableObject {
-    @Published var isAddedLanguage = false
+    @Published var isAddedLanguage: Bool = false
 }

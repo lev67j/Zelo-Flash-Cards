@@ -22,7 +22,7 @@ struct EditNoteView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#4A6C5A")
+                Color(hex: "#ddead1")
                     .ignoresSafeArea()
                 
                 

@@ -23,21 +23,9 @@ struct CardShopView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                if vm.isAddedLanguage {
-                    ZStack {
-                        Color(hex: "#4A6C5A")
-                            .ignoresSafeArea()
-                        
-                        VStack {
-                            Text("You added Language!")
-                        }
-                    }
-                } else {
-                    Color(hex: "#4A6C5A")
-                        .ignoresSafeArea()
+                Color(hex: "#ddead1")
+                    .ignoresSafeArea()
                 
-                }
-              
                 ScrollView {
                     VStack(spacing: 8) {
                         ForEach(shopCollections) { collection in
@@ -51,6 +39,7 @@ struct CardShopView: View {
             }
         }
     }
+
     private func initializeShopCollections() {
         let languages = [
             "Spanish", "English", "French", "German", "Chinese",
@@ -113,35 +102,30 @@ struct ShopCollectionCardView: View {
     
     var body: some View {
         ZStack {
-            VStack(alignment: .leading, spacing: 8) {
+          
+            VStack(alignment: .leading) {
                 Text(collection.name ?? "Language")
                     .font(.title3)
                     .foregroundColor(.black)
+                    .padding(.bottom, 70)
                 
-                Text("words: \(collection.cards?.count ?? 0)")
-                    .font(.headline)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
-                    .background(priorityColor(for: "low"))
-                    .foregroundColor(.white)
-                    .clipShape(Capsule())
                 
                 HStack {
                     Image(systemName: "calendar")
                         .foregroundColor(.gray)
                     
-                    Text(formattedDate(collection.creationDate))
+                    Text("2025")
                         .font(.headline)
                         .foregroundColor(.gray)
                 }
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: 120)
-            .background(Color(hex: "#9FD8D8"))
+            .frame(height: 150)
+            .background(Color(hex: "#546a50").opacity(0.2))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.black, lineWidth: 2)
+                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
             )
             .cornerRadius(12)
             .padding(.horizontal)
@@ -152,28 +136,34 @@ struct ShopCollectionCardView: View {
                     NavigationLink(destination: LookShopCardView(collection: collection)) {
                         Image(systemName: "ellipsis")
                             .foregroundColor(.black)
+                            .bold()
                             .padding(10)
                     }
                 }
                 Spacer()
             }
-            .padding(.top, 10)
+            .padding(.top, 20)
             .padding(.trailing, 25)
             
             VStack {
                 Spacer()
                 HStack {
                     Spacer()
-                     Button(action: {
+                    
+                    Button {
                         addToUserCollections()
                         vm.isAddedLanguage = true
-                        }) {
+                    } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#ddead1"))
                             .font(.system(size: 20, weight: .bold))
-                            .frame(width: 40, height: 40)
-                            .background(Circle().fill(Color(hex: "#57DF6E")))
-                            .shadow(radius: 4)
+                            .frame(width: 43, height: 43)
+                            .background(Color(hex: "#546a90").opacity(0.5))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
+                            )
+                            .cornerRadius(12)
                     }
                 }
             }

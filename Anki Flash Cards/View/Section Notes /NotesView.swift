@@ -38,25 +38,32 @@ struct NotesView: View {
                     } else {
                         ScrollView {
                             ForEach(notes) { note in
-                                Button(action: {
+                                Button {
                                     selectedNote = note
                                     showingEditNote = true
-                                }) {
+                                } label: {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text(note.text ?? "")
                                             .foregroundColor(.black)
-                                            .lineLimit(3)
                                             .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.bottom, 60)
                                         
-                                        Text(formattedDate(note.creationDate))
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
+                                        HStack {
+                                            Image(systemName: "calendar")
+                                                .foregroundColor(.gray)
+                                            
+                                            Text(formattedDate(note.creationDate))
+                                                .font(.headline)
+                                                .foregroundColor(.gray)
+                                        }
                                     }
                                     .padding()
-                                    .background(Color(hex: "#9FD8D8"))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(height: 150)
+                                    .background(Color(hex: "#546a50").opacity(0.2))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.black, lineWidth: 2)
+                                            .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
                                     )
                                     .cornerRadius(12)
                                     .padding(.horizontal)

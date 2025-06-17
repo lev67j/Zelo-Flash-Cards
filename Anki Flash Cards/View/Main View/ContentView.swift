@@ -93,7 +93,7 @@ struct ContentView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.black)
                                     .padding(5)
-                                    .background(selectedTab == "Notes" ? Color(hex: "#9DF25E") : Color.gray.opacity(0.2))
+                                    .background(selectedTab == "Notes" ? Color(hex: "#ddead1") : Color.gray.opacity(0.2))
                                     .clipShape(Circle())
                             }
                             .padding(.horizontal, 15)
@@ -118,7 +118,7 @@ struct ContentView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.black)
                                     .padding(5)
-                                    .background(selectedTab == "Card Shop" ? Color(hex: "#9DF25E") : Color.gray.opacity(0.2))
+                                    .background(selectedTab == "Card Shop" ? Color(hex: "#ddead1") : Color.gray.opacity(0.2))
                                     .clipShape(Circle())
                             }
                             .padding(.horizontal, 15)

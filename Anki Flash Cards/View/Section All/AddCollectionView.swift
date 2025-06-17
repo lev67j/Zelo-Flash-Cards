@@ -16,7 +16,7 @@ struct AddCollectionView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {

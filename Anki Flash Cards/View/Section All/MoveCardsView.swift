@@ -26,7 +26,7 @@ struct MoveCardsView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
@@ -39,7 +39,7 @@ struct MoveCardsView: View {
                 
                 // Выбор целевой коллекции
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Select a collection")
+                    Text("Select a collection for transfer")
                         .font(.headline)
                         .foregroundColor(.black)
                         .padding(.horizontal)
@@ -54,7 +54,7 @@ struct MoveCardsView: View {
                                         .font(.subheadline)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(moveTarget == target ? Color.blue : Color.gray.opacity(0.2))
+                                        .background(moveTarget == target ? Color(hex: "#546a50") : Color.gray.opacity(0.2))
                                         .foregroundColor(moveTarget == target ? .white : .black)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 20)
@@ -79,8 +79,9 @@ struct MoveCardsView: View {
                     }) {
                         HStack {
                             Image(systemName: selectedCards.count == cards.count ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(.blue)
-                            Text(selectedCards.count == cards.count ? "Remove selection" : "Select all")
+                                .foregroundColor(Color(hex: "#E6A7FA")) // PINK HEX
+                            
+                            Text(selectedCards.count == cards.count ? "Remove selection" : "Select all cards")
                                 .font(.subheadline)
                                 .foregroundColor(.black)
                         }
@@ -95,18 +96,42 @@ struct MoveCardsView: View {
                     }
                     
                     Button(action: {
-                        isCopyMode.toggle()
+                        isCopyMode = false
                     }) {
                         HStack {
-                            Image(systemName: isCopyMode ? "doc.on.doc.fill" : "arrowshape.turn.up.right")
-                                .foregroundColor(.orange)
-                            Text(isCopyMode ? "Copy" : "Move")
+                            Image(systemName: "arrowshape.turn.up.right.fill")
+                                .foregroundColor(Color(hex: "#E6A7FA")) // PINK HEX
+                            
+                            Text("Move")
                                 .font(.subheadline)
-                                .foregroundColor(.black)
+                                .foregroundColor(isCopyMode ? .black : .white)
                         }
+                        .frame(width: 70, height: 20)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(Color.gray.opacity(0.2))
+                        .background(isCopyMode ? Color.gray.opacity(0.2) : Color(hex: "#546a50"))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.black, lineWidth: 2)
+                        )
+                        .cornerRadius(20)
+                    }
+                    
+                    Button(action: {
+                        isCopyMode = true
+                    }) {
+                        HStack {
+                            Image(systemName: "doc.on.doc.fill")
+                                .foregroundColor(Color(hex: "#E6A7FA")) // PINK HEX
+                            
+                            Text("Copy")
+                                .font(.subheadline)
+                                .foregroundColor(isCopyMode ? .white : .black)
+                        }
+                        .frame(width: 70, height: 20)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(isCopyMode ? Color(hex: "#546a50") : Color.gray.opacity(0.2))
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(Color.black, lineWidth: 2)
@@ -114,7 +139,6 @@ struct MoveCardsView: View {
                         .cornerRadius(20)
                     }
                 }
-                .padding(.horizontal)
                 
                 // Список карточек
                 ScrollView {
@@ -126,7 +150,7 @@ struct MoveCardsView: View {
                                     .foregroundColor(.black)
                                 Spacer()
                                 Image(systemName: selectedCards.contains(card) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color(hex: "#E6A7FA")) // PINK HEX
                                     .onTapGesture {
                                         toggleSelection(for: card)
                                     }

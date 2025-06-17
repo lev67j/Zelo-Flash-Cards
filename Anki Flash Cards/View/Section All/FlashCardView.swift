@@ -25,7 +25,7 @@ struct FlashCardView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
             .ignoresSafeArea()
    
         VStack {
@@ -60,12 +60,10 @@ struct FlashCardView: View {
                         )
                         .cornerRadius(12)
                     }
-                    .padding(.bottom)
                 } else {
                     Text("(No cards available in collection.)")
                         .font(.system(size: 20).bold())
-                        .foregroundColor(.red.opacity(0.8))
-                        .padding()
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()

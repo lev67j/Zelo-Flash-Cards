@@ -25,7 +25,7 @@ struct EditCollectionView: View {
 
     var body: some View {
           ZStack {
-            Color(hex: "#4A6C5A")
+              Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
@@ -145,14 +145,14 @@ struct EditCollectionView: View {
                                 .foregroundColor(.red)
                             Text("Delete Collection")
                                 .font(.headline)
-                                .foregroundColor(.red)
+                                .foregroundColor(.black)
                             Spacer()
                         }
                         .padding()
                         .background(Color.white.opacity(0.3))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.red, lineWidth: 2)
+                                .stroke(Color.black, lineWidth: 2)
                         )
                         .cornerRadius(12)
                     }

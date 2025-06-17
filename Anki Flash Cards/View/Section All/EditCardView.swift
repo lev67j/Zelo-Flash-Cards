@@ -26,7 +26,7 @@ struct EditCardView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
@@ -75,11 +75,10 @@ struct EditCardView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.2))
-                            .foregroundColor(.red)
+                            .foregroundColor(.black)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.red, lineWidth: 2)
+                                    .stroke(Color.black, lineWidth: 2)
                             )
                             .cornerRadius(12)
                     }

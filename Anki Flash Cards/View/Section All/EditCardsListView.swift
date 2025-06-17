@@ -31,7 +31,7 @@ struct EditCardsListView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#4A6C5A")
+            Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
             VStack {
@@ -40,7 +40,7 @@ struct EditCardsListView: View {
                     .background(Color.white.opacity(0.7))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 3)
+                            .stroke(Color.gray.opacity(0.5), lineWidth: 2)
                     )
                     .cornerRadius(12)
                     .padding(.horizontal)
@@ -92,7 +92,6 @@ struct EditCardsListView: View {
                     .cornerRadius(12) // Закругленные углы для всего списка
                     .padding(.horizontal, 20)
                 }
-                .background(Color(hex: "#4A6C5A"))
                 .navigationTitle("Edit Cards")
                 .sheet(isPresented: $showEditCardView, onDismiss: {
                     cardToEdit = nil

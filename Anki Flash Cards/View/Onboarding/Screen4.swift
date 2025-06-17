@@ -76,15 +76,15 @@ private struct StudyTimeButton: View {
                     
                     Text(label)
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.black)
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black)
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(selectedStudyTime == timeInMinutes ? Color.blue.opacity(0.1) : Color.white)
+            .background(selectedStudyTime == timeInMinutes ? Color.blue.opacity(0.1) :  Color(hex: "#9caf88"))
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)

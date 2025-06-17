@@ -94,11 +94,11 @@ private struct AgeButton: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black)
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(selectedAgeRange == ageRange ? Color.blue.opacity(0.1) : Color.white)
+            .background(selectedAgeRange == ageRange ? Color.blue.opacity(0.1) : Color(hex: "#9caf88"))
             .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)

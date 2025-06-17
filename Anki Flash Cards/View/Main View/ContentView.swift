@@ -31,7 +31,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#4A6C5A")
+                Color(hex: "#ddead1")
                 .ignoresSafeArea()
                 
                 VStack() {
@@ -43,7 +43,7 @@ struct ContentView: View {
                             .background(Color(hex: "#E6A7FA")) // PINK HEX
                             .cornerRadius(8)
                         
-                        Text("Zelo Cards")
+                        Text("Zelo Flash Cards")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.black)
@@ -188,18 +188,12 @@ struct CollectionCardView: View {
         
         var body: some View {
             ZStack {
-                VStack(alignment: .leading, spacing: 8) {
+                 VStack(alignment: .leading) {
                     Text(collection.name ?? "Unnamed")
                         .font(.title3)
                         .foregroundColor(.black)
-                    
-                    Text(collection.priority ?? "middle")
-                        .font(.headline)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 4)
-                        .background(priorityColor(for: collection.priority ?? "middle"))
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
+                        .padding(.bottom, 70)
+                     
                     
                     HStack {
                         Image(systemName: "calendar")
@@ -212,28 +206,29 @@ struct CollectionCardView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 120)
-                .background(Color(hex: "#9FD8D8"))
+                .frame(height: 150)
+                .background(Color(hex: "#546a50").opacity(0.2))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.black, lineWidth: 2)
+                        .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
                 )
                 .cornerRadius(12)
                 .padding(.horizontal)
                 .padding(.vertical, 4)
-                
+                 
                 VStack {
                     HStack {
                         Spacer()
                         NavigationLink(destination: EditCollectionView(collection: collection)) {
                             Image(systemName: "ellipsis")
                                 .foregroundColor(.black)
+                                .bold()
                                 .padding(10)
                         }
                     }
                     Spacer()
                 }
-                .padding(.top, 10)
+                .padding(.top, 20)
                 .padding(.trailing, 25)
                 
                 VStack {
@@ -245,7 +240,7 @@ struct CollectionCardView: View {
                                 .foregroundColor(.white)
                                 .font(.system(size: 20, weight: .bold))
                                 .frame(width: 40, height: 40)
-                                .background(Circle().fill(Color(hex: "#9DF25E"))) // GREEN HEX #57DF6E
+                                .background(Circle().fill(Color(hex: "#9DF25E")))
                                 .shadow(radius: 4)
                         }
                     }

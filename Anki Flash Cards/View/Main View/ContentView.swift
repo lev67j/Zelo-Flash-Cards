@@ -44,7 +44,7 @@ struct ContentView: View {
                             .cornerRadius(8)
                         
                         Text("Zelo Flash Cards")
-                            .font(.largeTitle)
+                            .font(.system(size: 23))
                             .fontWeight(.bold)
                             .foregroundColor(.black)
                         
@@ -68,7 +68,7 @@ struct ContentView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.black)
                                     .padding(5)
-                                    .background(selectedTab == "All" ? Color(hex: "#9DF25E") : Color.gray.opacity(0.2))
+                                    .background(selectedTab == "All" ? Color(hex: "#ddead1") : Color.gray.opacity(0.2))
                                     .clipShape(Circle())
                             }
                             .padding(.horizontal, 15)
@@ -237,11 +237,15 @@ struct CollectionCardView: View {
                         Spacer()
                         NavigationLink(destination: StatisticsView(collection: collection)) {
                             Image(systemName: "play.fill")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(hex: "#ddead1"))
                                 .font(.system(size: 20, weight: .bold))
-                                .frame(width: 40, height: 40)
-                                .background(Circle().fill(Color(hex: "#9DF25E")))
-                                .shadow(radius: 4)
+                                .frame(width: 43, height: 43)
+                                .background(Color(hex: "#546a90").opacity(0.5))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
+                                )
+                                .cornerRadius(12)
                         }
                     }
                 }
@@ -271,7 +275,6 @@ struct CollectionCardView: View {
             }
         }
     }
-
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

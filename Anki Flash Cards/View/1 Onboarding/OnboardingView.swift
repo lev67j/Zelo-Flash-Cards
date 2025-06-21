@@ -26,6 +26,8 @@ struct OnboardingView: View {
     
     @ObservedObject private var vm = OnboardingVM()
     
+    @StateObject private var stateProperties = StatePropertiesVM()
+    
     var body: some View {
         if !isOnboardingCompleted {
             VStack {
@@ -49,7 +51,9 @@ struct OnboardingView: View {
                 }
             }
         } else {
-            ContentView() // Переход на основное представление после онбординга
+            // Переход на основное представление после онбординга
+            TabBarElements()
+                .environmentObject(stateProperties)
         }
     }
 }

@@ -8,13 +8,6 @@
 import SwiftUI
 import CoreData
 
-
-
-// for last screen:
-//.onAppear {
-//    UserDefaults.standard.set(true, forKey: "isOnboardingCompleted")
-//}
-
 // Основное представление онбординга
 struct OnboardingView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -30,6 +23,7 @@ struct OnboardingView: View {
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
     @AppStorage("isOnboardingCompletedKey") private var isOnboardingCompleted = false
+    
     @ObservedObject private var vm = OnboardingVM()
     
     var body: some View {
@@ -46,12 +40,12 @@ struct OnboardingView: View {
             }
             .background(
                 Color(hex: "#ddead1")
-                .ignoresSafeArea())
+                    .ignoresSafeArea())
             .onAppear {
                 InitialDataSetup.setupInitialData(context: viewContext)
                 print("Языки загружены: \(languages.count)")
                 for language in languages {
-                    print("Язык: \(language.name_language ?? ""), Коллекции: \(language.language_collections?.count ?? 0)")
+                    print("Язык: \(language.name_language ?? ""), Коллекции: \(language.language_collections?.count ?? 0), Priority: \(language.priority ?? "")")
                 }
             }
         } else {
@@ -136,6 +130,7 @@ struct HeaderView: View {
         }
     }
 }
+
 struct LinearProgressViewStyle: ProgressViewStyle {
     func makeBody(configuration: Configuration) -> some View {
         GeometryReader { geometry in

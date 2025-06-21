@@ -9,6 +9,7 @@ import SwiftUI
 import CoreData
 
 struct CardShopView: View {
+    
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [
@@ -20,6 +21,17 @@ struct CardShopView: View {
     
     @ObservedObject private var vm = ShopVM()
     
+    // Computed property to sort collections by priority
+    private var sorted_shop_collections: [ShopCollection] {
+        shopCollections.sorted { (lhs, rhs) -> Bool in
+            let priorityOrder = ["high": 3, "middle": 2, "low": 1]
+            let lhsPriority = priorityOrder[lhs.priority?.lowercased() ?? "middle"] ?? 2
+            let rhsPriority = priorityOrder[rhs.priority?.lowercased() ?? "middle"] ?? 2
+            
+            return lhsPriority > rhsPriority
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -28,69 +40,12 @@ struct CardShopView: View {
                 
                 ScrollView {
                     VStack(spacing: 8) {
-                        ForEach(shopCollections) { collection in
+                        ForEach(sorted_shop_collections) { collection in
                             ShopCollectionCardView(collection: collection, vm: vm)
                         }
                     }
                 }
-                .onAppear {
-                    initializeShopCollections()
-                }
             }
-        }
-    }
-
-    private func initializeShopCollections() {
-        let languages = [
-            "Spanish", "English", "French", "German", "Chinese",
-            "Japanese", "Russian", "Italian", "Portuguese", "Arabic"
-        ]
-        
-        let fetchRequest: NSFetchRequest<ShopCollection> = ShopCollection.fetchRequest()
-        do {
-            let existingCollections = try viewContext.fetch(fetchRequest)
-            let existingNames = Set(existingCollections.map { $0.name ?? "" })
-            
-            for language in languages where !existingNames.contains(language) {
-                let newCollection = ShopCollection(context: viewContext)
-                newCollection.name = language
-                newCollection.priority = "middle"
-                newCollection.creationDate = Date()
-                
-                // Download card from JSON
-                loadCardsFromJSON(for: newCollection)
-                
-                print(newCollection.cards?.count ?? 0)
-            }
-            try viewContext.save()
-        } catch {
-            print("Ошибка при инициализации магазинных коллекций: \(error)")
-        }
-    }
-    private func loadCardsFromJSON(for collection: ShopCollection) {
-        guard let language = collection.name else { return }
-        
-        // Загрузка JSON-файла из бандла
-        guard let url = Bundle.main.url(forResource: language, withExtension: "json") else {
-            print("JSON-файл для \(language) не найден")
-            return
-        }
-        
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            let cardData = try decoder.decode([CardData].self, from: data)
-            
-            // Создание ShopCard для каждой записи
-            for cardEntry in cardData {
-                let card = ShopCard(context: viewContext)
-                card.frontText = cardEntry.front
-                card.backText = cardEntry.back
-                card.creationDate = Date()
-                card.collection = collection
-            }
-        } catch {
-            print("Ошибка при загрузке карточек для \(language): \(error)")
         }
     }
 }
@@ -133,7 +88,7 @@ struct ShopCollectionCardView: View {
             VStack {
                 HStack {
                     Spacer()
-                    NavigationLink(destination: LookShopCardView(collection: collection)) {
+                    NavigationLink(destination: List_Crads_in_Shop_Language(collection: collection)) {
                         Image(systemName: "ellipsis")
                             .foregroundColor(.black)
                             .bold()
@@ -151,24 +106,44 @@ struct ShopCollectionCardView: View {
                     Spacer()
                     
                     Button {
+                        // Анимация нажатия
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            vm.isButtonPressed = true
+                        }
+                        
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        generator.impactOccurred()
+                        
+                        // Действие кнопки
                         addToUserCollections()
                         vm.isAddedLanguage = true
+                        
+                        // Возврат к исходному состоянию
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation {
+                                vm.isButtonPressed = false
+                            }
+                        }
                     } label: {
                         Image(systemName: "plus")
                             .foregroundColor(Color(hex: "#ddead1"))
                             .font(.system(size: 20, weight: .bold))
                             .frame(width: 43, height: 43)
-                            .background(Color(hex: "#546a90").opacity(0.5))
+                            .background(vm.isButtonPressed ? Color(hex: "#546a90") : Color(hex: "#546a90").opacity(0.4))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
                             )
                             .cornerRadius(12)
+                            .scaleEffect(vm.isButtonPressed ? 0.4 : 1.0)
                     }
                 }
             }
             .padding(.bottom, 15)
             .padding(.trailing, 25)
+            
+            
         }
     }
     

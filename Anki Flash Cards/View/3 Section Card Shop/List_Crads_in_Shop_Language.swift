@@ -1,5 +1,5 @@
 //
-//  LookShopCardView.swift
+//  List_Crads_in_Shop_Language.swift
 //  Flash Card
 //
 //  Created by Lev Vlasov on 2025-05-08.
@@ -7,13 +7,14 @@
 
 import SwiftUI
 
-struct LookShopCardView: View {
+struct List_Crads_in_Shop_Language: View {
     @ObservedObject var collection: ShopCollection
     @State private var searchText: String = ""
-   
-    private var cards: [Card] {
-        let allCards = (collection.cards?.allObjects as? [Card]) ?? []
+    
+    private var cards: [ShopCard] {
+        let allCards = (collection.cards?.allObjects as? [ShopCard]) ?? []
         let sortedCards = allCards.sorted { $0.creationDate ?? Date.distantPast > $1.creationDate ?? Date.distantPast }
+        
         if searchText.isEmpty {
             return sortedCards
         } else {
@@ -41,38 +42,49 @@ struct LookShopCardView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 5)
                 
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(cards) { card in
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(card.frontText ?? "No front text")
-                                        .font(.headline)
-                                    Text(card.backText ?? "No back text")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
+                if cards.isEmpty {
+                    Text("No cards available")
+                        .foregroundColor(.gray)
+                        .padding()
+                    Spacer()
+                } else {
+                   ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(cards) { card in
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text(card.frontText ?? "No front text")
+                                            .font(.headline)
+                                        Text(card.backText ?? "No back text")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    Spacer()
                                 }
-                                Spacer()
-                            }
-                            .padding(.vertical, 4)
-                            .background(Color.white)
-                            
-                            if card != cards.last {
-                                Divider()
-                                    .background(Color.gray)
-                                    .padding(.horizontal)
+                                .padding()
+                                .background(Color.white)
+                                
+                                if card != cards.last {
+                                    Divider()
+                                        .background(Color.gray)
+                                        .padding(.horizontal)
+                                }
                             }
                         }
+                        .background(Color.white) // Фон для всего списка
+                        .cornerRadius(12) // Закругленные углы для всего списка
+                        .padding(.horizontal, 20)
                     }
-                    .background(Color.white) // Фон для всего списка
-                    .cornerRadius(12) // Закругленные углы для всего списка
-                    .padding(.horizontal, 20)
                 }
-               .navigationTitle("\(collection.name ?? "Language") Cards")
+            }
+            .navigationTitle("\(collection.name ?? "Language") Cards")
+            .onAppear {
+                print("Loaded \(cards.count) cards for \(collection.name ?? "unknown")")
             }
         }
     }
 }
+
 
 struct LookShopCardView_Previews: PreviewProvider {
     static var previews: some View {
@@ -94,7 +106,7 @@ struct LookShopCardView_Previews: PreviewProvider {
         }
         
         return NavigationStack {
-            LookShopCardView(collection: collection)
+            List_Crads_in_Shop_Language(collection: collection)
                 .environment(\.managedObjectContext, context)
         }
     }

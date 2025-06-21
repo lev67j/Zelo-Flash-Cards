@@ -9,4 +9,5 @@ import SwiftUI
 
 final class ShopVM: ObservableObject {
     @Published var isAddedLanguage: Bool = false
+    @Published var isButtonPressed = false
 }

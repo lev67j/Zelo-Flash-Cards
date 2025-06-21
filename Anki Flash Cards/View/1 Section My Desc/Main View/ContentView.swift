@@ -28,6 +28,9 @@ struct ContentView: View {
         }
     }
     
+    private let isFirstOpenKey = "isFirstOpen"
+    @AppStorage("isFirstOpenKey") private var isFirstOpen = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -35,8 +38,9 @@ struct ContentView: View {
                 .ignoresSafeArea()
                 
                 VStack() {
+                    
                     // Custom Header
-                    HStack {
+                     HStack {
                         Image(systemName: "square.stack")
                             .foregroundColor(.black)
                             .frame(width: 40, height: 40)
@@ -53,7 +57,7 @@ struct ContentView: View {
                     .padding(.horizontal)
                     .padding(.top, 10)
                     .padding(.bottom, 5)
-                    
+                   
                     // Tabs (All, Notes, Card Shop)
                     HStack(spacing: 10) {
                         Button {
@@ -135,7 +139,8 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 10)
-                   
+                     
+                     
                     // Main content section
                     if selectedTab == "All" {
                         ScrollView {
@@ -148,9 +153,9 @@ struct ContentView: View {
                     } else if selectedTab == "Card Shop" {
                         CardShopView()
                     }
+                     
                 }
-                
-                // Add collection button
+                 // Add collection button
                 VStack {
                     Spacer()
                     HStack {
@@ -179,12 +184,21 @@ struct ContentView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(true)
+            .onAppear {
+                if isFirstOpen == false {
+                    isFirstOpen = true
+                    
+                    // In first open app show shop language
+                    selectedTab = "Card Shop"
+                }
+            }
         }
     }
 }
     
 struct CollectionCardView: View {
-        let collection: CardCollection
+    let collection: CardCollection
+    @State private var isPlayButtonPressed = false
         
     var body: some View {
         ZStack {
@@ -240,12 +254,13 @@ struct CollectionCardView: View {
                             .foregroundColor(Color(hex: "#ddead1"))
                             .font(.system(size: 20, weight: .bold))
                             .frame(width: 43, height: 43)
-                            .background(Color(hex: "#546a90").opacity(0.5))
+                            .background(isPlayButtonPressed ? Color(hex: "#546a90") : Color(hex: "#546a90").opacity(0.4))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
-                            )
+                                   )
                             .cornerRadius(12)
+                            .scaleEffect(isPlayButtonPressed ? 0.4 : 1.0)
                     }
                 }
             }
@@ -274,6 +289,7 @@ struct CollectionCardView: View {
             }
         }
     }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

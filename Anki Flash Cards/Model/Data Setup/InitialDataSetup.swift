@@ -34,6 +34,30 @@ struct InitialDataSetup {
             language.creationDate = Date()
             language.priority = "middle"
             
+            if language.name_language == "Spanish" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else if language.name_language == "English" {
+                language.priority = "middle"
+            } else {
+                language.priority = "middle"
+            }
+            
             let collection = ShopCollection(context: context)
             collection.name = languageName
             collection.creationDate = Date()

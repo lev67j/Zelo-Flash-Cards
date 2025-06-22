@@ -98,9 +98,8 @@ struct MainSetCardView: View {
                                                             }
                                                         }
                                                         .sheet(isPresented: $show_edit_set) {
-                                                            VStack {
-                                                                Text("")
-                                                            }
+                                                            EditSetView(collection: collection)
+                                                                .presentationDetents ([.height(300)])
                                                         }
                                                     }
                                                     
@@ -192,6 +191,18 @@ struct MainSetCardView: View {
                                                                 Spacer()
                                                             }
                                                         }
+                                                    }
+                                                    .alert(isPresented: $delete_set_alert) {
+                                                        Alert(
+                                                            title: Text("Delete Collection"),
+                                                            message: Text("Are you sure you want to delete this collection and all its cards?"),
+                                                            primaryButton: .destructive(Text("Delete")) {
+                                                                deleteCollection()
+                                                                open_sheet_edit_collection = false
+                                                                dismiss()
+                                                            },
+                                                            secondaryButton: .cancel()
+                                                        )
                                                     }
                                                 }
                                                 .padding(.top)
@@ -404,6 +415,17 @@ struct MainSetCardView: View {
             }
         }
     }
+    private func deleteCollection() {
+        viewContext.delete(collection)
+        do {
+            try viewContext.save()
+            dismiss()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+    
     private func updateChartData() {
         chartData = CardGrade.allCases.map { grade in
             (

@@ -45,7 +45,7 @@ struct HomeView: View {
                     // Main content section
                     if sortedCollections.isEmpty {
                         empty_desk_user
-                    } else {
+                     } else {
                         VStack {
                              ScrollView {
                                 HStack {
@@ -91,7 +91,7 @@ struct HomeView: View {
     
     var empty_desk_user: some View {
         VStack {
-            
+            Spacer()
         }
     }
         

@@ -17,7 +17,7 @@ struct MainSetCardView: View {
     @State private var navigateToFlashCards = false
     @State private var delete_set_alert = false
     @State private var selectedCardCount = 10
- 
+    
     
     // Sheets
     @State private var showPicker = false
@@ -72,134 +72,134 @@ struct MainSetCardView: View {
                                         .foregroundStyle(Color(hex: "#546a50"))
                                 }
                                 .sheet(isPresented: $open_sheet_edit_collection) {
-                                    /*ZStack {
-                                        Color(hex: "#ddead1")
-                                            .ignoresSafeArea()
-                                        
-                                        // Action Buttons
-                                        VStack {
-                                            VStack(spacing: 35) {
-                                                
-                                                // Edit Set Button
-                                                VStack {
-                                                    Button {
-                                                        show_edit_set = true
-                                                    } label: {
-                                                        HStack {
-                                                            Image(systemName: "pencil")
-                                                                .bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            Text("Edit Set")
-                                                                .font(.system(size: 17)).bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                    .sheet(isPresented: show_edit_set) {
-                                                        VStack {
-                                                            Text("")
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Add Cards Button
-                                                VStack {
-                                                    Button {
-                                                        show_add_cards = true
-                                                    } label: {
-                                                        HStack {
-                                                            Image(systemName: "plus")
-                                                                .bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            Text("Add Cards")
-                                                                .font(.system(size: 17)).bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                    .sheet(isPresented: $show_add_cards) {
-                                                      //  AddCardView(collection: collection)
-                                                        VStack {
-                                                            Text("")
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Manage Cards Button
-                                                VStack {
-                                                    Button {
-                                                        show_list_cards = true
-                                                    } label: {
-                                                        HStack {
-                                                            Image(systemName: "rectangle.stack")
-                                                                .bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            Text("List Cards")
-                                                                .font(.system(size: 17)).bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                    .sheet(isPresented: $show_list_cards) {
-                                                       // EditCardsListView()
-                                                        VStack {
-                                                            Text("")
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Move Cards Button
-                                                VStack {
-                                                    Button {
-                                                        show_move_cards = true
-                                                    } label: {
-                                                        HStack {
-                                                            Image(systemName: "arrowshape.turn.up.right")
-                                                                .bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            Text("Move Cards")
-                                                                .font(.system(size: 17)).bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                    .sheet(isPresented: $show_add_cards) {
-                                                    //    MoveCardsView(sourceCollection: collection)
-                                                        VStack {
-                                                            Text("")
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Delete Button
-                                                VStack {
-                                                    Button {
-                                                        delete_set_alert = true
-                                                    } label: {
-                                                        HStack {
-                                                            Image(systemName: "trash")
-                                                                .bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            Text("Delete Set")
-                                                                .font(.system(size: 17)).bold()
-                                                                .foregroundColor(text_color_for_sheet_edit_set)
-                                                            
-                                                            Spacer()
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            .padding(.top)
-                                            .padding()
-                                            Spacer()
-                                          
-                                        }
-                                    }*/
                                     VStack {
+                                        ZStack {
+                                            Color(hex: "#ddead1")
+                                                .ignoresSafeArea()
+                                            
+                                            // Action Buttons
+                                            VStack {
+                                                VStack(spacing: 35) {
+                                                    
+                                                    // Edit Set Button
+                                                    VStack {
+                                                        Button {
+                                                            show_edit_set = true
+                                                        } label: {
+                                                            HStack {
+                                                                Image(systemName: "pencil")
+                                                                    .bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                Text("Edit Set")
+                                                                    .font(.system(size: 17)).bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                        .sheet(isPresented: $show_edit_set) {
+                                                            VStack {
+                                                                Text("")
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Add Cards Button
+                                                    VStack {
+                                                        Button {
+                                                            show_add_cards = true
+                                                        } label: {
+                                                            HStack {
+                                                                Image(systemName: "plus")
+                                                                    .bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                Text("Add Cards")
+                                                                    .font(.system(size: 17)).bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                        .sheet(isPresented: $show_add_cards) {
+                                                            //  AddCardView(collection: collection)
+                                                            VStack {
+                                                                Text("")
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Manage Cards Button
+                                                    VStack {
+                                                        Button {
+                                                            show_list_cards = true
+                                                        } label: {
+                                                            HStack {
+                                                                Image(systemName: "rectangle.stack")
+                                                                    .bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                Text("List Cards")
+                                                                    .font(.system(size: 17)).bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                        .sheet(isPresented: $show_list_cards) {
+                                                            // EditCardsListView()
+                                                            VStack {
+                                                                Text("")
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Move Cards Button
+                                                    VStack {
+                                                        Button {
+                                                            show_move_cards = true
+                                                        } label: {
+                                                            HStack {
+                                                                Image(systemName: "arrowshape.turn.up.right")
+                                                                    .bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                Text("Move Cards")
+                                                                    .font(.system(size: 17)).bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                        .sheet(isPresented: $show_move_cards) {
+                                                            //    MoveCardsView(sourceCollection: collection)
+                                                            VStack {
+                                                                Text("")
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    // Delete Button
+                                                    VStack {
+                                                        Button {
+                                                            delete_set_alert = true
+                                                        } label: {
+                                                            HStack {
+                                                                Image(systemName: "trash")
+                                                                    .bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                Text("Delete Set")
+                                                                    .font(.system(size: 17)).bold()
+                                                                    .foregroundColor(text_color_for_sheet_edit_set)
+                                                                
+                                                                Spacer()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                .padding(.top)
+                                                .padding()
+                                                Spacer()
+                                                
+                                            }
+                                        }
                                         
                                     }
                                     .presentationDetents ([.height(300)])
@@ -360,7 +360,7 @@ struct MainSetCardView: View {
                                                         Button {
                                                             selectedCards = cards
                                                             navigateToFlashCards = true
-                                                    
+                                                            
                                                             // for dismiss sheet
                                                             showPicker = false
                                                             open_sheet_flashcards = false

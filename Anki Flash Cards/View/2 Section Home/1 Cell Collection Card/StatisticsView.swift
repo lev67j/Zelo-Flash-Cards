@@ -31,7 +31,7 @@ struct StatisticsView: View {
            
                 
                 VStack(spacing: 20) {
-                   BarChartView(data: chartData)
+                    BarChartView(data: chartData, back: Color.white.opacity(0.3))
                     .frame(height: 250)
                     .padding(.horizontal)
                     
@@ -182,13 +182,14 @@ struct BarChartView: View {
     var maxValue: Int {
         data.map { $0.value }.max() ?? 1
     }
+    let back: Color
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 20) {
             ForEach(data, id: \.label) { item in
                 let height: CGFloat = {
                     if maxValue > 0 {
-                        return CGFloat(item.value) / CGFloat(maxValue) * 150
+                        return CGFloat(item.value) / CGFloat(maxValue) * 130
                     } else {
                         return 150
                     }
@@ -210,11 +211,7 @@ struct BarChartView: View {
             }
         }
         .padding()
-        .background(Color.white.opacity(0.3))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.black, lineWidth: 2)
-        )
+        .background(back)
         .cornerRadius(12)
     }
 }

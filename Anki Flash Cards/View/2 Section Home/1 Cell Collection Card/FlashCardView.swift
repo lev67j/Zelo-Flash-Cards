@@ -30,153 +30,192 @@ struct FlashCardView: View {
    
         VStack {
             if totalCards == 0 {
-                Spacer()
-                Text("No cards to review!")
-                    .font(.system(size: 30).bold())
-                    .foregroundColor(.black)
-                    .padding()
+                // No Cards To Review
                 
-                if !allCards.isEmpty {
-                    Button(action: {
-                        sessionCards = allCards
-                        currentCardIndex = 0
-                        cardsSeen = 0
-                        totalCards = sessionCards.count
-                        print("Repeat all cards button pressed, sessionCards count: \(sessionCards.count)")
-                    }) {
-                        HStack {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                                .foregroundColor(.green)
-                            Text("Repeat all cards")
-                                .font(.headline)
-                                .foregroundColor(.black)
+                // Header
+                VStack {
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(Color(hex: "#546a50"))
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.gray.opacity(0.2))
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+                    
+                }
+                
+                VStack {
+                    Spacer()
+                    Text("No cards to review!")
+                        .font(.system(size: 30).bold())
+                        .foregroundColor(.black)
+                        .padding()
+                    
+                    if !allCards.isEmpty {
+                        Button(action: {
+                            sessionCards = allCards
+                            currentCardIndex = 0
+                            cardsSeen = 0
+                            totalCards = sessionCards.count
+                            print("Repeat all cards button pressed, sessionCards count: \(sessionCards.count)")
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .foregroundColor(.green)
+                                Text("Repeat all cards")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.2))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.black, lineWidth: 2)
+                            )
+                            .cornerRadius(12)
+                        }
+                    } else {
+                        Text("(No cards available in collection.)")
+                            .font(.system(size: 20).bold())
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Spacer()
+                }
+            } else {
+                
+                // Header
+                VStack {
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(Color(hex: "#546a50"))
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            nextCard()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text("Skip")
+                                    .font(.system(size: 17)).bold()
+                                    .foregroundStyle(Color(hex: "#546a50"))
+                                
+                                Image(systemName: "arrow.right")
+                                    .font(.system(size: 20)).bold()
+                                    .foregroundStyle(Color(hex: "#546a50"))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+                }
+                
+                // Main Content
+                VStack(spacing: 20) {
+                VStack(spacing: 10) {
+                    Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                    
+                    
+                    ZStack {
+                        ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .frame(height: 14)
+                            .clipShape(Capsule())
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.top)
+                
+                if let card = sessionCards.isEmpty ? nil : sessionCards[currentCardIndex] {
+                    // Determine which text to show based on swapSides and showBackSide
+                    let frontText = collection.swapSides ? card.backText ?? "" : card.frontText ?? ""
+                    let backText = collection.swapSides ? card.frontText ?? "" : card.backText ?? ""
+                    
+                    Text(showBackSide ? backText : frontText)
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.black)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white.opacity(0.3))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.black, lineWidth: 2)
                         )
                         .cornerRadius(12)
-                    }
-                } else {
-                    Text("(No cards available in collection.)")
-                        .font(.system(size: 20).bold())
-                        .foregroundColor(.gray)
-                }
-                
-                Spacer()
-            } else {
-                VStack(spacing: 20) {
-                    VStack(spacing: 10) {
-                        Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                        
-                        
-                        ZStack {
-                            ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
-                                .progressViewStyle(LinearProgressViewStyle())
-                                .frame(height: 14)
-                                .clipShape(Capsule())
-                        }
                         .padding(.horizontal)
-                    }
-                    .padding(.top)
-                    
-                    if let card = sessionCards.isEmpty ? nil : sessionCards[currentCardIndex] {
-                        // Determine which text to show based on swapSides and showBackSide
-                        let frontText = collection.swapSides ? card.backText ?? "" : card.frontText ?? ""
-                        let backText = collection.swapSides ? card.frontText ?? "" : card.backText ?? ""
-                        
-                        Text(showBackSide ? backText : frontText)
-                            .font(.title)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.black)
-                            .padding()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.white.opacity(0.3))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.black, lineWidth: 2)
-                            )
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                            .padding(.vertical, 10)
-                            .onTapGesture {
-                                withAnimation {
-                                    showBackSide.toggle()
-                                }
+                        .padding(.vertical, 10)
+                        .onTapGesture {
+                            withAnimation {
+                                showBackSide.toggle()
                             }
-                        
-                        TextField("Enter your translation...", text: $userInput)
-                            .padding()
-                            .background(Color.white.opacity(0.4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.black, lineWidth: 2)
-                            )
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                        
-                        HStack(spacing: 8) {
-                            GradientButton(
-                                title: "Again",
-                                gradient: LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 1.0, green: 0.8, blue: 0.8), Color(red: 1.0, green: 0.7, blue: 0.7)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                action: { handleAgain(card) }
-                            )
-                            GradientButton(
-                                title: "Hard",
-                                gradient: LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 1.0, green: 0.9, blue: 0.7), Color(red: 1.0, green: 0.85, blue: 0.6)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                action: { handleHard(card) }
-                            )
-                            GradientButton(
-                                title: "Good",
-                                gradient: LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 0.8, green: 1.0, blue: 0.8), Color(red: 0.7, green: 0.95, blue: 0.7)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                action: { handleGood(card) }
-                            )
-                            GradientButton(
-                                title: "Easy",
-                                gradient: LinearGradient(
-                                    gradient: Gradient(colors: [Color(red: 0.8, green: 0.9, blue: 1.0), Color(red: 0.7, green: 0.85, blue: 1.0)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                action: { handleEasy(card) }
-                            )
                         }
+                    
+                    TextField("Enter your translation...", text: $userInput)
+                        .padding()
+                        .background(Color.white.opacity(0.4))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.black, lineWidth: 2)
+                        )
+                        .cornerRadius(12)
                         .padding(.horizontal)
-                        .padding(.bottom, 20)
+                    
+                    HStack(spacing: 8) {
+                        GradientButton(
+                            title: "Again",
+                            gradient: LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 1.0, green: 0.8, blue: 0.8), Color(red: 1.0, green: 0.7, blue: 0.7)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            action: { handleAgain(card) }
+                        )
+                        GradientButton(
+                            title: "Hard",
+                            gradient: LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 1.0, green: 0.9, blue: 0.7), Color(red: 1.0, green: 0.85, blue: 0.6)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            action: { handleHard(card) }
+                        )
+                        GradientButton(
+                            title: "Good",
+                            gradient: LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 0.8, green: 1.0, blue: 0.8), Color(red: 0.7, green: 0.95, blue: 0.7)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            action: { handleGood(card) }
+                        )
+                        GradientButton(
+                            title: "Easy",
+                            gradient: LinearGradient(
+                                gradient: Gradient(colors: [Color(red: 0.8, green: 0.9, blue: 1.0), Color(red: 0.7, green: 0.85, blue: 1.0)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            action: { handleEasy(card) }
+                        )
                     }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
             }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    nextCard()
-                }) {
-                    HStack(spacing: 4) {
-                        Text("Next")
-                            .font(.body)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 16).bold())
-                    }
-                    .foregroundColor(.blue)
-                }
             }
         }
         .onAppear {

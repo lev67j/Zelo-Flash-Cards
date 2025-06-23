@@ -158,7 +158,7 @@ struct StatisticsView: View {
                 updateChartData()
             }
             .navigationDestination(isPresented: $navigateToFlashCards) {
-                FlashCardView(collection: collection, optionalCards: selectedCards)
+                FlashCardViewTest(collection: collection, optionalCards: selectedCards)
                     .environment(\.managedObjectContext, viewContext)
             }
         }

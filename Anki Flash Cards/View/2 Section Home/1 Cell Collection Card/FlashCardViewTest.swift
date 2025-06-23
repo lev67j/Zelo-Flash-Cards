@@ -199,6 +199,19 @@ struct CardView: View {
     @State private var offset = CGSize.zero
     @State private var rotation: Double = 0
     
+    private var cardBackgroundColor: Color {
+        if offset.width > 0 {
+            // Свайп вправо - зеленый
+            return Color.green
+        } else if offset.width < 0 {
+            // Свайп влево - красный
+            return Color.red
+        } else {
+            // Нейтральное положение - белый
+            return Color.white
+        }
+    }
+    
     var body: some View {
         let swapSides = collection.swapSides
         let frontText = swapSides ? (card.backText ?? "") : (card.frontText ?? "")
@@ -206,64 +219,62 @@ struct CardView: View {
         
         let displayText = flipped ? backText : frontText
         
-        VStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 2)
-                    )
-                
-                Text(displayText)
-                    .font(.title)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.black)
-                    .padding()
-            }
-            .offset(offset)
-            .rotationEffect(.degrees(rotation))
-            .gesture(
-                isTop ? DragGesture()
-                    .onChanged { gesture in
-                        offset = gesture.translation
-                        rotation = Double(gesture.translation.width / 20)
-                    }
-                    .onEnded { gesture in
-                        let horizontal = gesture.translation.width
-                        let threshold: CGFloat = 100
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(cardBackgroundColor) // Используем вычисляемое свойство для цвета
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.black, lineWidth: 2)
+                )
+            
+            Text(displayText)
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.black)
+                .padding()
+        }
+        .offset(offset)
+        .rotationEffect(.degrees(rotation))
+        .gesture(
+            isTop ? DragGesture()
+                .onChanged { gesture in
+                    offset = gesture.translation
+                    rotation = Double(gesture.translation.width / 20)
+                }
+                .onEnded { gesture in
+                    let horizontal = gesture.translation.width
+                    let threshold: CGFloat = 100
+                    
+                    if abs(horizontal) > threshold {
+                        let direction: FlashCardViewTest.SwipeDirection = horizontal > 0 ? .right : .left
                         
-                        if abs(horizontal) > threshold {
-                            let direction: FlashCardViewTest.SwipeDirection = horizontal > 0 ? .right : .left
-                            
-                            withAnimation(.easeOut) {
-                                switch direction {
-                                case .left:
-                                    offset = CGSize(width: -500, height: 0)
-                                    rotation = -20
-                                case .right:
-                                    offset = CGSize(width: 500, height: 0)
-                                    rotation = 20
-                                }
-                            }
-                            
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                onSwiped(direction)
-                            }
-                        } else {
-                            withAnimation(.spring()) {
-                                offset = .zero
-                                rotation = 0
+                        withAnimation(.easeOut) {
+                            switch direction {
+                            case .left:
+                                offset = CGSize(width: -500, height: 0)
+                                rotation = -20
+                            case .right:
+                                offset = CGSize(width: 500, height: 0)
+                                rotation = 20
                             }
                         }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            onSwiped(direction)
+                        }
+                    } else {
+                        withAnimation(.spring()) {
+                            offset = .zero
+                            rotation = 0
+                        }
                     }
-                : nil
-            )
-            .onTapGesture {
-                if isTop {
-                    withAnimation {
-                        flipped.toggle()
-                    }
+                }
+            : nil
+        )
+        .onTapGesture {
+            if isTop {
+                withAnimation {
+                    flipped.toggle()
                 }
             }
         }

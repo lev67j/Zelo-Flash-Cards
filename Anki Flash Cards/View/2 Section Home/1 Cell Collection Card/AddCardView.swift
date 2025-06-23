@@ -52,34 +52,26 @@ struct AddCardView: View {
                     // Front Text Field
                     TextField("Front Text", text: $frontText)
                         .padding()
-                        .background(Color.white.opacity(0.3))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 3)
-                        )
+                        .background(Color.white.opacity(0.6))
                         .cornerRadius(12)
                         .padding(.horizontal)
                     
                     // Back Text Field
                     TextField("Back Text", text: $backText)
                         .padding()
-                        .background(Color.white.opacity(0.3))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 3)
-                        )
+                        .background(Color.white.opacity(0.6))
                         .cornerRadius(12)
                         .padding(.horizontal)
                 }
                 
                 // Control Buttons
                 HStack(spacing: 12) {
-                    Button(action: {
+                    Button {
                         showJSONInput.toggle()
-                    }) {
+                    } label: {
                         HStack {
                             Image(systemName: "doc.plaintext")
-                                .foregroundColor(.orange)
+                                .foregroundColor(Color(hex: "#546a50"))
                             Text(showJSONInput ? "Manual Input" : "Import JSON")
                                 .font(.subheadline)
                                 .foregroundColor(.black)
@@ -87,21 +79,17 @@ struct AddCardView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(Color.gray.opacity(0.2))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
                         .cornerRadius(20)
                     }
                     
                     // Add Card Button
-                    Button(action: {
+                    Button {
                         if showJSONInput && !jsonText.isEmpty {
                             addCardsFromJSON()
                         } else {
                             addCard()
                         }
-                    }) {
+                    } label: {
                         HStack {
                             Image(systemName: "plus")
                                 .foregroundColor(.black)
@@ -111,11 +99,7 @@ struct AddCardView: View {
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background((showJSONInput && jsonText.isEmpty) || (!showJSONInput && frontText.isEmpty && backText.isEmpty) ? Color.gray : Color(hex: "#E6A7FA")) // PINK HEX
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
+                        .background((showJSONInput && jsonText.isEmpty) || (!showJSONInput && frontText.isEmpty && backText.isEmpty) ? Color.gray.opacity(0.2) : Color(hex: "#546a50").opacity(0.5))
                         .cornerRadius(20)
                     }
                     .disabled((showJSONInput && jsonText.isEmpty) || (!showJSONInput && frontText.isEmpty && backText.isEmpty))

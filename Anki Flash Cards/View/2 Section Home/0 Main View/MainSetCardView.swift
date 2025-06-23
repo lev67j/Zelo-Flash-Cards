@@ -23,7 +23,7 @@ struct MainSetCardView: View {
     @State private var showPicker = false
     @State private var open_sheet_flashcards = false
     @State private var open_sheet_edit_collection = false
-    @State private var show_edit_set = false
+    @State private var navigate_to_edit_set = false
     @State private var show_add_cards = false
     @State private var show_move_cards = false
     @State private var show_list_cards = false
@@ -38,10 +38,10 @@ struct MainSetCardView: View {
     // Design Settings
     @State private var back_for_base_button = Color(hex: "#546a50").opacity(0.1)
     @State private var back_for_main_start_button = Color(hex: "#546a50").opacity(0.7)
-    @State private var text_color_for_base_button = Color.black.opacity(0.8)
+    @State private var text_color_for_base_button = Color(hex: "#546a50")
+    @State private var text_color_for_sheet_edit_set = Color(hex: "#546a50")
     @State private var shadow_for_start_buttons: CGFloat = 10
-    @State private var text_color_for_sheet_edit_set = Color.black.opacity(0.8)
-    
+   
     var body: some View {
         NavigationStack {
             ZStack {
@@ -84,7 +84,8 @@ struct MainSetCardView: View {
                                                     // Edit Set Button
                                                     VStack {
                                                         Button {
-                                                            show_edit_set = true
+                                                            navigate_to_edit_set = true
+                                                            open_sheet_edit_collection = false
                                                         } label: {
                                                             HStack {
                                                                 Image(systemName: "pencil")
@@ -95,58 +96,6 @@ struct MainSetCardView: View {
                                                                     .foregroundColor(text_color_for_sheet_edit_set)
                                                                 
                                                                 Spacer()
-                                                            }
-                                                        }
-                                                        .sheet(isPresented: $show_edit_set) {
-                                                            EditSetView(collection: collection)
-                                                                .presentationDetents ([.height(300)])
-                                                        }
-                                                    }
-                                                    
-                                                    // Add Cards Button
-                                                    VStack {
-                                                        Button {
-                                                            show_add_cards = true
-                                                        } label: {
-                                                            HStack {
-                                                                Image(systemName: "plus")
-                                                                    .bold()
-                                                                    .foregroundColor(text_color_for_sheet_edit_set)
-                                                                Text("Add Cards")
-                                                                    .font(.system(size: 17)).bold()
-                                                                    .foregroundColor(text_color_for_sheet_edit_set)
-                                                                
-                                                                Spacer()
-                                                            }
-                                                        }
-                                                        .sheet(isPresented: $show_add_cards) {
-                                                            //  AddCardView(collection: collection)
-                                                            VStack {
-                                                                Text("")
-                                                            }
-                                                        }
-                                                    }
-                                                    
-                                                    // Manage Cards Button
-                                                    VStack {
-                                                        Button {
-                                                            show_list_cards = true
-                                                        } label: {
-                                                            HStack {
-                                                                Image(systemName: "rectangle.stack")
-                                                                    .bold()
-                                                                    .foregroundColor(text_color_for_sheet_edit_set)
-                                                                Text("List Cards")
-                                                                    .font(.system(size: 17)).bold()
-                                                                    .foregroundColor(text_color_for_sheet_edit_set)
-                                                                
-                                                                Spacer()
-                                                            }
-                                                        }
-                                                        .sheet(isPresented: $show_list_cards) {
-                                                            // EditCardsListView()
-                                                            VStack {
-                                                                Text("")
                                                             }
                                                         }
                                                     }
@@ -213,15 +162,14 @@ struct MainSetCardView: View {
                                         }
                                         
                                     }
-                                    .presentationDetents ([.height(300)])
+                                    .presentationDetents ([.height(200)])
                                 }
                             }
                         }
                         .padding(.horizontal)
                         .padding(.bottom, 10)
                     }
-                    
-                    ScrollView {
+                     ScrollView {
                         VStack(spacing: 20) {
                             
                             // Statistic Bars
@@ -360,7 +308,7 @@ struct MainSetCardView: View {
                                                                     }
                                                                 }
                                                             }
-                                                            .presentationDetents([.medium])
+                                                            .presentationDetents([.height(300)])
                                                         }
                                                     }
                                                     
@@ -394,7 +342,7 @@ struct MainSetCardView: View {
                                                 Spacer()
                                             }
                                         }
-                                        .presentationDetents([.medium])
+                                        .presentationDetents([.height(300)])
                                     }
                                 }
                             }
@@ -412,6 +360,13 @@ struct MainSetCardView: View {
                 FlashCardView(collection: collection, optionalCards: selectedCards)
                     .navigationBarBackButtonHidden(true)
                     .environment(\.managedObjectContext, viewContext)
+            }
+            .navigationDestination(isPresented: $navigate_to_edit_set) {
+                EditSetView(collection: collection)
+                    .environment(\.managedObjectContext, viewContext)
+                    .navigationBarBackButtonHidden(true)
+                
+                
             }
         }
     }

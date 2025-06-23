@@ -101,30 +101,6 @@ struct AddCollectionView: View {
     }
 }
 
-// Custom Priority Button
-struct PriorityButton: View {
-    let title: String
-    let color: Color
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(isSelected ? color : Color.gray.opacity(0.2))
-                .foregroundColor(isSelected ? .white : .black)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.black, lineWidth: 2)
-                )
-                .cornerRadius(20)
-        }
-    }
-}
-
 struct AddCollectionView_Previews: PreviewProvider {
     static var previews: some View {
         AddCollectionView()

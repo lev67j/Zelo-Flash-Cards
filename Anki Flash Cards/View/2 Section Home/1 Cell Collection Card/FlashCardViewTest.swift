@@ -116,6 +116,8 @@ struct FlashCardViewTest: View {
                     
                     // Main Content
                     VStack(spacing: 20) {
+                        
+                        // Header
                         VStack(spacing: 10) {
                             Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
                                 .font(.headline)
@@ -153,6 +155,8 @@ struct FlashCardViewTest: View {
                             .frame(height: 400)
                             .padding(.horizontal)
                         }
+                        
+                        Spacer()
                     }
                 }
             }
@@ -176,15 +180,11 @@ struct FlashCardViewTest: View {
             handleHard(card)
         case .right:
             handleGood(card)
-        case .up:
-            handleEasy(card)
-        case .down:
-            handleAgain(card)
         }
     }
     
     enum SwipeDirection {
-        case left, right, up, down
+        case left, right
     }
 }
 
@@ -206,73 +206,64 @@ struct CardView: View {
         
         let displayText = flipped ? backText : frontText
         
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.black, lineWidth: 2)
-                )
-            
-            Text(displayText)
-                .font(.title)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.black)
-                .padding()
-        }
-        .offset(offset)
-        .rotationEffect(.degrees(rotation))
-        .gesture(
-            isTop ? DragGesture()
-                .onChanged { gesture in
-                    offset = gesture.translation
-                    rotation = Double(gesture.translation.width / 20)
-                }
-                .onEnded { gesture in
-                    let horizontal = gesture.translation.width
-                    let vertical = gesture.translation.height
-                    let threshold: CGFloat = 100
-                    
-                    if abs(horizontal) > threshold || abs(vertical) > threshold {
-                        let direction: FlashCardViewTest.SwipeDirection
+        VStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.black, lineWidth: 2)
+                    )
+                
+                Text(displayText)
+                    .font(.title)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.black)
+                    .padding()
+            }
+            .offset(offset)
+            .rotationEffect(.degrees(rotation))
+            .gesture(
+                isTop ? DragGesture()
+                    .onChanged { gesture in
+                        offset = gesture.translation
+                        rotation = Double(gesture.translation.width / 20)
+                    }
+                    .onEnded { gesture in
+                        let horizontal = gesture.translation.width
+                        let threshold: CGFloat = 100
                         
-                        if abs(horizontal) > abs(vertical) {
-                            direction = horizontal > 0 ? .right : .left
+                        if abs(horizontal) > threshold {
+                            let direction: FlashCardViewTest.SwipeDirection = horizontal > 0 ? .right : .left
+                            
+                            withAnimation(.easeOut) {
+                                switch direction {
+                                case .left:
+                                    offset = CGSize(width: -500, height: 0)
+                                    rotation = -20
+                                case .right:
+                                    offset = CGSize(width: 500, height: 0)
+                                    rotation = 20
+                                }
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onSwiped(direction)
+                            }
                         } else {
-                            direction = vertical > 0 ? .down : .up
-                        }
-                        
-                        withAnimation(.easeOut) {
-                            switch direction {
-                            case .left:
-                                offset = CGSize(width: -500, height: 0)
-                                rotation = -20
-                            case .right:
-                                offset = CGSize(width: 500, height: 0)
-                                rotation = 20
-                            case .up:
-                                offset = CGSize(width: 0, height: -500)
-                            case .down:
-                                offset = CGSize(width: 0, height: 500)
+                            withAnimation(.spring()) {
+                                offset = .zero
+                                rotation = 0
                             }
                         }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onSwiped(direction)
-                        }
-                    } else {
-                        withAnimation(.spring()) {
-                            offset = .zero
-                            rotation = 0
-                        }
                     }
-                }
-            : nil
-        )
-        .onTapGesture {
-            if isTop {
-                withAnimation {
-                    flipped.toggle()
+                : nil
+            )
+            .onTapGesture {
+                if isTop {
+                    withAnimation {
+                        flipped.toggle()
+                    }
                 }
             }
         }
@@ -302,12 +293,6 @@ extension FlashCardViewTest {
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
         let startOfTomorrow = calendar.startOfDay(for: tomorrow)
         return calendar.date(byAdding: .minute, value: 1, to: startOfTomorrow)!
-    }
-    
-    private func nextScheduleDateForEasy() -> Date {
-        let calendar = Calendar.current
-        let fourDaysLater = calendar.date(byAdding: .day, value: 4, to: Date())!
-        return calendar.startOfDay(for: fourDaysLater)
     }
   
     private func prepareSession() {
@@ -361,18 +346,6 @@ extension FlashCardViewTest {
         }
     }
     
-    private func handleAgain(_ card: Card) {
-        card.lastGrade = .again
-        card.isNew = false
-        saveCard(card)
-        let removed = sessionCards.remove(at: currentCardIndex)
-        sessionCards.append(removed)
-        if currentCardIndex >= sessionCards.count {
-            currentCardIndex = 0
-        }
-        totalCards = cardsSeen + sessionCards.count
-    }
-    
     private func handleHard(_ card: Card) {
         card.nextScheduleDate = nextScheduleDateForHard()
         card.lastGrade = .hard
@@ -391,21 +364,6 @@ extension FlashCardViewTest {
     private func handleGood(_ card: Card) {
         card.nextScheduleDate = nextScheduleDateForGood()
         card.lastGrade = .good
-        card.isNew = false
-        saveCard(card)
-        sessionCards.remove(at: currentCardIndex)
-        cardsSeen += 1
-        totalCards = cardsSeen + sessionCards.count
-        if !sessionCards.isEmpty {
-            if currentCardIndex >= sessionCards.count {
-                currentCardIndex = 0
-            }
-        }
-    }
-    
-    private func handleEasy(_ card: Card) {
-        card.nextScheduleDate = nextScheduleDateForEasy()
-        card.lastGrade = .easy
         card.isNew = false
         saveCard(card)
         sessionCards.remove(at: currentCardIndex)

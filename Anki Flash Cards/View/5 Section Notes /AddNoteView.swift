@@ -12,7 +12,10 @@ struct AddNoteView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var text: String = ""
+    @State private var name: String = ""
 
+    @State private var show_alert_add_name = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -21,15 +24,58 @@ struct AddNoteView: View {
                 
                 
                 VStack {
-                   TextEditor(text: $text)
-                        .padding()
-                        .background(Color.white.opacity(0.3))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .padding()
+                
+                    // Name
+                    VStack(alignment: .leading) {
+                       VStack {
+                            HStack {
+                                Text("Name")
+                                    .foregroundStyle(.black.opacity(0.41)).bold()
+                                    .font(.system(size: 15))
+                                    .padding(.leading, 8)
+                                  
+                                Spacer()
+                            }
+                            
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color(hex: "#546a50").opacity(0.09))
+                                    .frame(height: 50)
+                                    .cornerRadius(10)
+                                
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        TextField("Name note", text: $name)
+                                            .foregroundStyle(.black.opacity(0.41)).bold()
+                                            .padding(.leading)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
+                    }
                     
+                    
+                    // Text in note
+                    VStack {
+                        HStack {
+                            Text("Text note")
+                                .foregroundStyle(.black.opacity(0.41)).bold()
+                                .font(.system(size: 15))
+                                .padding(.leading, 8)
+                            
+                            Spacer()
+                        }
+                        
+                        TextEditor(text: $text)
+                            .cornerRadius(20)
+                            .foregroundColor(Color(hex: "#546a50"))
+                            .lineSpacing(5)
+                        
+                    }
+                        .padding()
+                        
                     Spacer()
                 }
                 .navigationTitle("")
@@ -40,15 +86,34 @@ struct AddNoteView: View {
                             dismiss()
                         }) {
                             Image(systemName: "xmark")
-                                .foregroundColor(.white)
+                                .foregroundColor(.orange)
                                 .bold()
                         }
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: saveNote) {
+                        Button {
+                            if name != "" && name != " " && name != "  " && name != "   " {
+                                show_alert_add_name = false
+                                
+                                // If name is added
+                                if !show_alert_add_name {
+                                    saveNote()
+                                }
+                                
+                            } else {
+                                show_alert_add_name = true
+                            }
+                        } label: {
                             Image(systemName: "checkmark")
-                                .foregroundColor(.green)
+                                .foregroundColor(Color(hex: "#546a50"))
                                 .bold()
+                        }
+                        .alert(isPresented: $show_alert_add_name) {
+                            Alert(
+                                title: Text("Please add name note"),
+                                message: Text(""),
+                                dismissButton: .cancel()
+                            )
                         }
                     }
                 }
@@ -60,6 +125,7 @@ struct AddNoteView: View {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
         let newNote = Note(context: viewContext)
+        newNote.name = name
         newNote.text = text
         newNote.creationDate = Date()
         newNote.id = UUID()

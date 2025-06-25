@@ -41,7 +41,7 @@ struct NotesView: View {
                                         showingEditNote = true
                                     } label: {
                                         VStack(alignment: .leading, spacing: 8) {
-                                            Text(note.text ?? "")
+                                            Text(note.name ?? "Name note")
                                                 .foregroundColor(.black)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .padding(.bottom, 60)
@@ -121,10 +121,12 @@ struct NotesView_Previews: PreviewProvider {
         
         // Добавим пример данных для превью
         let exampleNote1 = Note(context: context)
+        exampleNote1.name = "example note 1"
         exampleNote1.text = "Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки.Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки.Пример заметки номер один. Она может быть длинной, но обрежется на 3 строки."
         exampleNote1.creationDate = Date()
 
         let exampleNote2 = Note(context: context)
+        exampleNote2.name = "example note 2"
         exampleNote2.text = "Вторая заметка – покороче."
         exampleNote2.creationDate = Date().addingTimeInterval(-3600)
 

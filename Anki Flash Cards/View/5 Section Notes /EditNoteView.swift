@@ -12,11 +12,16 @@ struct EditNoteView: View {
     @Environment(\.dismiss) private var dismiss
 
     @ObservedObject var note: Note
+    
     @State private var text: String
+    @State private var name: String
+    
+    @State private var show_alert_add_name = false
 
     init(note: Note) {
         self.note = note
         _text = State(initialValue: note.text ?? "")
+        _name = State(initialValue: note.name ?? "")
     }
 
     var body: some View {
@@ -27,22 +32,74 @@ struct EditNoteView: View {
                 
                 
                 VStack {
-                    TextEditor(text: $text)
-                        .padding()
-                        .background(Color.white.opacity(0.3))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .padding()
+                
+                    // Name
+                    VStack(alignment: .leading) {
+                       VStack {
+                            HStack {
+                                Text("Name")
+                                    .foregroundStyle(.black.opacity(0.41)).bold()
+                                    .font(.system(size: 15))
+                                    .padding(.leading, 8)
+                                  
+                                Spacer()
+                            }
+                            
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color(hex: "#546a50").opacity(0.09))
+                                    .frame(height: 50)
+                                    .cornerRadius(10)
+                                
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        TextField("Name note", text: $name)
+                                            .foregroundStyle(.black.opacity(0.41)).bold()
+                                            .padding(.leading)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
+                    }
                     
+                    
+                    // Text in note
+                    VStack {
+                        HStack {
+                            Text("Text note")
+                                .foregroundStyle(.black.opacity(0.41)).bold()
+                                .font(.system(size: 15))
+                                .padding(.leading, 8)
+                            
+                            Spacer()
+                        }
+                        
+                        TextEditor(text: $text)
+                            .cornerRadius(20)
+                            .foregroundColor(Color(hex: "#546a50"))
+                            .lineSpacing(5)
+                        
+                    }
+                        .padding()
+                        
                     Spacer()
                     
-                    Button(role: .destructive, action: deleteNote) {
-                        Label("Delete Note", systemImage: "trash")
-                            .foregroundColor(.red)
+                    // Delete Note
+                    VStack {
+                        Button {
+                            deleteNote()
+                        } label: {
+                            HStack {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(.orange)
+                                
+                                Text("Delete note")
+                                    .foregroundStyle(.orange)
+                            }
+                        }
                     }
-                    .padding()
                 }
                 .navigationTitle("")
                 .navigationBarTitleDisplayMode(.inline)
@@ -52,15 +109,34 @@ struct EditNoteView: View {
                             dismiss()
                         }) {
                             Image(systemName: "xmark")
-                                .foregroundColor(.white)
+                                .foregroundColor(.orange)
                                 .bold()
                         }
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: saveChanges) {
+                        Button {
+                            if name != "" && name != " " && name != "  " && name != "   " {
+                                show_alert_add_name = false
+                                
+                                // If name is added
+                                if !show_alert_add_name {
+                                    saveChanges()
+                                }
+                                
+                            } else {
+                                show_alert_add_name = true
+                            }
+                        } label: {
                             Image(systemName: "checkmark")
-                                .foregroundColor(.green)
+                                .foregroundColor(Color(hex: "#546a50"))
                                 .bold()
+                        }
+                        .alert(isPresented: $show_alert_add_name) {
+                            Alert(
+                                title: Text("Please add name note"),
+                                message: Text(""),
+                                dismissButton: .cancel()
+                            )
                         }
                     }
                 }
@@ -72,6 +148,7 @@ struct EditNoteView: View {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
         note.text = text
+        note.name = name
         note.creationDate = Date() // обновляем дату на текущую
         do {
             try viewContext.save()
@@ -98,6 +175,7 @@ struct EditNoteView_Previews: PreviewProvider {
         
         // Пример заметки
         let note = Note(context: context)
+        note.name = "Name This test note"
         note.text = "Это текст заметки для редактирования."
         note.creationDate = Date()
         

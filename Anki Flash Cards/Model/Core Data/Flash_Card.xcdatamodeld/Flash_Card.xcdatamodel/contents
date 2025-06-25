@@ -19,6 +19,7 @@
     <entity name="Note" representedClassName="Note" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="text" optional="YES" attributeType="String"/>
     </entity>
     <entity name="ShopCard" representedClassName="ShopCard" syncable="YES" codeGenerationType="class">

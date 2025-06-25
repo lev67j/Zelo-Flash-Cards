@@ -1,15 +1,13 @@
 //
 //  FlashCardView.swift
-//  Flash Card
+//  Zelo Cards
 //
-//  Created by Lev Vlasov on 2025-04-07.
+//  Created by Lev Vlasov on 2025-06-23.
 //
-
 
 import SwiftUI
 import CoreData
 
-/*
 struct FlashCardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
@@ -18,12 +16,13 @@ struct FlashCardView: View {
     var optionalCards: [Card]?
     
     @State private var currentCardIndex: Int = 0
-    @State private var showBackSide: Bool = false
-    @State private var userInput: String = ""
     @State private var sessionCards: [Card] = []
     @State private var cardsSeen: Int = 0
     @State private var totalCards: Int = 0
     @State private var allCards: [Card] = []
+    
+    @State private var hard_cards: Int = 0
+    @State private var good_cards: Int = 0
     
     var body: some View {
         ZStack {
@@ -31,203 +30,134 @@ struct FlashCardView: View {
                 .ignoresSafeArea()
             
             VStack {
-                if totalCards == 0 {
-                    // No Cards To Review
-                    
-                    // Header
-                    VStack {
+                
+                // Header
+                VStack {
+                    // buttons + progress
+                    VStack(spacing: 10) {
+                        
                         HStack {
                             Button {
                                 dismiss()
                             } label: {
-                                Image(systemName: "arrow.left")
+                                Image(systemName: "xmark")
                                     .font(.system(size: 20)).bold()
                                     .foregroundStyle(Color(hex: "#546a50"))
                             }
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                        
-                    }
-                    
-                    VStack {
-                        Spacer()
-                        Text("No cards to review!")
-                            .font(.system(size: 30).bold())
-                            .foregroundColor(.black)
-                            .padding()
-                        
-                        if !allCards.isEmpty {
-                            Button(action: {
-                                sessionCards = allCards
-                                currentCardIndex = 0
-                                cardsSeen = 0
-                                totalCards = sessionCards.count
-                                print("Repeat all cards button pressed, sessionCards count: \(sessionCards.count)")
-                            }) {
-                                HStack {
-                                    Image(systemName: "arrow.triangle.2.circlepath")
-                                        .foregroundColor(.green)
-                                    Text("Repeat all cards")
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(Color.gray.opacity(0.2))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.black, lineWidth: 2)
-                                )
-                                .cornerRadius(12)
-                            }
-                        } else {
-                            Text("(No cards available in collection.)")
-                                .font(.system(size: 20).bold())
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                    }
-                } else {
-                    
-                    // Header
-                    VStack {
-                        HStack {
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20)).bold()
-                                    .foregroundStyle(Color(hex: "#546a50"))
-                            }
+                            .padding(.horizontal)
                             
                             Spacer()
                             
-                            Button {
-                                nextCard()
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Text("Skip")
-                                        .font(.system(size: 17)).bold()
-                                        .foregroundStyle(Color(hex: "#546a50"))
-                                    
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 20)).bold()
-                                        .foregroundStyle(Color(hex: "#546a50"))
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                    }
-                    
-                    // Main Content
-                    VStack(spacing: 20) {
-                        VStack(spacing: 10) {
                             Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
                                 .font(.headline)
                                 .foregroundColor(.black)
                             
+                            Spacer()
                             
-                            ZStack {
-                                ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
-                                    .progressViewStyle(LinearProgressViewStyle())
-                                    .frame(height: 14)
-                                    .clipShape(Capsule())
+                            Button {
+                                //dismiss()
+                            } label: {
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: 20)).bold()
+                                    .foregroundStyle(Color(hex: "#546a50"))
                             }
                             .padding(.horizontal)
                         }
-                        .padding(.top)
+                        .padding(.bottom, 10)
+                        .padding(.top, 5)
                         
-                        // If flashcards session finish
-                        if sessionCards.isEmpty {
+                        ZStack {
+                            ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
+                                .progressViewStyle(LinearProgressViewStyle())
+                                .frame(height: 5)
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    
+                    // 18 hard | 36 good
+                    VStack {
+                        if !sessionCards.isEmpty {
                             VStack {
-                                Spacer()
-                            }
-                            .onAppear {
-                                dismiss()
-                            }
-                        }
-                        
-                        if let card = sessionCards.isEmpty ? nil : sessionCards[currentCardIndex] {
-                            // Determine which text to show based on swapSides and showBackSide
-                            let frontText = collection.swapSides ? card.backText ?? "" : card.frontText ?? ""
-                            let backText = collection.swapSides ? card.frontText ?? "" : card.backText ?? ""
-                            
-                            Text(showBackSide ? backText : frontText)
-                                .font(.title)
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(.black)
-                                .padding()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(Color.white.opacity(0.3))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.black, lineWidth: 2)
-                                )
-                                .cornerRadius(12)
-                                .padding(.horizontal)
-                                .padding(.vertical, 10)
-                                .onTapGesture {
-                                    withAnimation {
-                                        showBackSide.toggle()
-                                    }
+                                HStack {
+                                    Text("\(hard_cards)")
+                                        .background(
+                                            Rectangle()
+                                                .fill(.orange.opacity(0.4))
+                                                .frame(width: 45, height: 30)
+                                                .overlay(
+                                                    Rectangle()
+                                                        .stroke(Color.orange, lineWidth: 2)
+                                                )
+                                        )
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(good_cards)")
+                                        .background(
+                                            Rectangle()
+                                                .fill(.green.opacity(0.4))
+                                                .frame(width: 45, height: 30)
+                                                .overlay(
+                                                    Rectangle()
+                                                        .stroke(Color.green, lineWidth: 2)
+                                                )
+                                            
+                                        )
                                 }
-                            
-                            TextField("Enter your translation...", text: $userInput)
-                                .padding()
-                                .background(Color.white.opacity(0.4))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.black, lineWidth: 2)
-                                )
-                                .cornerRadius(12)
-                                .padding(.horizontal)
-                            
-                            HStack(spacing: 8) {
-                                GradientButton(
-                                    title: "Again",
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [Color(red: 1.0, green: 0.8, blue: 0.8), Color(red: 1.0, green: 0.7, blue: 0.7)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    action: { handleAgain(card) }
-                                )
-                                GradientButton(
-                                    title: "Hard",
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [Color(red: 1.0, green: 0.9, blue: 0.7), Color(red: 1.0, green: 0.85, blue: 0.6)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    action: { handleHard(card) }
-                                )
-                                GradientButton(
-                                    title: "Good",
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [Color(red: 0.8, green: 1.0, blue: 0.8), Color(red: 0.7, green: 0.95, blue: 0.7)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    action: { handleGood(card) }
-                                )
-                                GradientButton(
-                                    title: "Easy",
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [Color(red: 0.8, green: 0.9, blue: 1.0), Color(red: 0.7, green: 0.85, blue: 1.0)]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    action: { handleEasy(card) }
-                                )
+                                .padding(.top, 25)
+                                .padding(.horizontal, 15)
                             }
-                            .padding(.horizontal)
-                            .padding(.bottom, 20)
+                            .padding(.bottom, 30)
                         }
                     }
+                }
+                
+                // Card stack
+                VStack {
+                    if !sessionCards.isEmpty {
+                        ZStack {
+                            ForEach(Array(sessionCards.enumerated().prefix(3)), id: \.element) { (index, card) in
+                                let isTop = index == currentCardIndex
+                                
+                                CardView(
+                                    card: card,
+                                    collection: collection,
+                                    isTop: isTop,
+                                    onSwiped: { direction in
+                                        handleSwipe(for: card, direction: direction)
+                                    }
+                                )
+                                .stacked(at: index - currentCardIndex, in: min(3, sessionCards.count - currentCardIndex))
+                                .zIndex(Double(sessionCards.count - index))
+                                .allowsHitTesting(isTop)
+                            }
+                        }
+                        .frame(height: 400)
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer()
+                }
+                
+                // Finish Screen
+                VStack {
+                    
+                    // Text "Nice Work..." and Image Win or Lose
+                    VStack {
+                        
+                    }
+                    
+                    // Circle "Your Progress" and number of cards know/still learning
+                    VStack {
+                        
+                    }
+                    
+                    // Buttons: "Back in Menu" and "Practice "
+                    VStack {
+                        
+                    }
+                    
                 }
             }
             .onAppear {
@@ -235,8 +165,280 @@ struct FlashCardView: View {
             }
         }
     }
+   private func handleSwipe(for card: Card, direction: SwipeDirection) {
+        switch direction {
+        case .left:
+            handleHard(card)
+        case .right:
+            handleGood(card)
+        }
+    }
+    
+    enum SwipeDirection {
+        case left, right
+    }
 }
 
+// MARK: - Draggable Card View
+struct CardView: View {
+    let card: Card
+    let collection: CardCollection
+    let isTop: Bool
+    let onSwiped: (FlashCardView.SwipeDirection) -> Void
+    
+    @State private var flipped = false
+    @State private var offset = CGSize.zero
+    @State private var rotation: Double = 0
+    
+    private var cardBackgroundColor: Color {
+        if offset.width > 0 {
+            // Свайп вправо - зеленый
+            return Color.green
+        } else if offset.width < 0 {
+            // Свайп влево - красный
+            return Color.orange
+        } else {
+            // Нейтральное положение - белый
+            return Color.white
+        }
+    }
+  
+    var body: some View {
+        let swapSides = collection.swapSides
+        let frontText = swapSides ? (card.backText ?? "") : (card.frontText ?? "")
+        let backText = swapSides ? (card.frontText ?? "") : (card.backText ?? "")
+        let displayText = flipped ? backText : frontText
+        
+        VStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.white) // Используем вычисляемое свойство для цвета
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(cardBackgroundColor, lineWidth: 2)
+                    )
+                    .frame(width: 350, height: 470)
+                
+                
+                if offset.width > 0 {
+                    // Свайп вправо - зеленый
+                    Text("Know")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(cardBackgroundColor)
+                        .padding()
+                } else if offset.width < 0 {
+                    // Свайп влево - красный
+                    Text("Still learning")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(cardBackgroundColor)
+                        .padding()
+                } else {
+                    // Нейтральное положение - белый
+                    Text(displayText)
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.black)
+                        .padding()
+                }
+            }
+            .offset(offset)
+            .rotationEffect(.degrees(rotation))
+            .gesture(
+                isTop ? DragGesture()
+                    .onChanged { gesture in
+                        offset = gesture.translation
+                        rotation = Double(gesture.translation.width / 20)
+                    }
+                    .onEnded { gesture in
+                        let horizontal = gesture.translation.width
+                        let threshold: CGFloat = 100
+                        
+                        if abs(horizontal) > threshold {
+                            let direction: FlashCardView.SwipeDirection = horizontal > 0 ? .right : .left
+                            
+                            withAnimation(.easeOut) {
+                                switch direction {
+                                case .left:
+                                    offset = CGSize(width: -500, height: 0)
+                                    rotation = -20
+                                case .right:
+                                    offset = CGSize(width: 500, height: 0)
+                                    rotation = 20
+                                }
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onSwiped(direction)
+                            }
+                        } else {
+                            withAnimation(.spring()) {
+                                offset = .zero
+                                rotation = 0
+                            }
+                        }
+                    }
+                : nil
+            )
+            .onTapGesture {
+                if isTop {
+                 //   withAnimation {
+                        flipped.toggle()
+                  //  }
+                }
+            }
+        }
+        .padding(.top, 100)
+    }
+}
+
+// MARK: - Stack Modifier
+extension View {
+    func stacked(at position: Int, in total: Int) -> some View {
+        let offset = CGFloat(position) * 8
+        let scale = max(1.0 - CGFloat(position) * 0.05, 0.8)
+        return self
+            .offset(y: offset)
+            .scaleEffect(scale)
+    }
+}
+
+// MARK: - Spaced Repetition Logic
+extension FlashCardView {
+    private func nextScheduleDateForHard() -> Date {
+        let calendar = Calendar.current
+        return calendar.date(byAdding: .minute, value: 30, to: Date())!
+    }
+    
+    private func nextScheduleDateForGood() -> Date {
+        let calendar = Calendar.current
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
+        let startOfTomorrow = calendar.startOfDay(for: tomorrow)
+        return calendar.date(byAdding: .minute, value: 1, to: startOfTomorrow)!
+    }
+  
+    private func prepareSession() {
+        allCards = (collection.cards?.allObjects as? [Card]) ?? []
+        
+        let gradePriority: [CardGrade: Int] = [.new: 0, .again: 1, .hard: 2, .good: 3, .easy: 4]
+        
+        sessionCards = optionalCards ?? []
+        if sessionCards.isEmpty && optionalCards == nil {
+            let today = Calendar.current.startOfDay(for: Date())
+            let dueCards = allCards.filter { card in
+                if card.isNew && card.lastGrade == .new {
+                    return true
+                }
+                switch card.lastGrade {
+                case .again:
+                    return true
+                case .hard:
+                    return card.nextScheduleDate.map { $0 <= Date() } ?? false
+                case .good, .easy:
+                    return card.nextScheduleDate.map { Calendar.current.startOfDay(for: $0) <= today } ?? false
+                default:
+                    return false
+                }
+            }
+            
+            sessionCards = dueCards.sorted { card1, card2 in
+                let priority1 = gradePriority[card1.lastGrade] ?? 5
+                let priority2 = gradePriority[card2.lastGrade] ?? 5
+                return priority1 < priority2
+            }
+        } else {
+            sessionCards.sort { card1, card2 in
+                let priority1 = gradePriority[card1.lastGrade] ?? 5
+                let priority2 = gradePriority[card2.lastGrade] ?? 5
+                return priority1 < priority2
+            }
+        }
+        
+        cardsSeen = 0
+        totalCards = sessionCards.count
+        currentCardIndex = 0
+    }
+    
+    private func nextCard() {
+        guard !sessionCards.isEmpty else { return }
+        if currentCardIndex < sessionCards.count - 1 {
+            currentCardIndex += 1
+        } else {
+            currentCardIndex = 0
+        }
+    }
+    
+    private func handleHard(_ card: Card) {
+        
+        hard_cards += 1
+        
+        card.nextScheduleDate = nextScheduleDateForHard()
+        card.lastGrade = .hard
+        card.isNew = false
+        saveCard(card)
+        sessionCards.remove(at: currentCardIndex)
+        cardsSeen += 1
+        totalCards = cardsSeen + sessionCards.count
+        if !sessionCards.isEmpty {
+            if currentCardIndex >= sessionCards.count {
+                currentCardIndex = 0
+            }
+        }
+    }
+    
+    private func handleGood(_ card: Card) {
+        
+        good_cards += 1
+        
+        card.nextScheduleDate = nextScheduleDateForGood()
+        card.lastGrade = .good
+        card.isNew = false
+        saveCard(card)
+        sessionCards.remove(at: currentCardIndex)
+        cardsSeen += 1
+        totalCards = cardsSeen + sessionCards.count
+        if !sessionCards.isEmpty {
+            if currentCardIndex >= sessionCards.count {
+                currentCardIndex = 0
+            }
+        }
+    }
+    
+    private func saveCard(_ card: Card) {
+        do {
+            try viewContext.save()
+        } catch {
+            print("Error saving card: \(error)")
+        }
+    }
+}
+
+// MARK: - Preview
+struct FlashCardViewTest_Previews: PreviewProvider {
+    static var previews: some View {
+        let context = PersistenceController.preview.container.viewContext
+        let collection = CardCollection(context: context)
+        collection.name = "Test Collection"
+        
+        for i in 1...3 {
+            let card = Card(context: context)
+            card.frontText = "Front \(i)"
+            card.backText = "Back \(i)"
+            card.creationDate = Calendar.current.startOfDay(for: Date())
+            card.isNew = true
+            collection.addToCards(card)
+        }
+        try? context.save()
+        
+        return FlashCardView(collection: collection, optionalCards: (collection.cards?.allObjects as? [Card]))
+            .environment(\.managedObjectContext, context)
+    }
+}
+
+
+// Saved Last Logic
+/*
 // MARK: - Логика работы повторения (Spaced Repetition)
 extension FlashCardView {
     private func nextScheduleDateForHard() -> Date {
@@ -388,51 +590,6 @@ extension FlashCardView {
         } catch {
             print("Error saving card: \(error)")
         }
-    }
-}
-
-struct GradientButton: View {
-    let title: String
-    let gradient: LinearGradient
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.black)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity)
-                .background(gradient)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.black, lineWidth: 2)
-                )
-                .cornerRadius(12)
-        }
-    }
-}
-
-struct FlashCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        let context = PersistenceController.preview.container.viewContext
-        let collection = CardCollection(context: context)
-        collection.name = "Test Collection"
-        
-        // Добавляем тестовые карточки
-        for i in 1...300 {
-            let card = Card(context: context)
-            card.frontText = "Front \(i)"
-            card.backText = "Back \(i)"
-            card.creationDate = Calendar.current.startOfDay(for: Date())
-            card.isNew = true
-            collection.addToCards(card)
-        }
-        try? context.save()
-        
-        return FlashCardView(collection: collection, optionalCards: (collection.cards?.allObjects as? [Card]))
-            .environment(\.managedObjectContext, context)
     }
 }
 */

@@ -22,8 +22,8 @@ struct TabBarElements: View {
                         NotesView()
                     case .day_quest:
                         DayQuestView()
-                    case .settings:
-                        SettingsView()
+                    case .profile:
+                        ProfileView()
                     }
                 }
                 
@@ -49,14 +49,18 @@ struct CustomTabBar: View {
     @Binding var selectedTab: TabName
     
     var body: some View {
-        VStack {
+        VStack(spacing: 15) {
+            Rectangle()
+                .fill(Color(hex: "#546a50").opacity(0.05))
+                .frame(height: 2)
+                .frame(width: 400)
+            
             HStack(spacing: 45) {
                 TabButton(icon: "house", tab: .home, name: "Home", selectedTab: $selectedTab)
                 TabButton(icon: "note.text", tab: .notes, name: "Notes", selectedTab: $selectedTab)
                 TabButton(icon: "tray.full.fill", tab: .day_quest, name: "Day Quest", selectedTab: $selectedTab)
-                TabButton(icon: "gearshape.fill", tab: .settings, name: "Settings", selectedTab: $selectedTab)
+                TabButton(icon: "person.fill", tab: .profile, name: "Profile", selectedTab: $selectedTab)
             }
-            .padding(.top, 10)
         }
     }
 }
@@ -89,5 +93,5 @@ struct TabButton: View {
 }
 
 enum TabName {
-    case home, day_quest, notes, settings
+    case home, day_quest, notes, profile
 }

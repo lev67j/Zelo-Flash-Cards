@@ -10,8 +10,13 @@ import SwiftUI
 struct ProfileView: View {
     
     var body: some View {
-        VStack {
+        ZStack {
+            Color(hex: "#ddead1")
+                .ignoresSafeArea()
             
+            VStack {
+                Text("Profile in development!")
+            }
         }
     }
 }

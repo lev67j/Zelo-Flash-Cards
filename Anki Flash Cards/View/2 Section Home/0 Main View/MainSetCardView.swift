@@ -381,7 +381,7 @@ struct MainSetCardView: View {
                 updateChartData()
             }
             .navigationDestination(isPresented: $navigateToFlashCards) {
-                FlashCardViewTest(collection: collection, optionalCards: selectedCards)
+                FlashCardView(collection: collection, optionalCards: selectedCards)
                     .navigationBarBackButtonHidden(true)
                     .environment(\.managedObjectContext, viewContext)
             }

@@ -33,7 +33,6 @@ struct NotesView: View {
                             
                             // No Notes
                          
-                            
                         } else {
                             ScrollView {
                                 ForEach(notes) { note in
@@ -93,7 +92,7 @@ struct NotesView: View {
                                     .cornerRadius(20)
                                     .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 4)
                             }
-                            .padding(.bottom, 70)
+                            .padding(.bottom, 85)
                             .padding(.trailing, 20)
                         }
                     }

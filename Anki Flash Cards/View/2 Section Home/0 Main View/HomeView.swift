@@ -40,8 +40,8 @@ struct HomeView: View {
                 VStack() {
                     
                     // Search Language
-                    search_language_button_and_profile
-                    
+                    search_language_button_and_settings
+                       
                     // Main content section
                     if sortedCollections.isEmpty {
                         empty_desk_user
@@ -95,7 +95,7 @@ struct HomeView: View {
         }
     }
         
-    var search_language_button_and_profile: some View {
+    var search_language_button_and_settings: some View {
         HStack {
             // Search
             VStack {
@@ -127,10 +127,10 @@ struct HomeView: View {
                 }
             }
             
-            // Profile Button
+            // Settings Button
             VStack {
-                 NavigationLink {
-                     ProfileView()
+                NavigationLink {
+                    SettingsView()
                 } label: {
                     VStack {
                         ZStack {
@@ -138,9 +138,9 @@ struct HomeView: View {
                                 .fill(.gray.opacity(0.2))
                                 .frame(height: 50)
                             
-                            Image(systemName: "person.fill")
+                            Image(systemName: "gearshape.fill")
                                 .foregroundStyle(Color(hex: "#546a50").opacity(0.7))
-                                .font(.system(size: 25))
+                                .font(.system(size: 20))
                         }
                     }
                 }
@@ -167,7 +167,7 @@ struct HomeView: View {
                             .cornerRadius(20)
                             .shadow(color: .black.opacity(0.2), radius: 5)
                     }
-                    .padding(.bottom, 70)
+                    .padding(.bottom, 85)
                     .padding(.trailing, 20)
                 }
             }

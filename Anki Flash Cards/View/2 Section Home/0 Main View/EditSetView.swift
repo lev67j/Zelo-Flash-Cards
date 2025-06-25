@@ -121,7 +121,7 @@ struct EditSetView: View {
                                                 Rectangle()
                                                     .foregroundStyle(Color(hex: "#546a50").opacity(0.3))
                                                     .frame(width: 1.5, height: 20)
-                                                   
+                                                
                                                 HStack(spacing: 10) {
                                                     PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == "low") {
                                                         selectedPriority = "low"
@@ -141,6 +141,23 @@ struct EditSetView: View {
                                         
                                         Spacer()
                                     }
+                                }
+                                
+                                // Search Cards
+                                VStack {
+                                    HStack {
+                                        Image(systemName: "magnifyingglass")
+                                            .foregroundStyle(Color(hex: "#546a50").opacity(0.6))
+                                            .bold()
+                                            .padding(.leading)
+                                        
+                                        TextField("Search cards", text: $searchText)
+                                            .foregroundStyle(Color(hex: "#546a50"))
+                                            .padding([.top, .bottom, .trailing], 10)
+                                    }
+                                    .background(Color(hex: "#546a50").opacity(0.2))
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 5)
                                 }
                             }
                             
@@ -249,8 +266,7 @@ struct CardCell: View {
                             .foregroundStyle(Color(hex: "#546a50"))
                             .font(.system(size: 17))
                             .padding(.horizontal)
-                  //          .focused($front_text_focused)
-                        
+        
                         Rectangle()
                             .foregroundStyle(Color(hex: "#546a50"))
                             .frame(height: 1.3)

@@ -97,8 +97,8 @@ struct EditCardsListView: View {
                     cardToEdit = nil
                 }) {
                     if let cardToEdit = cardToEdit {
-                        EditCardView(card: cardToEdit)
-                            .environment(\.managedObjectContext, viewContext)
+                //        EditCardView(card: cardToEdit)
+                 //           .environment(\.managedObjectContext, viewContext)
                     } else {
                         Text("Try Again Right Now. Please :)")
                             .foregroundColor(.green)

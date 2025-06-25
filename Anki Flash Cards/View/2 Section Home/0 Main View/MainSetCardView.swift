@@ -171,6 +171,8 @@ struct MainSetCardView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 10)
                     }
+                    
+                    
                      ScrollView {
                         VStack(spacing: 20) {
                             
@@ -434,5 +436,50 @@ struct MainSetCardView_Previews: PreviewProvider {
         
         return MainSetCardView(collection: collection)
             .environment(\.managedObjectContext, context)
+    }
+}
+
+
+
+
+
+// Columns for level card
+struct BarChartView: View {
+    let data: [(label: String, value: Int, color: Color)]
+    
+    var maxValue: Int {
+        data.map { $0.value }.max() ?? 1
+    }
+    let back: Color
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 20) {
+            ForEach(data, id: \.label) { item in
+                let height: CGFloat = {
+                    if maxValue > 0 {
+                        return CGFloat(item.value) / CGFloat(maxValue) * 130
+                    } else {
+                        return 150
+                    }
+                }()
+
+                VStack {
+                    Text("\(item.value)")
+                        .font(.caption)
+                        .foregroundColor(.black)
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(item.color.opacity(0.7))
+                        .frame(width: 50, height: height)
+
+                    Text(item.label)
+                        .font(.caption)
+                        .foregroundColor(.black)
+                }
+            }
+        }
+        .padding()
+        .background(back)
+        .cornerRadius(12)
     }
 }

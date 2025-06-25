@@ -22,6 +22,9 @@ struct FlashCardViewTest: View {
     @State private var allCards: [Card] = []
     @State private var showNoCardsView = false
     
+    @State private var hard_cards: Int = 0
+    @State private var good_cards: Int = 0
+    
     var body: some View {
         ZStack {
             Color(hex: "#ddead1")
@@ -29,7 +32,8 @@ struct FlashCardViewTest: View {
             
             VStack {
                 if showNoCardsView {
-                    // No Cards To Review
+                    
+                    // Finish Session
                     VStack {
                         HStack {
                             Button {
@@ -82,57 +86,80 @@ struct FlashCardViewTest: View {
                         
                         Spacer()
                     }
-                } else {
-                    // Header
-                    VStack {
-                        HStack {
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20)).bold()
-                                    .foregroundStyle(Color(hex: "#546a50"))
-                            }
-                            
-                            Spacer()
-                            
-                            Button {
-                                nextCard()
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Text("Skip")
-                                        .font(.system(size: 17)).bold()
-                                        .foregroundStyle(Color(hex: "#546a50"))
-                                    
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 20)).bold()
-                                        .foregroundStyle(Color(hex: "#546a50"))
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                    }
                     
+                } else {
                     // Main Content
                     VStack(spacing: 20) {
                         
                         // Header
-                        VStack(spacing: 10) {
-                            Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            
-                            ZStack {
-                                ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
-                                    .progressViewStyle(LinearProgressViewStyle())
-                                    .frame(height: 14)
-                                    .clipShape(Capsule())
+                        VStack {
+                            // buttons + progress
+                            VStack(spacing: 10) {
+                                
+                                HStack {
+                                    Button {
+                                        dismiss()
+                                    } label: {
+                                        Image(systemName: "xmark")
+                                            .font(.system(size: 20)).bold()
+                                            .foregroundStyle(Color(hex: "#546a50"))
+                                    }
+                                    .padding(.horizontal)
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
+                                        .font(.headline)
+                                        .foregroundColor(.black)
+                                    
+                                    Spacer()
+                                    
+                                    Button {
+                                        //dismiss()
+                                    } label: {
+                                        Image(systemName: "gearshape.fill")
+                                            .font(.system(size: 20)).bold()
+                                            .foregroundStyle(Color(hex: "#546a50"))
+                                    }
+                                    .padding(.horizontal)
+                                }
+                                .padding(.bottom, 10)
+                                .padding(.top, 5)
+                                
+                                ZStack {
+                                    ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
+                                        .progressViewStyle(LinearProgressViewStyle())
+                                        .frame(height: 5)
+                                }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
+                            
+                            
+                            // 18 hard | 36 good
+                            VStack {
+                                
+                                HStack {
+                                    Text("\(hard_cards)")
+                                        .background(
+                                            Rectangle()
+                                                .fill(.orange)
+                                                .frame(width: 45, height: 30)
+                                          )
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(good_cards)")
+                                        .background(
+                                            Rectangle()
+                                                .fill(.green)
+                                                .frame(width: 45, height: 30)
+                                          )
+                                }
+                                .padding(.top, 25)
+                                .padding(.horizontal, 15)
+                            }
+                            .padding(.bottom, 30)
                         }
-                        .padding(.top)
-                        
                         // Card stack
                         if !sessionCards.isEmpty {
                             ZStack {
@@ -173,8 +200,7 @@ struct FlashCardViewTest: View {
             }
         }
     }
-    
-    private func handleSwipe(for card: Card, direction: SwipeDirection) {
+   private func handleSwipe(for card: Card, direction: SwipeDirection) {
         switch direction {
         case .left:
             handleHard(card)
@@ -205,79 +231,100 @@ struct CardView: View {
             return Color.green
         } else if offset.width < 0 {
             // Свайп влево - красный
-            return Color.red
+            return Color.orange
         } else {
             // Нейтральное положение - белый
             return Color.white
         }
     }
-    
+  
     var body: some View {
         let swapSides = collection.swapSides
         let frontText = swapSides ? (card.backText ?? "") : (card.frontText ?? "")
         let backText = swapSides ? (card.frontText ?? "") : (card.backText ?? "")
-        
         let displayText = flipped ? backText : frontText
         
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(cardBackgroundColor) // Используем вычисляемое свойство для цвета
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.black, lineWidth: 2)
-                )
-            
-            Text(displayText)
-                .font(.title)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.black)
-                .padding()
-        }
-        .offset(offset)
-        .rotationEffect(.degrees(rotation))
-        .gesture(
-            isTop ? DragGesture()
-                .onChanged { gesture in
-                    offset = gesture.translation
-                    rotation = Double(gesture.translation.width / 20)
+        VStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.white) // Используем вычисляемое свойство для цвета
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(cardBackgroundColor, lineWidth: 2)
+                    )
+                    .frame(width: 350, height: 470)
+                
+                
+                if offset.width > 0 {
+                    // Свайп вправо - зеленый
+                    Text("Know")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(cardBackgroundColor)
+                        .padding()
+                } else if offset.width < 0 {
+                    // Свайп влево - красный
+                    Text("Still learning")
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(cardBackgroundColor)
+                        .padding()
+                } else {
+                    // Нейтральное положение - белый
+                    Text(displayText)
+                        .font(.title)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.black)
+                        .padding()
                 }
-                .onEnded { gesture in
-                    let horizontal = gesture.translation.width
-                    let threshold: CGFloat = 100
-                    
-                    if abs(horizontal) > threshold {
-                        let direction: FlashCardViewTest.SwipeDirection = horizontal > 0 ? .right : .left
+            }
+            .offset(offset)
+            .rotationEffect(.degrees(rotation))
+            .gesture(
+                isTop ? DragGesture()
+                    .onChanged { gesture in
+                        offset = gesture.translation
+                        rotation = Double(gesture.translation.width / 20)
+                    }
+                    .onEnded { gesture in
+                        let horizontal = gesture.translation.width
+                        let threshold: CGFloat = 100
                         
-                        withAnimation(.easeOut) {
-                            switch direction {
-                            case .left:
-                                offset = CGSize(width: -500, height: 0)
-                                rotation = -20
-                            case .right:
-                                offset = CGSize(width: 500, height: 0)
-                                rotation = 20
+                        if abs(horizontal) > threshold {
+                            let direction: FlashCardViewTest.SwipeDirection = horizontal > 0 ? .right : .left
+                            
+                            withAnimation(.easeOut) {
+                                switch direction {
+                                case .left:
+                                    offset = CGSize(width: -500, height: 0)
+                                    rotation = -20
+                                case .right:
+                                    offset = CGSize(width: 500, height: 0)
+                                    rotation = 20
+                                }
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onSwiped(direction)
+                            }
+                        } else {
+                            withAnimation(.spring()) {
+                                offset = .zero
+                                rotation = 0
                             }
                         }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            onSwiped(direction)
-                        }
-                    } else {
-                        withAnimation(.spring()) {
-                            offset = .zero
-                            rotation = 0
-                        }
                     }
-                }
-            : nil
-        )
-        .onTapGesture {
-            if isTop {
-                withAnimation {
-                    flipped.toggle()
+                : nil
+            )
+            .onTapGesture {
+                if isTop {
+                 //   withAnimation {
+                        flipped.toggle()
+                  //  }
                 }
             }
         }
+        .padding(.top, 100)
     }
 }
 
@@ -358,6 +405,9 @@ extension FlashCardViewTest {
     }
     
     private func handleHard(_ card: Card) {
+        
+        hard_cards += 1
+        
         card.nextScheduleDate = nextScheduleDateForHard()
         card.lastGrade = .hard
         card.isNew = false
@@ -373,6 +423,9 @@ extension FlashCardViewTest {
     }
     
     private func handleGood(_ card: Card) {
+        
+        good_cards += 1
+        
         card.nextScheduleDate = nextScheduleDateForGood()
         card.lastGrade = .good
         card.isNew = false

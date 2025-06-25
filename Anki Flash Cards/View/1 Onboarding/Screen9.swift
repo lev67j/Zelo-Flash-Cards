@@ -31,8 +31,7 @@ struct NineScreen: View {
             .padding(.horizontal)
             .padding(.top)
             .padding(.top)
-        
-            VStack {
+    
                 // Изображение алерта с тенью
                 Image("alertImage")
                     .resizable()
@@ -56,8 +55,8 @@ struct NineScreen: View {
             }
             .padding(.top, 40)
             
-            Spacer()
-
+        Spacer()
+        
             // Кнопка "Continue" + запрос разрешения на уведомления
             Button(action: {
                 requestNotificationPermission {
@@ -76,15 +75,15 @@ struct NineScreen: View {
                     .background(Color(hex: "#546a50"))
                     .cornerRadius(12)
             }
-            .padding(.horizontal)
+            .padding()//.horizontal)
+            .padding(.bottom)
         }
     }
 
-    private func requestNotificationPermission(completion: @escaping () -> Void) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            DispatchQueue.main.async {
-                completion()
-            }
+private func requestNotificationPermission(completion: @escaping () -> Void) {
+    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        DispatchQueue.main.async {
+            completion()
         }
     }
 }

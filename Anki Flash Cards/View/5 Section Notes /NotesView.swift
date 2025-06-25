@@ -32,12 +32,7 @@ struct NotesView: View {
                         if notes.isEmpty {
                             
                             // No Notes
-                            Image("no_notes_image")
-                                .resizable()
-                                .scaledToFit()
-                                .padding()
-                                .padding(.bottom, 100)
-                                .shadow(radius: 40)
+                         
                             
                         } else {
                             ScrollView {

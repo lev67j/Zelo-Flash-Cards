@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct CardShopView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [
@@ -20,15 +20,17 @@ struct CardShopView: View {
     private var shopCollections: FetchedResults<ShopCollection>
     
     @ObservedObject private var vm = ShopVM()
+    @State private var searchText: String = ""
     
     // Computed property to sort collections by priority
     private var sorted_shop_collections: [ShopCollection] {
-        shopCollections.sorted { (lhs, rhs) -> Bool in
-            let priorityOrder = ["high": 3, "middle": 2, "low": 1]
-            let lhsPriority = priorityOrder[lhs.priority?.lowercased() ?? "middle"] ?? 2
-            let rhsPriority = priorityOrder[rhs.priority?.lowercased() ?? "middle"] ?? 2
-            
-            return lhsPriority > rhsPriority
+        if searchText.isEmpty {
+            return shopCollections.shuffled()
+        } else {
+            return shopCollections.filter { collection in
+                (collection.name?.lowercased().contains(searchText.lowercased()) ?? false) ||
+                (collection.language?.name_language?.lowercased().contains(searchText.lowercased()) ?? false)
+            }
         }
     }
     
@@ -38,10 +40,60 @@ struct CardShopView: View {
                 Color(hex: "#ddead1")
                     .ignoresSafeArea()
                 
-                ScrollView {
-                    VStack(spacing: 8) {
-                        ForEach(sorted_shop_collections) { collection in
-                            ShopCollectionCardView(collection: collection, vm: vm)
+                VStack {
+                    
+                    // Header: back button
+                    VStack {
+                        HStack {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "arrow.left")
+                                    .font(.system(size: 20)).bold()
+                                    .foregroundStyle(Color(hex: "#546a50"))
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 10)
+                    }
+                    
+                    // Search Language
+                    VStack(alignment: .leading) {
+                        ZStack {
+                            Rectangle()
+                                .fill(.gray.opacity(0.20))
+                                .frame(height: 50)
+                                .cornerRadius(30)
+                            
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundStyle(.black.opacity(0.41))
+                                        .bold()
+                                    
+                                    TextField("Search Language", text: $searchText)
+                                        .foregroundStyle(.black.opacity(0.41))
+                                        .bold()
+                                    
+                                    Spacer()
+                                }
+                                .padding(.leading)
+                            }
+                        }
+                        .padding()
+                    }
+                    .buttonStyle(.plain)
+                    
+                    // List Collections
+                    VStack {
+                        ScrollView {
+                            VStack(spacing: 8) {
+                                ForEach(sorted_shop_collections) { collection in
+                                    ShopCollectionCardView(collection: collection, vm: vm)
+                                }
+                            }
                         }
                     }
                 }

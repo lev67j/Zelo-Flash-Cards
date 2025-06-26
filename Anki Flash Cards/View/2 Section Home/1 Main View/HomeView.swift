@@ -101,6 +101,7 @@ struct HomeView: View {
             VStack {
                 NavigationLink {
                     CardShopView()
+                        .navigationBarBackButtonHidden(true)
                 } label: {
                     VStack(alignment: .leading) {
                         ZStack {

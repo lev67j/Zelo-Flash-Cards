@@ -45,9 +45,9 @@ struct OnboardingView: View {
                     .ignoresSafeArea())
             .onAppear {
                 InitialDataSetup.setupInitialData(context: viewContext)
-                print("Языки загружены: \(languages.count)")
+                print("Language downloaded: \(languages.count)")
                 for language in languages {
-                    print("Язык: \(language.name_language ?? ""), Коллекции: \(language.language_collections?.count ?? 0), Priority: \(language.priority ?? "")")
+                    print("Language: \(language.name_language ?? ""), Collections: \(language.language_collections?.count ?? 0), Priority: \(language.priority ?? "")")
                 }
             }
         } else {

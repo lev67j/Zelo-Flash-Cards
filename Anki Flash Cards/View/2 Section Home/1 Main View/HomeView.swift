@@ -96,59 +96,67 @@ struct HomeView: View {
     }
         
     var search_language_button_and_settings: some View {
-        HStack {
-            // Search
-            VStack {
-                NavigationLink {
-                    CardShopView()
-                        .navigationBarBackButtonHidden(true)
-                } label: {
-                    VStack(alignment: .leading) {
-                        ZStack {
-                            Rectangle()
-                                .fill(.gray.opacity(0.20))
-                                .frame(height: 50)
-                                .cornerRadius(30)
-                            
-                            VStack(alignment: .leading) {
+        VStack {
+            HStack {
+                // Search
+                VStack {
+                    NavigationLink {
+                        CardShopView()
+                            .navigationBarBackButtonHidden(true)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            ZStack {
+                                Rectangle()
+                                    .fill(.gray.opacity(0.20))
+                                    .frame(height: 50)
+                                    .cornerRadius(30)
+                                
                                 HStack {
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundStyle(.black.opacity(0.41))
-                                        .bold()
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            Image(systemName: "magnifyingglass")
+                                                .foregroundStyle(.black.opacity(0.41))
+                                                .bold()
+                                            
+                                            Text("Search Language")
+                                                .foregroundStyle(.black.opacity(0.41))
+                                                .bold()
+                                        }
+                                    }
+                                    .padding(.leading)
                                     
-                                    Text("Search Language")
-                                        .foregroundStyle(.black.opacity(0.41))
-                                        .bold()
+                                    Spacer()
                                 }
                             }
-                            .padding(.trailing, 100)
                         }
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            
-            // Settings Button
-            VStack {
-                NavigationLink {
-                    SettingsView()
-                } label: {
-                    VStack {
-                        ZStack {
-                            Circle()
-                                .fill(.gray.opacity(0.2))
-                                .frame(height: 50)
-                            
-                            Image(systemName: "gearshape.fill")
-                                .foregroundStyle(Color(hex: "#546a50").opacity(0.7))
-                                .font(.system(size: 20))
-                        }
+                        .buttonStyle(.plain)
                     }
                 }
+                
+                // Settings Button
+                VStack {
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        VStack {
+                            ZStack {
+                                Circle()
+                                    .fill(.gray.opacity(0.2))
+                                    .frame(height: 50)
+                                
+                                Image(systemName: "gearshape.fill")
+                                    .foregroundStyle(Color(hex: "#546a50").opacity(0.7))
+                                    .font(.system(size: 20))
+                            }
+                        }
+                    }
+                }
+                .padding(5)
+                
             }
+            .padding(.bottom)
+            .padding(.horizontal)
         }
-        .padding(.bottom)
-        .padding(.horizontal)
     }
     
     var add_collection_button: some View {

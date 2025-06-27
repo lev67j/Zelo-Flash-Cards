@@ -41,50 +41,55 @@ struct CardShopView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    
-                    // Header: back button
-                    VStack {
-                        HStack {
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "arrow.left")
-                                    .font(.system(size: 20)).bold()
-                                    .foregroundStyle(Color(hex: "#546a50"))
-                            }
-                            
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                    }
-                    
                     // Search Language
                     VStack(alignment: .leading) {
-                        ZStack {
-                            Rectangle()
-                                .fill(.gray.opacity(0.20))
-                                .frame(height: 50)
-                                .cornerRadius(30)
-                            
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundStyle(.black.opacity(0.41))
-                                        .bold()
+                        HStack {
+                            // Search
+                            VStack {
+                                ZStack {
+                                    Rectangle()
+                                        .fill(.gray.opacity(0.20))
+                                        .frame(height: 50)
+                                        .cornerRadius(30)
                                     
-                                    TextField("Search Language", text: $searchText)
-                                        .foregroundStyle(.black.opacity(0.41))
-                                        .bold()
-                                    
-                                    Spacer()
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            HStack {
+                                                Image(systemName: "magnifyingglass")
+                                                    .foregroundStyle(.black.opacity(0.41))
+                                                    .bold()
+                                                
+                                                TextField("Search Language", text: $searchText)
+                                                    .foregroundStyle(.black.opacity(0.41))
+                                                    .bold()
+                                            }
+                                            .padding(.leading)
+                                            
+                                            Spacer()
+                                            
+                                        }
+                                    }
                                 }
-                                .padding(.leading)
+                                .padding(.leading, 10)
+                                
                             }
+                            
+                            // Cancel
+                            VStack {
+                                Button {
+                                    dismiss()
+                                } label: {
+                                    Text("Cancel")
+                                        .font(.system(size: 16)).bold()
+                                        .foregroundStyle(Color(hex: "#546a50"))
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, 7)
+                            }
+                            
                         }
-                        .padding()
+                        .padding(5)
                     }
-                    .buttonStyle(.plain)
                     
                     // List Collections
                     VStack {
@@ -242,10 +247,4 @@ struct ShopCollectionCardView: View {
             print("Ошибка при добавлении коллекции в пользовательские: \(error)")
         }
     }
-}
-
-// Структура для декодирования JSON
-struct CardData: Decodable {
-    let front: String
-    let back: String
 }

@@ -138,6 +138,13 @@ struct FlashCardView: View {
                     }
                     
                     Spacer()
+                    
+                    // Test for flip card
+                    VStack {
+                        Spacer()
+                        Text("Tap for flip card")
+                            .foregroundStyle(Color(hex: "#546a50"))
+                    }
                 }
                 
                 // Finish Screen
@@ -208,39 +215,46 @@ struct CardView: View {
         let frontText = swapSides ? (card.backText ?? "") : (card.frontText ?? "")
         let backText = swapSides ? (card.frontText ?? "") : (card.backText ?? "")
         let displayText = flipped ? backText : frontText
-        
-        VStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.white) // Используем вычисляемое свойство для цвета
-                    .overlay(
+        GeometryReader { geometry in
+            VStack {
+                ZStack {
+                    VStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(cardBackgroundColor, lineWidth: 2)
-                    )
-                    .frame(width: 350, height: 470)
-                
-                
-                if offset.width > 0 {
-                    // Свайп вправо - зеленый
-                    Text("Know")
-                        .font(.title)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(cardBackgroundColor)
-                        .padding()
-                } else if offset.width < 0 {
-                    // Свайп влево - красный
-                    Text("Still learning")
-                        .font(.title)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(cardBackgroundColor)
-                        .padding()
-                } else {
-                    // Нейтральное положение - белый
-                    Text(displayText)
-                        .font(.title)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.black)
-                        .padding()
+                            .fill(.white) // Используем вычисляемое свойство для цвета
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(cardBackgroundColor, lineWidth: 2)
+                            )
+                            .padding()
+                            .padding(.bottom)
+                        
+                            .frame(width: geometry.size.width,
+                                   height: geometry.size.height * 1.5)
+                    }
+                    
+                    
+                    if offset.width > 0 {
+                        // Свайп вправо - зеленый
+                        Text("Know")
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(cardBackgroundColor)
+                            .padding()
+                    } else if offset.width < 0 {
+                        // Свайп влево - красный
+                        Text("Still learning")
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(cardBackgroundColor)
+                            .padding()
+                    } else {
+                        // Нейтральное положение - белый
+                        Text(displayText)
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.black)
+                            .padding()
+                    }
                 }
             }
             .offset(offset)
@@ -283,13 +297,10 @@ struct CardView: View {
             )
             .onTapGesture {
                 if isTop {
-                 //   withAnimation {
-                        flipped.toggle()
-                  //  }
+                    flipped.toggle()
                 }
             }
         }
-        .padding(.top, 100)
     }
 }
 
@@ -435,7 +446,6 @@ struct FlashCardViewTest_Previews: PreviewProvider {
             .environment(\.managedObjectContext, context)
     }
 }
-
 
 // Saved Last Logic
 /*

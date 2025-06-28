@@ -26,14 +26,41 @@ struct FifthScreen: View {
             
             VStack(spacing: 10) {
                 AgeButton(ageRange: "From 13 to 17 years old", color: Color(red: 1.0, green: 0.8, blue: 0.8), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "18 to 24 years old", color: Color(red: 1.0, green: 0.9, blue: 0.7), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "25 to 34 years old", color: Color(red: 1.0, green: 0.9, blue: 0.6), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "35 to 44 years old", color: Color(red: 1.0, green: 0.9, blue: 0.6), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "45 to 54 years old", color: Color(red: 0.8, green: 1.0, blue: 0.8), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "55 to 64 years old", color: Color(red: 0.7, green: 1.0, blue: 0.9), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 AgeButton(ageRange: "65+ years old", color: Color(red: 0.7, green: 0.9, blue: 1.0), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
             }
             .padding(.horizontal)
+            .background(Color(hex: "#546a50").opacity(0.3))
+            .cornerRadius(20)
+            .padding()
             
             Spacer()
         }
@@ -97,13 +124,6 @@ private struct AgeButton: View {
                     .foregroundColor(.black)
             }
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(selectedAgeRange == ageRange ? Color.blue.opacity(0.1) : Color(hex: "#9caf88"))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-            )
         }
     }
 }

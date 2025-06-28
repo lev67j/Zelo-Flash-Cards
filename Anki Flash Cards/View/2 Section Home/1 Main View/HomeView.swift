@@ -75,6 +75,7 @@ struct HomeView: View {
             .sheet(isPresented: $showingAddCollection) {
                 AddCollectionView()
                     .environment(\.managedObjectContext, viewContext)
+                    .presentationDetents([.medium])
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(true)
@@ -133,7 +134,8 @@ struct HomeView: View {
                     }
                 }
                 
-                // Settings Button
+                // Settings Button (Settings Screen In Development)
+                /*
                 VStack {
                     NavigationLink {
                         SettingsView()
@@ -152,7 +154,7 @@ struct HomeView: View {
                     }
                 }
                 .padding(5)
-                
+*/
             }
             .padding(.bottom)
             .padding(.horizontal)

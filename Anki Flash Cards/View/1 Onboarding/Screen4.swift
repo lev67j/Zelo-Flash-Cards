@@ -26,11 +26,26 @@ struct FourthScreen: View {
             
             VStack(spacing: 10) {
                 StudyTimeButton(timeInMinutes: 10, label: "Relaxed", emoji: "😊", selectedStudyTime: $selectedStudyTime, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 StudyTimeButton(timeInMinutes: 15, label: "Relaxed but effective", emoji: "🙂", selectedStudyTime: $selectedStudyTime, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 StudyTimeButton(timeInMinutes: 20, label: "Accelerated", emoji: "🎓", selectedStudyTime: $selectedStudyTime, currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 StudyTimeButton(timeInMinutes: 30, label: "Super accelerated", emoji: "🚀", selectedStudyTime: $selectedStudyTime, currentPage: $currentPage)
             }
             .padding(.horizontal)
+            .background(Color(hex: "#546a50").opacity(0.3))
+            .cornerRadius(20)
+            .padding()
             
             Spacer()
         }
@@ -67,29 +82,27 @@ private struct StudyTimeButton: View {
             }
         }) {
             HStack {
-                Text(emoji)
-                    .font(.title)
-                VStack(alignment: .leading) {
-                    Text("\(timeInMinutes) minutes")
-                        .font(.headline)
-                        .foregroundColor(.black)
+                HStack {
+                    Text(emoji)
+                        .font(.title)
                     
-                    Text(label)
-                        .font(.subheadline)
-                        .foregroundColor(.black)
+                    VStack(alignment: .leading) {
+                        Text("\(timeInMinutes) minutes")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                        
+                        Text(label)
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                    }
                 }
+                    
                 Spacer()
+                
                 Image(systemName: "chevron.right")
                     .foregroundColor(.black)
             }
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(selectedStudyTime == timeInMinutes ? Color.blue.opacity(0.1) :  Color(hex: "#9caf88"))
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-            )
         }
     }
 }

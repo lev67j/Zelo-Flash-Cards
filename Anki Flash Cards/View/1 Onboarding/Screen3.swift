@@ -11,8 +11,7 @@ import CoreData
 // Третий экран - выбор уровня владения языком
 struct ThirdScreen: View {
     @Binding var currentPage: Int
-    
-    @ObservedObject var vm: OnboardingVM
+     @ObservedObject var vm: OnboardingVM
     
     var body: some View {
         VStack(spacing: 20) {
@@ -22,13 +21,27 @@ struct ThirdScreen: View {
                 .foregroundColor(Color(hex: "#546a50"))
                 .padding(.top)
             
-            VStack(spacing: 10) {
+            VStack {
                 LevelButton(level: "Beginner", currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 LevelButton(level: "Elementary", currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 LevelButton(level: "Intermediate", currentPage: $currentPage)
+                Divider()
+                    .background(Color(hex: "#546a50").opacity(0.5))
+                    .padding(.horizontal)
+                
                 LevelButton(level: "Advanced", currentPage: $currentPage)
             }
-            .padding(.horizontal)
+            .background(Color(hex: "#546a50").opacity(0.3))
+            .cornerRadius(20)
+            .padding()
             
             Spacer()
         }
@@ -45,34 +58,36 @@ private struct LevelButton: View {
                 currentPage += 1
             }
         } label: {
-            HStack {
-                ZStack {
-                    HStack {
-                        Image("language_level_\(level)")
-                            .resizable()
-                            .frame(width: 50, height: 50)
+            VStack {
+                HStack {
+                    ZStack {
+                        HStack {
+                            Image("language_level_\(level)")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(Color(hex: "#546a50").opacity(0.4))
+                            
+                            Spacer()
+                        }
                         
-                        Spacer()
-                    }
-                    
-                    
-                    HStack {
-                        Text(level)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.leading, 80)
                         
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.white)
+                        HStack {
+                            Text(level)
+                                .foregroundColor(Color(hex: "#546a50"))
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.leading, 80)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(Color(hex: "#546a50"))
+                        }
                     }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color(hex: "#9caf88"))
-            .cornerRadius(10)
         }
     }
 }

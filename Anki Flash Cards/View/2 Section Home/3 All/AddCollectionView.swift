@@ -13,73 +13,103 @@ struct AddCollectionView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var collectionName: String = ""
     @State private var selectedPriority: String = "middle"
+    
+    @State private var add_name_alert = false
 
     var body: some View {
         ZStack {
             Color(hex: "#ddead1")
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                // Header
-                Text("New Collection")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.black)
-                    .padding(.top, 20)
-                
-                // Name Field
-                TextField("Collection Name", text: $collectionName)
-                    .padding()
-                    .background(Color.white.opacity(0.3))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 3)
-                    )
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                
-                // Priority Selection
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Priority")
-                        .font(.headline)
-                        .foregroundColor(.black)
+            VStack {
+                // Title + Priority
+                VStack(spacing: 15) {
+                    // Name Field
+                    VStack {
+                        TextField("Collection Name", text: $collectionName)
+                            .padding(.horizontal)
+                            .foregroundStyle(Color(hex: "#546a50"))
+                        
+                        Rectangle()
+                            .foregroundStyle(Color(hex: "#546a50"))
+                            .frame(height: 1.3)
+                            .padding(.horizontal)
+                        
+                        HStack {
+                            Text("Title")
+                                .foregroundStyle(Color(hex: "#546a50"))
+                                .font(.system(size: 13))
+                                .padding(.horizontal)
+                            
+                            Spacer()
+                        }
+                    }
+                    .padding(.bottom, 25)
                     
-                    HStack(spacing: 10) {
-                        PriorityButton(title: "Low", color: Color(hex: "#CDEDB3"), isSelected: selectedPriority == "low") {
-                            selectedPriority = "low"
-                        }
-                        
-                        PriorityButton(title: "Middle", color: Color(hex: "#CEF11B"), isSelected: selectedPriority == "middle") {
-                            selectedPriority = "middle"
-                        }
-                        
-                        PriorityButton(title: "High", color: Color(hex: "#1D6617"), isSelected: selectedPriority == "high") {
-                            selectedPriority = "high"
+                    // Priority Selection
+                    VStack {
+                        HStack {
+                            VStack {
+                                HStack {
+                                    Text("Priority")
+                                        .font(.headline)
+                                        .foregroundColor(.black)
+                                    
+                                    Rectangle()
+                                        .foregroundStyle(Color(hex: "#546a50").opacity(0.3))
+                                        .frame(width: 1.5, height: 20)
+                                    
+                                    HStack(spacing: 10) {
+                                        PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == "low") {
+                                            selectedPriority = "low"
+                                        }
+                                        
+                                        PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == "middle") {
+                                            selectedPriority = "middle"
+                                        }
+                                        
+                                        PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == "high") {
+                                            selectedPriority = "high"
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            Spacer()
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.top, 30)
                 
                 Spacer()
                 
-                // Save Button
-                Button(action: {
-                    addCollection()
-                }) {
-                    Text("Create Collection")
-                        .font(.headline)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(hex: "#E6A7FA")) // PINK HEX
-                        .foregroundColor(.black)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .cornerRadius(12)
+                VStack {
+                    Button {
+                        if collectionName != "" && collectionName != " " && collectionName != "  " {
+                            addCollection()
+                        } else {
+                            add_name_alert = true
+                        }
+                    } label: {
+                        Text("Create Collection")
+                            .font(.headline)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color(hex: "#546a50").opacity(0.7))
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
+            }
+           .alert(isPresented: $add_name_alert) {
+                Alert(
+                    title: Text("Please add name"),
+                    message: Text(""),
+                    dismissButton: .cancel()
+                )
             }
         }
     }

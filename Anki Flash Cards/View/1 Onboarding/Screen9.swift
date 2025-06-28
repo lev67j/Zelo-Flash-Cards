@@ -28,9 +28,8 @@ struct NineScreen: View {
                     .font(.system(size: 17))
                     .foregroundColor(Color(UIColor.systemGray))
             }
-            .padding(.horizontal)
-            .padding(.top)
-            .padding(.top)
+            .padding()
+            .padding(.bottom, 40)
     
                 // Изображение алерта с тенью
                 Image("alertImage")
@@ -53,8 +52,7 @@ struct NineScreen: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.trailing, 70)
             }
-            .padding(.top, 40)
-            
+             
         Spacer()
         
             // Кнопка "Continue" + запрос разрешения на уведомления

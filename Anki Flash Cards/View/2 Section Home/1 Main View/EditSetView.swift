@@ -14,7 +14,8 @@ struct EditSetView: View {
 
     @State private var collectionName: String
     @State private var selectedPriority: String
- 
+    @State private var add_name_alert = false
+    
     init(collection: CardCollection) {
         self.collection = collection
         self._collectionName = State(initialValue: collection.name ?? "")
@@ -70,14 +71,25 @@ struct EditSetView: View {
                                 Spacer()
                                 
                                 Button {
-                                    saveCollection()
-                                    dismiss()
-                                } label: {
+                                    if collectionName != "" && collectionName != " " && collectionName != "  " {
+                                        saveCollection()
+                                        dismiss()
+                                    } else {
+                                        add_name_alert = true
+                                    }
+                                 } label: {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 20)).bold()
                                         .foregroundStyle(Color(hex: "#546a50"))
                                 }
                                 .padding(.horizontal)
+                                .alert(isPresented: $add_name_alert) {
+                                    Alert(
+                                        title: Text("Please add name"),
+                                        message: Text(""),
+                                        dismissButton: .cancel()
+                                    )
+                                }
                             }
                             .padding(.bottom)
                         }
@@ -85,7 +97,6 @@ struct EditSetView: View {
                         Spacer()
                         
                         ScrollView {
-                            
                             // Title + Priority
                             VStack(spacing: 15) {
                                 // Name Field
@@ -252,9 +263,6 @@ struct CardCell: View {
     @State private var jsonText: String = ""
    
     var body: some View {
-        
-        
-        
         // Cell
         VStack {
             VStack {
@@ -317,7 +325,7 @@ struct CardCell: View {
             }
         }
         
-        
+        // ADD DELETE FUNC !!! (in trailing scroll)
     }
     
     

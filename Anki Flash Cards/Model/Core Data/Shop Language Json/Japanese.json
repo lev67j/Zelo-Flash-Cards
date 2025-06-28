@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Japanese A1",
+    "cards": [
   {"front": "こんにちは", "back": "Hello"},
   {"front": "さようなら", "back": "Goodbye"},
   {"front": "お願いします", "back": "Please"},
@@ -154,3 +157,4 @@
   {"front": "医者", "back": "Doctor"},
   {"front": "薬局", "back": "Pharmacy"}
 ]
+}

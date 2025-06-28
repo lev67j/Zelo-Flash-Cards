@@ -86,30 +86,42 @@ struct InitialDataSetup {
     }
     
     private static func loadCardsFromJSON(for collection: ShopCollection, context: NSManagedObjectContext) {
-        guard let language = collection.name else { return }
+        guard let collection_name = collection.name else { return }
         
         // Загрузка JSON-файла из бандла
-        guard let url = Bundle.main.url(forResource: language, withExtension: "json") else {
-            print("JSON-файл для \(language) не найден")
+        guard let url = Bundle.main.url(forResource: collection_name, withExtension: "json") else {
+            print("JSON-файл для \(collection_name) не найден")
             return
         }
         
         do {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
-            let cardData = try decoder.decode([CardData].self, from: data)
+            let cardData = try decoder.decode(CardModel.self, from: data)
             
             // Создание ShopCard для каждой записи
-            for cardEntry in cardData {
+            for cardEntry in cardData.cards {
                 let card = ShopCard(context: context)
+                card.collection_name = cardData.name
                 card.frontText = cardEntry.front
                 card.backText = cardEntry.back
                 card.creationDate = Date()
                 card.collection = collection
             }
         } catch {
-            print("Ошибка при загрузке карточек для \(language): \(error)")
+            print("Ошибка при загрузке карточек для \(collection_name): \(error)")
         }
     }
 }
 
+
+// Структура для декодирования JSON
+struct CardModel: Decodable {
+    let name: String
+    let cards: [CardData]
+}
+
+struct CardData: Decodable {
+    let front: String
+    let back: String
+}

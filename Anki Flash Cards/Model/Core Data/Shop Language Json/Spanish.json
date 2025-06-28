@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Spanish A1",
+    "cards": [
     {"front": "Hola", "back": "Hello"},
     {"front": "Adiós", "back": "Goodbye"},
     {"front": "Gracias", "back": "Thank you"},
@@ -198,3 +201,4 @@
     {"front": "Cocina", "back": "Kitchen"},
     {"front": "Baño", "back": "Bathroom"}
 ]
+}

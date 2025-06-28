@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Russian A1",
+    "cards": [
   {"front": "Привет", "back": "Hello"},
   {"front": "Пока", "back": "Bye"},
   {"front": "Спасибо", "back": "Thank you"},
@@ -175,3 +178,4 @@
   {"front": "Можно", "back": "Allowed / Can"},
   {"front": "Нельзя", "back": "Not allowed / Cannot"}
 ]
+}

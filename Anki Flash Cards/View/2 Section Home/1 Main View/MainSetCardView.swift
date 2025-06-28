@@ -119,10 +119,7 @@ struct MainSetCardView: View {
                                                             }
                                                         }
                                                         .sheet(isPresented: $show_move_cards) {
-                                                            //    MoveCardsView(sourceCollection: collection)
-                                                            VStack {
-                                                                Text("")
-                                                            }
+                                                          MoveCardsView(sourceCollection: collection)
                                                         }
                                                     }
                                                     

@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Arabic A1",
+    "cards": [
     {"front": "مرحبا", "back": "Hello"},
     {"front": "شكرا", "back": "Thank you"},
     {"front": "من فضلك", "back": "Please"},
@@ -194,3 +197,4 @@
     {"front": "أنف", "back": "Nose"},
     {"front": "قلب", "back": "Heart"}
 ]
+}

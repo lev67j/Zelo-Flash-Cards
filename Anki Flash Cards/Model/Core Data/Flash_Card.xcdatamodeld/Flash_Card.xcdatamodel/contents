@@ -24,6 +24,7 @@
     </entity>
     <entity name="ShopCard" representedClassName="ShopCard" syncable="YES" codeGenerationType="class">
         <attribute name="backText" optional="YES" attributeType="String"/>
+        <attribute name="collection_name" optional="YES" attributeType="String"/>
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="frontText" optional="YES" attributeType="String"/>
         <relationship name="collection" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShopCollection" inverseName="cards" inverseEntity="ShopCollection"/>

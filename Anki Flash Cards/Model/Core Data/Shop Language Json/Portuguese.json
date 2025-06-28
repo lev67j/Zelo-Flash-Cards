@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Portuguese A1",
+    "cards": [
   {"front": "Olá", "back": "Hello"},
   {"front": "Adeus", "back": "Goodbye"},
   {"front": "Por favor", "back": "Please"},
@@ -170,3 +173,4 @@
   {"front": "Médico", "back": "Doctor"},
   {"front": "Remédio", "back": "Medicine"}
 ]
+}

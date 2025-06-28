@@ -56,11 +56,7 @@ struct MoveCardsView: View {
                                         .padding(.vertical, 8)
                                         .background(moveTarget == target ? Color(hex: "#546a50") : Color.gray.opacity(0.2))
                                         .foregroundColor(moveTarget == target ? .white : .black)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .stroke(Color.black, lineWidth: 2)
-                                        )
-                                        .cornerRadius(20)
+                                         .cornerRadius(20)
                                 }
                             }
                         }
@@ -88,11 +84,7 @@ struct MoveCardsView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(Color.gray.opacity(0.2))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .cornerRadius(20)
+                       .cornerRadius(20)
                     }
                     
                     Button(action: {
@@ -110,10 +102,6 @@ struct MoveCardsView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(isCopyMode ? Color.gray.opacity(0.2) : Color(hex: "#546a50"))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
                         .cornerRadius(20)
                     }
                     
@@ -132,11 +120,7 @@ struct MoveCardsView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(isCopyMode ? Color(hex: "#546a50") : Color.gray.opacity(0.2))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .cornerRadius(20)
+                       .cornerRadius(20)
                     }
                 }
                 
@@ -144,24 +128,72 @@ struct MoveCardsView: View {
                 ScrollView {
                     VStack(spacing: 8) {
                         ForEach(cards, id: \.self) { card in
-                            HStack {
-                                Text(card.frontText ?? "No text")
-                                    .font(.body)
-                                    .foregroundColor(.black)
-                                Spacer()
-                                Image(systemName: selectedCards.contains(card) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(Color(hex: "#E6A7FA")) // PINK HEX
-                                    .onTapGesture {
-                                        toggleSelection(for: card)
+                            VStack {
+                                HStack {
+                                    // Cell Card
+                                    VStack(alignment: .leading) {
+                                        // Front
+                                        VStack {
+                                            HStack {
+                                                Text(card.frontText ?? "No text")
+                                                    .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                    .font(.system(size: 17))
+                                                    .padding(.horizontal)
+                                                
+                                                Spacer()
+                                            }
+                                            
+                                            Rectangle()
+                                                .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                .frame(height: 1.3)
+                                                .padding(.horizontal)
+                                            
+                                            HStack {
+                                                Text("Term")
+                                                    .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                    .font(.system(size: 11))
+                                                    .padding(.horizontal)
+                                                
+                                                Spacer()
+                                            }
+                                        }
+                                        .padding(.bottom, 10)
+                                        
+                                        // Back
+                                        VStack {
+                                            HStack {
+                                                Text(card.backText ?? "No text")
+                                                    .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                    .font(.system(size: 17))
+                                                    .padding(.horizontal)
+                                                
+                                                Spacer()
+                                            }
+                                            
+                                            Rectangle()
+                                                .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                .frame(height: 1.3)
+                                                .padding(.horizontal)
+                                            
+                                            HStack {
+                                                Text("Definition")
+                                                    .foregroundStyle(selectedCards.contains(card) ? Color(hex: "#546a50") : Color.gray.opacity(0.7))
+                                                    .font(.system(size: 11))
+                                                    .padding(.horizontal)
+                                                
+                                                Spacer()
+                                            }
+                                        }
                                     }
+                                }
+                                .frame(height: 150)
+                                .background(selectedCards.contains(card) ?
+                                            Color(hex: "#546a50").opacity(0.2) :
+                                                Color.gray.opacity(0.2))
+                                .onTapGesture {
+                                    toggleSelection(for: card)
+                                }
                             }
-                            .padding()
-                            .background(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.black, lineWidth: 2)
-                            )
-                            .cornerRadius(12)
                             .padding(.horizontal)
                         }
                     }
@@ -177,13 +209,9 @@ struct MoveCardsView: View {
                         .font(.headline)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(moveTarget == nil || selectedCards.isEmpty ? Color.gray : Color(hex: "#E6A7FA")) // PINK HEX
+                        .background(moveTarget == nil || selectedCards.isEmpty ? Color.gray.opacity(0.2) : Color(hex: "#546a50").opacity(0.6)) // PINK HEX
                         .foregroundColor(.black)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                        .cornerRadius(12)
+                       .cornerRadius(12)
                 }
                 .disabled(moveTarget == nil || selectedCards.isEmpty)
                 .padding(.horizontal)

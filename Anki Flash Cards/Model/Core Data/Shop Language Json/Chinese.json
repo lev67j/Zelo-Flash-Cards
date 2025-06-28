@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "Chinese A1",
+    "cards": [
   {"front": "你好", "back": "Hello"},
   {"front": "谢谢", "back": "Thank you"},
   {"front": "是", "back": "To be"},
@@ -197,3 +200,4 @@
   {"front": "我明白了", "back": "I understand"},
   {"front": "我不知道", "back": "I don't know"}
 ]
+}

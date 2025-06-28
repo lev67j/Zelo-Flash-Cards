@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "English A1",
+    "cards": [
     {"front": "Hello", "back": "Привет"},
     {"front": "Goodbye", "back": "До свидания"},
     {"front": "Thank you", "back": "Спасибо"},
@@ -196,3 +199,4 @@
     {"front": "Kitchen", "back": "Кухня"},
     {"front": "Bathroom", "back": "Ванная"}
 ]
+}

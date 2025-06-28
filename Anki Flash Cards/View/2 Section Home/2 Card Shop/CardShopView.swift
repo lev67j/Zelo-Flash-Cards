@@ -25,7 +25,7 @@ struct CardShopView: View {
     // Computed property to sort collections by priority
     private var sorted_shop_collections: [ShopCollection] {
         if searchText.isEmpty {
-            return shopCollections.shuffled()
+            return shopCollections.dropLast(0)
         } else {
             return shopCollections.filter { collection in
                 (collection.name?.lowercased().contains(searchText.lowercased()) ?? false) ||
@@ -96,7 +96,11 @@ struct CardShopView: View {
                         ScrollView {
                             VStack(spacing: 8) {
                                 ForEach(sorted_shop_collections) { collection in
-                                    ShopCollectionCardView(collection: collection, vm: vm)
+                                     NavigationLink {
+                                         List_Crads_in_Shop_Language(collection: collection)
+                                    } label: {
+                                        ShopCollectionCardView(collection: collection, vm: vm)
+                                    }
                                 }
                             }
                         }
@@ -111,15 +115,33 @@ struct ShopCollectionCardView: View {
     @ObservedObject var collection: ShopCollection
     @ObservedObject var vm: ShopVM
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack {
-          
             VStack(alignment: .leading) {
-                Text(collection.name ?? "Language")
-                    .font(.title3)
-                    .foregroundColor(.black)
-                    .padding(.bottom, 70)
+                VStack(spacing: 3) {
+                    HStack {
+                        Text(collection.name ?? "Language")
+                            .font(.title3)
+                            .foregroundColor(.black)
+                        
+                        Spacer()
+                    }
+                    
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(Color(hex: "#546a50").opacity(0.3))
+                    
+                    HStack {
+                        Text("\(collection.cards?.count ?? 0) words")
+                            .foregroundColor(Color(hex: "#546a50").opacity(0.5))
+                            .font(.system(size: 17))
+                        
+                        Spacer()
+                    }
+                }
+                .padding(.bottom, 40)
                 
                 
                 HStack {
@@ -143,64 +165,35 @@ struct ShopCollectionCardView: View {
             .padding(.horizontal)
             
             VStack {
-                HStack {
-                    Spacer()
-                    NavigationLink(destination: List_Crads_in_Shop_Language(collection: collection)) {
-                        Image(systemName: "ellipsis")
-                            .foregroundColor(.black)
-                            .bold()
-                            .padding(10)
-                    }
-                }
-                Spacer()
-            }
-            .padding(.top, 20)
-            .padding(.trailing, 25)
-            
-            VStack {
                 Spacer()
                 HStack {
                     Spacer()
                     
                     Button {
-                        // Анимация нажатия
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            vm.isButtonPressed = true
-                        }
-                        
                         // Вибрация
-                        let generator = UIImpactFeedbackGenerator(style: .light)
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
                         
                         // Действие кнопки
-                        addToUserCollections()
-                        vm.isAddedLanguage = true
-                        
-                        // Возврат к исходному состоянию
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation {
-                                vm.isButtonPressed = false
-                            }
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            addToUserCollections()
+                            vm.isAddedLanguage = true
+                            dismiss()
                         }
+                        
                     } label: {
                         Image(systemName: "plus")
                             .foregroundColor(Color(hex: "#ddead1"))
                             .font(.system(size: 20, weight: .bold))
                             .frame(width: 43, height: 43)
-                            .background(vm.isButtonPressed ? Color(hex: "#546a90") : Color(hex: "#546a90").opacity(0.4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 7)
-                            )
+                            .background(Color(hex: "#546a90").opacity(0.25))
                             .cornerRadius(12)
-                            .scaleEffect(vm.isButtonPressed ? 0.4 : 1.0)
+                            .scaleEffect(1.0)
                     }
                 }
             }
             .padding(.bottom, 15)
             .padding(.trailing, 25)
-            
-            
         }
     }
     

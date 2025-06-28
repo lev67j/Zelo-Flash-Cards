@@ -1,4 +1,8 @@
-[
+
+
+{
+    "name": "French A1",
+    "cards": [
   {"front": "Bonjour", "back": "Hello"},
   {"front": "Merci", "back": "Thank you"},
   {"front": "Oui", "back": "Yes"},
@@ -179,3 +183,4 @@
   {"front": "Plus", "back": "More"},
   {"front": "Trop", "back": "Too much"}
 ]
+}

@@ -1,4 +1,7 @@
-[
+
+{
+    "name": "German A1",
+    "cards": [
   {"front": "Hallo", "back": "Hello"},
   {"front": "Tschüss", "back": "Bye"},
   {"front": "Ja", "back": "Yes"},
@@ -180,3 +183,4 @@
   {"front": "Viel Glück", "back": "Good luck"},
   {"front": "Herzlichen Glückwunsch", "back": "Congratulations"}
 ]
+}

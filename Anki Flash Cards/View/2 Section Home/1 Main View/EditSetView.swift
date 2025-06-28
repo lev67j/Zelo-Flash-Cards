@@ -173,8 +173,7 @@ struct EditSetView: View {
                             }
                         }
                     }
-                    
-                    // Add Card
+                     // Add Card
                     add_card_button
                 }
             }
@@ -251,68 +250,74 @@ struct CardCell: View {
       
     @State private var showJSONInput = false
     @State private var jsonText: String = ""
-    
-   // @FocusState private var emailFieldIsFocused: Bool = false
-
+   
     var body: some View {
-        VStack {
-            HStack {
-                // Cell Card
-                VStack(alignment: .leading) {
-                    
-                    // Front
-                    VStack {
-                        TextField("no text", text: $frontText)
-                            .foregroundStyle(Color(hex: "#546a50"))
-                            .font(.system(size: 17))
-                            .padding(.horizontal)
         
-                        Rectangle()
-                            .foregroundStyle(Color(hex: "#546a50"))
-                            .frame(height: 1.3)
-                            .padding(.horizontal)
+        
+        
+        // Cell
+        VStack {
+            VStack {
+                HStack {
+                    // Cell Card
+                    VStack(alignment: .leading) {
                         
-                        HStack {
-                            Text("Term")
+                        // Front
+                        VStack {
+                            TextField("no text", text: $frontText)
                                 .foregroundStyle(Color(hex: "#546a50"))
-                                .font(.system(size: 11))
+                                .font(.system(size: 17))
                                 .padding(.horizontal)
                             
-                            Spacer()
+                            Rectangle()
+                                .foregroundStyle(Color(hex: "#546a50"))
+                                .frame(height: 1.3)
+                                .padding(.horizontal)
+                            
+                            HStack {
+                                Text("Term")
+                                    .foregroundStyle(Color(hex: "#546a50"))
+                                    .font(.system(size: 11))
+                                    .padding(.horizontal)
+                                
+                                Spacer()
+                            }
                         }
-                    }
-                    .padding(.bottom, 10)
-                    
-                    // Back
-                    VStack {
-                        TextField("no text", text: $backText)
-                            .foregroundStyle(Color(hex: "#546a50"))
-                            .font(.system(size: 17))
-                            .padding(.horizontal)
+                        .padding(.bottom, 10)
                         
-                        Rectangle()
-                            .foregroundStyle(Color(hex: "#546a50"))
-                            .frame(height: 1.3)
-                            .padding(.horizontal)
-                        
-                        HStack {
-                            Text("Definition")
+                        // Back
+                        VStack {
+                            TextField("no text", text: $backText)
                                 .foregroundStyle(Color(hex: "#546a50"))
-                                .font(.system(size: 11))
+                                .font(.system(size: 17))
                                 .padding(.horizontal)
                             
-                            Spacer()
+                            Rectangle()
+                                .foregroundStyle(Color(hex: "#546a50"))
+                                .frame(height: 1.3)
+                                .padding(.horizontal)
+                            
+                            HStack {
+                                Text("Definition")
+                                    .foregroundStyle(Color(hex: "#546a50"))
+                                    .font(.system(size: 11))
+                                    .padding(.horizontal)
+                                
+                                Spacer()
+                            }
                         }
                     }
                 }
+                .frame(height: 150)
+                .background(Color(hex: "#546a50").opacity(0.2))
+                .padding(.vertical, 5)
             }
-            .frame(height: 150)
-            .background(Color(hex: "#546a50").opacity(0.2))
-            .padding(.vertical, 5)
+            .onDisappear {
+                saveCard()
+            }
         }
-        .onDisappear {
-            saveCard()
-        }
+        
+        
     }
     
     

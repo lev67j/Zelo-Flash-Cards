@@ -288,7 +288,7 @@ struct CardView: View {
                 ZStack {
                     VStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(.white) // Используем вычисляемое свойство для цвета
+                            .fill(.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(cardBackgroundColor, lineWidth: 2)
@@ -316,7 +316,7 @@ struct CardView: View {
                             .foregroundColor(cardBackgroundColor)
                             .padding()
                     } else {
-                        // Нейтральное положение - белый
+                        // Нейтральное положение
                         Text(displayText)
                             .font(.title)
                             .multilineTextAlignment(.center)

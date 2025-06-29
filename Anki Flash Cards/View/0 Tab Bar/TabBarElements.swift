@@ -21,7 +21,7 @@ struct TabBarElements: View {
                     case .notes:
                         NotesView()
                     case .day_quest:
-                        DayQuestView()
+                        AIQuestView()
                     case .profile:
                         ProfileView()
                     }
@@ -58,7 +58,7 @@ struct CustomTabBar: View {
             HStack(spacing: 45) {
                 TabButton(icon: "house", tab: .home, name: "Home", selectedTab: $selectedTab)
                 TabButton(icon: "note.text", tab: .notes, name: "Notes", selectedTab: $selectedTab)
-                TabButton(icon: "tray.full.fill", tab: .day_quest, name: "Day Quest", selectedTab: $selectedTab)
+                TabButton(icon: "tray.full.fill", tab: .day_quest, name: "AI Quest", selectedTab: $selectedTab)
                 TabButton(icon: "person.fill", tab: .profile, name: "Profile", selectedTab: $selectedTab)
             }
         }

@@ -30,7 +30,6 @@ struct MainSetCardView: View {
     @State private var delete_set_alert = false
    
     
-    
     var cards: [Card] {
         (collection.cards?.allObjects as? [Card]) ?? []
     }

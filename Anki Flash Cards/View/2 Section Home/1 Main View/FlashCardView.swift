@@ -30,7 +30,6 @@ struct FlashCardView: View {
                 .ignoresSafeArea()
             
             VStack {
-                
                 // Header
                 VStack {
                     // buttons + progress
@@ -135,36 +134,105 @@ struct FlashCardView: View {
                         }
                         .frame(height: 400)
                         .padding(.horizontal)
-                    }
-                    
-                    Spacer()
-                    
-                    // Test for flip card
-                    VStack {
+                        
+                        
                         Spacer()
-                        Text("Tap for flip card")
-                            .foregroundStyle(Color(hex: "#546a50"))
+                        
+                        // Test for flip card
+                        VStack {
+                            Spacer()
+                            Text("Tap for flip card")
+                                .foregroundStyle(Color(hex: "#546a50"))
+                            
+                        }
                     }
                 }
                 
                 // Finish Screen
                 VStack {
-                    
-                    // Text "Nice Work..." and Image Win or Lose
-                    VStack {
+                    if sessionCards.isEmpty {
+                         // Text "Nice Work..." and Image Win or Lose
+                        VStack {
+                            HStack {
+                                Text("Nice work! Your progress has improved, you've learned even more cards!")
+                                .font(.system(size: 20).bold())
+                                .foregroundStyle(Color(hex: "#546a50"))
+                                .padding(.leading)
+                                
+                                Spacer()
+                                
+                                Image("cake_for_zelo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 157)
+                                    .clipShape(.rect(cornerRadius: 70))
+                            } .padding(.vertical)
+                        }
                         
-                    }
-                    
-                    // Circle "Your Progress" and number of cards know/still learning
-                    VStack {
+                        // Circle "Your Progress" and number of cards know/still learning
+                        VStack {
+                            HStack {
+                                 // Circle
+                                VStack {
+                                    
+                                }
+                                
+                                // Capsule know/still learning
+                                VStack(spacing: 40) {
+                                    Text("\(hard_cards)")
+                                        .foregroundStyle(.black.opacity(0.6))
+                                        .fontWeight(.bold)
+                                        .background(
+                                            Capsule()
+                                                .fill(.orange.opacity(0.4))
+                                                .frame(width: 200, height: 50)
+                                                .overlay(
+                                                    Capsule()
+                                                        .stroke(Color.orange, lineWidth: 2)
+                                                )
+                                        )
+                                    
+                                    Text("\(good_cards)")
+                                        .foregroundStyle(.black.opacity(0.6))
+                                        .fontWeight(.bold)
+                                        .background(
+                                            Capsule()
+                                                .fill(.green.opacity(0.4))
+                                                .frame(width: 200, height: 50)
+                                                .overlay(
+                                                    Capsule()
+                                                        .stroke(Color.green, lineWidth: 2)
+                                                )
+                                        )
+                                }
+                                .padding(.top, 25)
+                                .padding(.horizontal, 15)
+                                .padding(.leading, 180)
+                            }
+                            
+                                
+                                
+                            Spacer()
+                        }
                         
+                        // Buttons: "Back in Menu" and "Practice hard cards"
+                        VStack {
+                              VStack {
+                                Button {
+                                    dismiss()
+                                } label: {
+                                    Text("Back in Menu")
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color(hex: "#546a50"))
+                                        .cornerRadius(10)
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
                     }
-                    
-                    // Buttons: "Back in Menu" and "Practice "
-                    VStack {
-                        
-                    }
-                    
                 }
             }
             .onAppear {
@@ -172,7 +240,7 @@ struct FlashCardView: View {
             }
         }
     }
-   private func handleSwipe(for card: Card, direction: SwipeDirection) {
+    private func handleSwipe(for card: Card, direction: SwipeDirection) {
         switch direction {
         case .left:
             handleHard(card)
@@ -432,7 +500,7 @@ struct FlashCardViewTest_Previews: PreviewProvider {
         let collection = CardCollection(context: context)
         collection.name = "Test Collection"
         
-        for i in 1...3 {
+        for i in 1...5 {
             let card = Card(context: context)
             card.frontText = "Front \(i)"
             card.backText = "Back \(i)"

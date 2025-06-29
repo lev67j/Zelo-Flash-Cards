@@ -50,6 +50,7 @@ struct HomeView: View {
                              ScrollView {
                                 HStack {
                                     Text("Sets")
+                                        .foregroundColor(.black)
                                         .font(.system(size: 17)).bold()
                                         .padding(.horizontal, 13)
                                       

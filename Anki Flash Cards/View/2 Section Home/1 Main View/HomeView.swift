@@ -17,6 +17,7 @@ struct HomeView: View {
     
     @State private var showingAddCollection = false
     @State private var selectedTab: String = "All"
+    @ObservedObject private var vm = DesignVM()
     
     // Computed property to sort collections by priority
     private var sortedCollections: [CardCollection] {
@@ -34,7 +35,7 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "#ddead1")
+                vm.color_back_home_view
                     .ignoresSafeArea()
                 
                 VStack() {
@@ -50,7 +51,7 @@ struct HomeView: View {
                              ScrollView {
                                 HStack {
                                     Text("Sets")
-                                        .foregroundColor(.black)
+                                        .foregroundColor(vm.color_title_sets)
                                         .font(.system(size: 17)).bold()
                                         .padding(.horizontal, 13)
                                       
@@ -109,7 +110,7 @@ struct HomeView: View {
                         VStack(alignment: .leading) {
                             ZStack {
                                 Rectangle()
-                                    .fill(.gray.opacity(0.20))
+                                    .fill(vm.color_back_button_search_home)
                                     .frame(height: 50)
                                     .cornerRadius(30)
                                 
@@ -117,11 +118,11 @@ struct HomeView: View {
                                     VStack(alignment: .leading) {
                                         HStack {
                                             Image(systemName: "magnifyingglass")
-                                                .foregroundStyle(.black.opacity(0.41))
+                                                .foregroundStyle(vm.color_text_search_home)
                                                 .bold()
                                             
                                             Text("Search Language")
-                                                .foregroundStyle(.black.opacity(0.41))
+                                                .foregroundStyle(vm.color_text_search_home)
                                                 .bold()
                                         }
                                     }
@@ -173,9 +174,9 @@ struct HomeView: View {
                     }) {
                         Image(systemName: "plus")
                             .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.black)
                             .frame(width: 60, height: 60)
-                            .background(Color(hex: "#546a50").opacity(0.5))
+                            .background(vm.color_back_button_add_collection_home)
+                            .foregroundColor(vm.color_text_button_add_collection_home)
                             .cornerRadius(20)
                             .shadow(color: .black.opacity(0.2), radius: 5)
                     }

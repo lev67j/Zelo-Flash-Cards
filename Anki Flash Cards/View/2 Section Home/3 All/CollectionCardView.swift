@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct CollectionCardView: View {
+    
     let collection: CardCollection
     @State private var isPlayButtonPressed = false
+    
+    @ObservedObject private var vm = DesignVM()
         
     var body: some View {
         ZStack {
@@ -19,18 +22,18 @@ struct CollectionCardView: View {
                     HStack {
                         Text(collection.name ?? "Unnamed")
                             .font(.title3)
-                            .foregroundColor(.black)
+                            .foregroundColor(vm.color_name_language_cell_set_home)
                             
                         Spacer()
                     }
                     
                     Rectangle()
                         .frame(height: 1)
-                        .foregroundColor(Color(hex: "#546a50").opacity(0.3))
+                        .foregroundColor(vm.color_line_cell_set_home)
                     
                     HStack {
                         Text("\(collection.cards?.count ?? 0) words")
-                            .foregroundColor(Color(hex: "#546a50").opacity(0.5))
+                            .foregroundColor(vm.color_number_cards_cell_set_home)
                             .font(.system(size: 17))
                           
                         Spacer()
@@ -41,21 +44,21 @@ struct CollectionCardView: View {
                 
                 HStack {
                     Image(systemName: "calendar")
-                        .foregroundColor(.gray)
+                        .foregroundColor(vm.color_calendar_text_cell_set_home)
                     
                     Text(formattedDate(collection.creationDate))
                         .font(.headline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(vm.color_calendar_text_cell_set_home)
                 }
                 
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: 150)
-            .background(Color(hex: "#546a50").opacity(0.2))
+            .background(vm.color_back_cell_set_home)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
+                    .stroke(vm.color_overlay_cell_set_home, lineWidth: 8)
             )
             .cornerRadius(12)
             .padding(.horizontal)

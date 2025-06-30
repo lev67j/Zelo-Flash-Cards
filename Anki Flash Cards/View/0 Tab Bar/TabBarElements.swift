@@ -10,6 +10,7 @@ import SwiftUI
 struct TabBarElements: View {
     @State private var selectedTab: TabName = .home
     @EnvironmentObject var stateProperties: StatePropertiesVM
+    @ObservedObject private var vm = DesignVM()
     
     var body: some View {
         NavigationStack {
@@ -35,7 +36,7 @@ struct TabBarElements: View {
                             .frame(width: 400) // all width in depending on the size of the iphone(quets for gpt)
                             .background(
                                 Rectangle()
-                                .foregroundStyle(Color(hex: "#ddead1"))
+                                    .foregroundStyle(vm.color_back_tabbar)
                                 .ignoresSafeArea(.all)
                             )
                     }
@@ -47,29 +48,53 @@ struct TabBarElements: View {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: TabName
+    @ObservedObject private var vm = DesignVM()
     
     var body: some View {
         VStack(spacing: 15) {
             Rectangle()
-                .fill(Color(hex: "#546a50").opacity(0.05))
+                .fill(vm.color_tab_line_tabbar)
                 .frame(height: 2)
                 .frame(width: 400)
             
             HStack(spacing: 45) {
-                TabButton(icon: "house", tab: .home, name: "Home", selectedTab: $selectedTab)
-                TabButton(icon: "note.text", tab: .notes, name: "Notes", selectedTab: $selectedTab)
-                TabButton(icon: "tray.full.fill", tab: .day_quest, name: "AI Quest", selectedTab: $selectedTab)
-                TabButton(icon: "person.fill", tab: .profile, name: "Profile", selectedTab: $selectedTab)
+                TabButton(selectedTab: $selectedTab,
+                          icon: "house",
+                          tab: .home,
+                          name: "Home",
+                          select_color: vm.color_1_tab_button_selected_tabbar,
+                          no_select_color: vm.color_1_tab_button_no_selected_tabbar)
+                TabButton(selectedTab: $selectedTab,
+                          icon: "note.text",
+                          tab: .notes,
+                          name: "Notes",
+                          select_color: vm.color_2_tab_button_selected_tabbar,
+                          no_select_color: vm.color_2_tab_button_no_selected_tabbar)
+                TabButton(selectedTab: $selectedTab, icon: "tray.full.fill",
+                          tab: .day_quest,
+                          name: "AI Quest",
+                          select_color: vm.color_3_tab_button_selected_tabbar,
+                          no_select_color: vm.color_3_tab_button_no_selected_tabbar)
+                TabButton(selectedTab: $selectedTab,
+                          icon: "person.fill",
+                          tab: .profile,
+                          name: "Profile",
+                          select_color: vm.color_4_tab_button_selected_tabbar,
+                          no_select_color: vm.color_4_tab_button_no_selected_tabbar)
             }
         }
     }
 }
 
 struct TabButton: View {
+    @ObservedObject private var vm = DesignVM()
+    @Binding var selectedTab: TabName
+     
     let icon: String
     let tab: TabName
     let name: String
-    @Binding var selectedTab: TabName
+    let select_color: Color
+    let no_select_color: Color
     
     var body: some View {
         Button {
@@ -81,12 +106,12 @@ struct TabButton: View {
                 Image(systemName: icon)
                     .bold()
                     .font(.system(size: 23))
-                    .foregroundColor(selectedTab == tab ? Color(hex: "#546a50") : Color(hex: "#546a50").opacity(0.6))
+                    .foregroundColor(selectedTab == tab ? select_color : no_select_color)
                     .padding(.bottom, 1)
                 
                 Text(name)
                     .font(.system(size: 13)).bold()
-                    .foregroundColor(selectedTab == tab ? Color(hex: "#546a50") : Color(hex: "#546a50").opacity(0.6))
+                    .foregroundColor(selectedTab == tab ? select_color : no_select_color)
             }
         }
     }

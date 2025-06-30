@@ -24,6 +24,15 @@ struct FlashCardView: View {
     @State private var hard_cards: Int = 0
     @State private var good_cards: Int = 0
     
+    @State private var selectedCards: [Card]? = nil
+    @State private var navigateToFlashCards = false
+    @State private var selectedCardCount = 10
+    
+    @State private var open_sheet_settings_flashcards = false
+    @State private var open_sheet_custom_cards = false
+    
+    @ObservedObject private var vm = DesignVM()
+    
     var body: some View {
         ZStack {
             Color(hex: "#ddead1")
@@ -54,13 +63,149 @@ struct FlashCardView: View {
                             Spacer()
                             
                             Button {
-                                //dismiss()
+                                if !sessionCards.isEmpty {
+                                    open_sheet_settings_flashcards = true
+                                }
                             } label: {
                                 Image(systemName: "gearshape.fill")
                                     .font(.system(size: 20)).bold()
                                     .foregroundStyle(Color(hex: "#546a50"))
                             }
                             .padding(.horizontal)
+                            .sheet(isPresented: $open_sheet_settings_flashcards) {
+                                ZStack {
+                                    vm.color_back_sheet_flash_card_mainset
+                                        .ignoresSafeArea()
+                                    
+                                    VStack {
+                                        VStack {
+                                            // Toggle Front and Back Sides
+                                            VStack {
+                                                HStack {
+                                                    Toggle(isOn: Binding(
+                                                        get: { collection.swapSides },
+                                                        set: { newValue in
+                                                            collection.swapSides = newValue
+                                                            try? viewContext.save()
+                                                        }
+                                                    )) {
+                                                        Text("Swap Front and Back Sides")
+                                                            .font(.headline)
+                                                            .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
+                                                    }
+                                                    .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
+                                                    .padding()
+                                                    .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
+                                                    .cornerRadius(12)
+                                                }
+                                                .padding(.horizontal)
+                                            }
+                                            
+                                            // Start Custom Cards "5-10-15..."
+                                            VStack {
+                                                Button {
+                                                    open_sheet_custom_cards = true
+                                                } label: {
+                                                    HStack {
+                                                        Text("Custom cards (\(selectedCardCount))")
+                                                            .font(.headline)
+                                                            .foregroundColor(vm.color_text_start_custom_cards_sheet_flash_card_mainset)
+                                                        Spacer()
+                                                    }
+                                                    .padding()
+                                                    .background(vm.color_back_start_custom_cards_sheet_flash_card_mainset)
+                                                    .cornerRadius(12)
+                                                }
+                                                .padding(.horizontal)
+                                                .sheet(isPresented: $open_sheet_custom_cards) {
+                                                    ZStack {
+                                                        vm.color_back_sheet_start_custom_cards_mainset
+                                                            .ignoresSafeArea()
+                                                        
+                                                        VStack {
+                                                            Text("Select number of cards")
+                                                                .foregroundStyle(vm.color_text_select_number_cards_mainset)
+                                                                .font(.headline)
+                                                                .padding()
+                                                            
+                                                            Picker("Number of cards", selection: $selectedCardCount) {
+                                                                ForEach(Array(stride(from: 5, through: 1000, by: 5)), id: \.self) { number in
+                                                                    Text("\(number)")
+                                                                        .foregroundStyle(vm.color_text_number_cards_mainset)
+                                                                        .tag(number)
+                                                                }
+                                                            }
+                                                            .pickerStyle(.wheel)
+                                                            
+                                                            Button {
+                                                                let today = Calendar.current.startOfDay(for: Date())
+                                                                let dueCards = allCards.filter { card in
+                                                                    if card.lastGrade == .again || card.isNew { return true }
+                                                                    if let scheduleDate = card.nextScheduleDate {
+                                                                        let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
+                                                                        return scheduleDay <= today
+                                                                    }
+                                                                    return false
+                                                                }
+                                                                
+                                                                sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
+                                                               
+                                                                // for dismiss sheet
+                                                                open_sheet_settings_flashcards = false
+                                                                open_sheet_custom_cards = false
+                                                            } label: {
+                                                                HStack {
+                                                                    Text("Start")
+                                                                        .font(.headline)
+                                                                        .foregroundColor(vm.color_text_button_start_mainset)
+                                                                }
+                                                                .padding()
+                                                                .padding(.horizontal, 100)
+                                                                .background(vm.color_back_button_start_mainset)
+                                                                .cornerRadius(12)
+                                                            }
+                                                        }
+                                                    }
+                                                    .presentationDetents([.height(300)])
+                                                }
+                                            }
+                                            
+                                            // Start Button
+                                            VStack {
+                                                Spacer()
+                                                
+                                                Button {
+                                                    selectedCards = allCards
+                                                    
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                        navigateToFlashCards = true
+                                                    }
+                                                    
+                                                    // for dismiss sheet
+                                                    open_sheet_custom_cards = false
+                                                    open_sheet_settings_flashcards = false
+                                                } label: {
+                                                    HStack {
+                                                        Text("Start")
+                                                            .font(.headline)
+                                                            .foregroundColor(vm.color_main_text_button_start_mainset)
+                                                    }
+                                                    .padding()
+                                                    .padding(.horizontal, 100)
+                                                    .background(vm.color_main_back_button_start_mainset)
+                                                    .cornerRadius(12)
+                                                    .shadow(radius: 5)
+                                                }
+                                                .padding(.horizontal)
+                                            }
+                                        }
+                                        .padding(.top)
+                                        
+                                        Spacer()
+                                    }
+                                }
+                                .presentationDetents([.height(300)])
+                            }
                         }
                         .padding(.bottom, 10)
                         .padding(.top, 5)
@@ -500,7 +645,7 @@ struct FlashCardViewTest_Previews: PreviewProvider {
         let collection = CardCollection(context: context)
         collection.name = "Test Collection"
         
-        for i in 1...5 {
+        for i in 1...500 {
             let card = Card(context: context)
             card.frontText = "Front \(i)"
             card.backText = "Back \(i)"

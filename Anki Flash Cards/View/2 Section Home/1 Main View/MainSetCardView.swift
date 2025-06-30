@@ -197,170 +197,35 @@ struct MainSetCardView: View {
                             VStack(spacing: 10) {
                                  // Flash Cards
                                 VStack {
-                                    VStack {
-                                        Button {
-                                            // If Cards > 0
-                                            if collection.cards?.count ?? 0 > 0 {
-                                                open_sheet_flashcards = true
-                                            } else {
-                                                show_alert_cards_empty = true
+                                    Button {
+                                        // If Cards > 0
+                                        if collection.cards?.count ?? 0 > 0 {
+                                            selectedCards = cards
+                                            
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                navigateToFlashCards = true
                                             }
-                                        } label: {
-                                            HStack {
-                                                Text("Flash Cards")
-                                                    .font(.headline)
-                                                    .foregroundColor(vm.color_text_flash_cards_button_mainset)
-                                                Spacer()
-                                            }
-                                            .padding()
-                                            .background(vm.color_back_flash_cards_button_mainset)
-                                            .cornerRadius(12)
+                                        } else {
+                                            show_alert_cards_empty = true
                                         }
-                                        .padding(.horizontal)
-                                        .alert(isPresented: $show_alert_cards_empty) {
-                                            Alert(
-                                                title: Text("No Cards"),
-                                                message: Text("Please add cards to start flashcards"),
-                                                dismissButton: .cancel()
-                                            )
+                                    } label: {
+                                        HStack {
+                                            Text("Flash Cards")
+                                                .font(.headline)
+                                                .foregroundColor(vm.color_text_flash_cards_button_mainset)
+                                            Spacer()
                                         }
-                                        .sheet(isPresented: $open_sheet_flashcards) {
-                                            ZStack {
-                                                vm.color_back_sheet_flash_card_mainset
-                                                    .ignoresSafeArea()
-                                                
-                                                VStack {
-                                                    VStack {
-                                                        // Toggle Front and Back Sides
-                                                        VStack {
-                                                            HStack {
-                                                                Toggle(isOn: Binding(
-                                                                    get: { collection.swapSides },
-                                                                    set: { newValue in
-                                                                        collection.swapSides = newValue
-                                                                        try? viewContext.save()
-                                                                    }
-                                                                )) {
-                                                                    Text("Swap Front and Back Sides")
-                                                                        .font(.headline)
-                                                                        .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
-                                                                }
-                                                                .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
-                                                                .padding()
-                                                                .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
-                                                                .cornerRadius(12)
-                                                            }
-                                                            .padding(.horizontal)
-                                                        }
-                                                        
-                                                        // Start Custom Cards "5-10-15..."
-                                                        VStack {
-                                                            Button {
-                                                                showPicker = true
-                                                            } label: {
-                                                                HStack {
-                                                                    Text("Custom cards (\(selectedCardCount))")
-                                                                        .font(.headline)
-                                                                        .foregroundColor(vm.color_text_start_custom_cards_sheet_flash_card_mainset)
-                                                                    Spacer()
-                                                                }
-                                                                .padding()
-                                                                .background(vm.color_back_start_custom_cards_sheet_flash_card_mainset)
-                                                                .cornerRadius(12)
-                                                            }
-                                                            .padding(.horizontal)
-                                                            .sheet(isPresented: $showPicker) {
-                                                                ZStack {
-                                                                    vm.color_back_sheet_start_custom_cards_mainset
-                                                                        .ignoresSafeArea()
-                                                                    
-                                                                    VStack {
-                                                                        Text("Select number of cards")
-                                                                            .foregroundStyle(vm.color_text_select_number_cards_mainset)
-                                                                            .font(.headline)
-                                                                            .padding()
-                                                                        
-                                                                        Picker("Number of cards", selection: $selectedCardCount) {
-                                                                            ForEach(Array(stride(from: 5, through: 1000, by: 5)), id: \.self) { number in
-                                                                                Text("\(number)")
-                                                                                    .foregroundStyle(vm.color_text_number_cards_mainset)
-                                                                                    .tag(number)
-                                                                            }
-                                                                        }
-                                                                        .pickerStyle(.wheel)
-                                                                        
-                                                                        Button {
-                                                                            let today = Calendar.current.startOfDay(for: Date())
-                                                                            let dueCards = cards.filter { card in
-                                                                                if card.lastGrade == .again || card.isNew { return true }
-                                                                                if let scheduleDate = card.nextScheduleDate {
-                                                                                    let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
-                                                                                    return scheduleDay <= today
-                                                                                }
-                                                                                return false
-                                                                            }
-                                                                            selectedCards = Array(dueCards.shuffled().prefix(selectedCardCount))
-                                                                            
-                                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                                                navigateToFlashCards = true
-                                                                            }
-                                                                            
-                                                                            // for dismiss sheet
-                                                                            showPicker = false
-                                                                            open_sheet_flashcards = false
-                                                                        } label: {
-                                                                            HStack {
-                                                                                Text("Start")
-                                                                                    .font(.headline)
-                                                                                    .foregroundColor(vm.color_text_button_start_mainset)
-                                                                            }
-                                                                            .padding()
-                                                                            .padding(.horizontal, 100)
-                                                                            .background(vm.color_back_button_start_mainset)
-                                                                            .cornerRadius(12)
-                                                                        }
-                                                                    }
-                                                                }
-                                                                .presentationDetents([.height(300)])
-                                                            }
-                                                        }
-                                                        
-                                                        // Start Button
-                                                        VStack {
-                                                            Spacer()
-                                                            
-                                                            Button {
-                                                                selectedCards = cards
-                                                                
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                                    navigateToFlashCards = true
-                                                                }
-                                                                
-                                                                // for dismiss sheet
-                                                                showPicker = false
-                                                                open_sheet_flashcards = false
-                                                            } label: {
-                                                                HStack {
-                                                                    Text("Start")
-                                                                        .font(.headline)
-                                                                        .foregroundColor(vm.color_main_text_button_start_mainset)
-                                                                }
-                                                                .padding()
-                                                                .padding(.horizontal, 100)
-                                                                .background(vm.color_main_back_button_start_mainset)
-                                                                .cornerRadius(12)
-                                                                .shadow(radius: 5)
-                                                            }
-                                                            .padding(.horizontal)
-                                                        }
-                                                    }
-                                                    .padding(.top)
-                                                    
-                                                    Spacer()
-                                                }
-                                            }
-                                            .presentationDetents([.height(300)])
-                                        }
+                                        .padding()
+                                        .background(vm.color_back_flash_cards_button_mainset)
+                                        .cornerRadius(12)
+                                    }
+                                    .padding(.horizontal)
+                                    .alert(isPresented: $show_alert_cards_empty) {
+                                        Alert(
+                                            title: Text("No Cards"),
+                                            message: Text("Please add cards to start flashcards"),
+                                            dismissButton: .cancel()
+                                        )
                                     }
                                 }
                             }

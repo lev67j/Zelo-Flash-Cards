@@ -5,6 +5,7 @@
 //  Created by Lev Vlasov on 2025-06-23.
 //
 
+
 import SwiftUI
 import CoreData
 
@@ -594,7 +595,6 @@ extension FlashCardView {
     }
     
     private func handleHard(_ card: Card) {
-        
         hard_cards += 1
         
         card.nextScheduleDate = nextScheduleDateForHard()
@@ -612,7 +612,6 @@ extension FlashCardView {
     }
     
     private func handleGood(_ card: Card) {
-        
         good_cards += 1
         
         card.nextScheduleDate = nextScheduleDateForGood()

@@ -98,6 +98,7 @@ struct CardShopView: View {
                                 ForEach(sorted_shop_collections) { collection in
                                      NavigationLink {
                                          List_Crads_in_Shop_Language(collection: collection)
+                                             .navigationBarBackButtonHidden(true)
                                     } label: {
                                         ShopCollectionCardView(collection: collection, vm: vm)
                                     }
@@ -156,7 +157,7 @@ struct ShopCollectionCardView: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: 150)
-            .background(Color(hex: "#546a50").opacity(0.2))
+            .background(Color(hex: "#546a50").opacity(0.000000001))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
@@ -183,10 +184,10 @@ struct ShopCollectionCardView: View {
                         
                     } label: {
                         Image(systemName: "plus")
-                            .foregroundColor(Color(hex: "#ddead1"))
+                            .foregroundColor(.black)
                             .font(.system(size: 20, weight: .bold))
                             .frame(width: 43, height: 43)
-                            .background(Color(hex: "#546a90").opacity(0.25))
+                            .background(Color(hex: "FBDA4B"))
                             .cornerRadius(12)
                             .scaleEffect(1.0)
                     }

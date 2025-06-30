@@ -18,10 +18,11 @@ struct ProfileView: View {
               
                 // User avatar, name
                 VStack {
-                    Image(systemName: "person.fill")
+                    Image("icon_image")
                         .resizable()
                         .frame(width: 100, height: 100)
                         .foregroundColor(Color(hex: "#546a50").opacity(0.5))
+                        .cornerRadius(55)
                     
                     Text("Anonymous User")
                         .font(.system(size: 20).bold())

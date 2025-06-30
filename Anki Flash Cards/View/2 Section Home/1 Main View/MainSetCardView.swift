@@ -349,6 +349,7 @@ struct MainSetCardView: View {
                                                                 .padding(.horizontal, 100)
                                                                 .background(vm.color_main_back_button_start_mainset)
                                                                 .cornerRadius(12)
+                                                                .shadow(radius: 5)
                                                             }
                                                             .padding(.horizontal)
                                                         }

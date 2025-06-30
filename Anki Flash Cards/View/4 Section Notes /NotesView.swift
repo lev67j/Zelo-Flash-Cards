@@ -35,6 +35,16 @@ struct NotesView: View {
                          
                         } else {
                             ScrollView {
+                                HStack {
+                                    Text("Notes")
+                                        .foregroundColor(.black)
+                                        .font(.system(size: 17)).bold()
+                                        .padding(.horizontal, 13)
+                                      
+                                    
+                                    Spacer()
+                                }
+                                
                                 ForEach(notes) { note in
                                     Button {
                                         selectedNote = note
@@ -58,7 +68,7 @@ struct NotesView: View {
                                         .padding()
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .frame(height: 150)
-                                        .background(Color(hex: "#546a50").opacity(0.2))
+                                        .background(Color(hex: "#546a50").opacity(0.000000001))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 12)
                                                 .stroke(Color(hex: "#546a50").opacity(0.2), lineWidth: 8)
@@ -88,7 +98,7 @@ struct NotesView: View {
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.black)
                                     .frame(width: 60, height: 60)
-                                    .background(Color(hex: "#546a50").opacity(0.5))
+                                    .background(Color(hex: "FBDA4B"))
                                     .cornerRadius(20)
                                     .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 4)
                             }
@@ -110,7 +120,7 @@ struct NotesView: View {
         guard let date = date else { return "" }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        formatter.timeStyle = .short
+        formatter.timeStyle = .none
         return formatter.string(from: date)
     }
 }

@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct List_Crads_in_Shop_Language: View {
-    @ObservedObject var collection: ShopCollection
+    @Environment(\.dismiss) private var dismiss
+     @ObservedObject var collection: ShopCollection
     @State private var searchText: String = ""
     
     private var cards: [ShopCard] {
@@ -31,16 +32,51 @@ struct List_Crads_in_Shop_Language: View {
                 .ignoresSafeArea()
             
             VStack {
-                TextField("Search cards...", text: $searchText)
-                    .padding(10)
-                    .background(Color.white.opacity(0.7))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 3)
-                    )
-                    .cornerRadius(12)
-                    .padding(.horizontal)
+                // Header
+                VStack {
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(Color(hex: "#546a50"))
+                           }
+                        .padding(.horizontal)
+                        
+                        Spacer()
+                        Text("\(collection.name ?? "Language") Cards")
+                            .font(.system(size: 18)).bold()
+                        Spacer()
+                        
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(Color(hex: "#546a50"))
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.bottom)
+                }
+                
+                // Search Cards
+                VStack {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(Color(hex: "#546a50").opacity(0.6))
+                            .bold()
+                            .padding(.leading)
+                        
+                        TextField("Search cards", text: $searchText)
+                            .foregroundStyle(Color(hex: "#546a50"))
+                            .padding([.top, .bottom, .trailing], 10)
+                    }
+                    .background(Color(hex: "#546a50").opacity(0.2))
+                    .padding(.horizontal, 25)
                     .padding(.vertical, 5)
+                }
                 
                 if cards.isEmpty {
                     Text("No cards available")
@@ -51,34 +87,78 @@ struct List_Crads_in_Shop_Language: View {
                    ScrollView {
                         VStack(spacing: 0) {
                             ForEach(cards) { card in
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text(card.frontText ?? "No front text")
-                                            .font(.headline)
-                                        Text(card.backText ?? "No back text")
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
+                                VStack {
+                                    VStack {
+                                        HStack {
+                                            // Cell Card
+                                            VStack(alignment: .leading) {
+                                                
+                                                // Front
+                                                VStack {
+                                                    HStack {
+                                                        Text(card.frontText ?? "No front text")
+                                                            .foregroundStyle(Color(hex: "#546a50"))
+                                                            .font(.system(size: 17))
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                    }
+                                                    
+                                                    Rectangle()
+                                                        .foregroundStyle(Color(hex: "#546a50"))
+                                                        .frame(height: 1.3)
+                                                        .padding(.horizontal)
+                                                    
+                                                    HStack {
+                                                        Text("Term")
+                                                            .foregroundStyle(Color(hex: "#546a50"))
+                                                            .font(.system(size: 11))
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                    }
+                                                }
+                                                .padding(.bottom, 10)
+                                                
+                                                // Back
+                                                VStack {
+                                                    HStack {
+                                                        Text(card.backText ?? "No back text")
+                                                            .foregroundStyle(Color(hex: "#546a50"))
+                                                            .font(.system(size: 17))
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                    }
+                                                    
+                                                    Rectangle()
+                                                        .foregroundStyle(Color(hex: "#546a50"))
+                                                        .frame(height: 1.3)
+                                                        .padding(.horizontal)
+                                                    
+                                                    HStack {
+                                                        Text("Definition")
+                                                            .foregroundStyle(Color(hex: "#546a50"))
+                                                            .font(.system(size: 11))
+                                                            .padding(.horizontal)
+                                                        
+                                                        Spacer()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .frame(height: 150)
+                                        .background(Color(hex: "#546a50").opacity(0.2))
+                                        .padding(5)
                                     }
-                                    Spacer()
-                                }
-                                .padding()
-                                .background(Color.white)
-                                
-                                if card != cards.last {
-                                    Divider()
-                                        .background(Color.gray)
-                                        .padding(.horizontal)
                                 }
                             }
                         }
-                        .background(Color.white) // Фон для всего списка
-                        .cornerRadius(12) // Закругленные углы для всего списка
-                        .padding(.horizontal, 20)
+                      .padding(.horizontal, 20)
                     }
                 }
             }
-            .navigationTitle("\(collection.name ?? "Language") Cards")
-            .onAppear {
+           .onAppear {
                 print("Loaded \(cards.count) cards for \(collection.name ?? "unknown")")
             }
         }

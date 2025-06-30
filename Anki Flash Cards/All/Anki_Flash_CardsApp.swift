@@ -15,6 +15,7 @@ struct Anki_Flash_CardsApp: App {
         WindowGroup {
             OnboardingView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .preferredColorScheme(.light) // Only light theme
         }
     }
 }

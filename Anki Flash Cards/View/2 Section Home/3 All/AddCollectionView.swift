@@ -96,9 +96,10 @@ struct AddCollectionView: View {
                             .font(.headline)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color(hex: "#F4863E").opacity(0.99))
+                            .background(Color(hex: "FBDA4B"))
                             .foregroundColor(.black)
                             .cornerRadius(12)
+                            .shadow(radius: 5)
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 20)

@@ -113,7 +113,7 @@ struct HomeView: View {
                                     .fill(vm.color_back_button_search_home)
                                     .frame(height: 50)
                                     .cornerRadius(30)
-                                
+                                   
                                 HStack {
                                     VStack(alignment: .leading) {
                                         HStack {
@@ -169,9 +169,13 @@ struct HomeView: View {
             HStack {
                 Spacer()
                 if selectedTab == "All" {
-                    Button(action: {
+                    Button {
                         showingAddCollection = true
-                    }) {
+                        
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                    } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 24, weight: .bold))
                             .frame(width: 60, height: 60)

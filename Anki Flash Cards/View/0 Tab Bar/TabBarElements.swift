@@ -70,6 +70,8 @@ struct CustomTabBar: View {
                           name: "Notes",
                           select_color: vm.color_2_tab_button_selected_tabbar,
                           no_select_color: vm.color_2_tab_button_no_selected_tabbar)
+                
+                
                 TabButton(selectedTab: $selectedTab, icon: "tray.full.fill",
                           tab: .day_quest,
                           name: "AI Quest",
@@ -89,7 +91,7 @@ struct CustomTabBar: View {
 struct TabButton: View {
     @ObservedObject private var vm = DesignVM()
     @Binding var selectedTab: TabName
-     
+    
     let icon: String
     let tab: TabName
     let name: String
@@ -101,6 +103,11 @@ struct TabButton: View {
             withAnimation {
                 selectedTab = tab
             }
+            
+            // Вибрация
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            
         } label: {
             VStack {
                 Image(systemName: icon)

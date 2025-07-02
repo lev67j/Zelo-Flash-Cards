@@ -107,6 +107,11 @@ struct CardShopView: View {
                         }
                     }
                 }
+                .onAppear {
+                    // Вибрация
+                    let generator = UIImpactFeedbackGenerator(style: .soft)
+                    generator.impactOccurred()
+                }
             }
         }
     }

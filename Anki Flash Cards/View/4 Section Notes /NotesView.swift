@@ -91,9 +91,13 @@ struct NotesView: View {
                         Spacer()
                         HStack {
                             Spacer()
-                            Button(action: {
+                            Button {
                                 showingAddNote = true
-                            }) {
+                                
+                                // Вибрация
+                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                                generator.impactOccurred()
+                            } label: {
                                 Image(systemName: "plus")
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.black)

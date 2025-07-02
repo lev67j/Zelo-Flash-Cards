@@ -198,6 +198,10 @@ struct MainSetCardView: View {
                                  // Flash Cards
                                 VStack {
                                     Button {
+                                        // Вибрация
+                                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                                        generator.impactOccurred()
+                                        
                                         // If Cards > 0
                                         if collection.cards?.count ?? 0 > 0 {
                                             selectedCards = cards
@@ -248,9 +252,12 @@ struct MainSetCardView: View {
                 EditSetView(collection: collection)
                     .environment(\.managedObjectContext, viewContext)
                     .navigationBarBackButtonHidden(true)
-                
-                
             }
+        }
+        .onAppear {
+            // Вибрация
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
         }
     }
     private func deleteCollection() {

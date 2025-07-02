@@ -86,9 +86,13 @@ struct AddCollectionView: View {
                 
                 VStack {
                     Button {
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                        
                         if collectionName != "" && collectionName != " " && collectionName != "  " {
                             addCollection()
-                        } else {
+                         } else {
                             add_name_alert = true
                         }
                     } label: {

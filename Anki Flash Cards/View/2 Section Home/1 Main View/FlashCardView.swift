@@ -94,6 +94,11 @@ struct FlashCardView: View {
                                                             .font(.headline)
                                                             .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
                                                     }
+                                                    .onTapGesture {
+                                                        // Вибрация
+                                                        let generator = UIImpactFeedbackGenerator(style: .soft)
+                                                        generator.impactOccurred()
+                                                    }
                                                     .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
                                                     .padding()
                                                     .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
@@ -139,6 +144,10 @@ struct FlashCardView: View {
                                                             .pickerStyle(.wheel)
                                                             
                                                             Button {
+                                                                // Вибрация
+                                                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                                                                generator.impactOccurred()
+                                                                
                                                                 let today = Calendar.current.startOfDay(for: Date())
                                                                 let dueCards = allCards.filter { card in
                                                                     if card.lastGrade == .again || card.isNew { return true }
@@ -164,6 +173,7 @@ struct FlashCardView: View {
                                                                 .padding(.horizontal, 100)
                                                                 .background(vm.color_back_button_start_mainset)
                                                                 .cornerRadius(12)
+                                                                .shadow(radius: 5)
                                                             }
                                                         }
                                                     }
@@ -176,6 +186,10 @@ struct FlashCardView: View {
                                                 Spacer()
                                                 
                                                 Button {
+                                                    // Вибрация
+                                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                                    generator.impactOccurred()
+                                                 
                                                     selectedCards = allCards
                                                     
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -365,6 +379,11 @@ struct FlashCardView: View {
                         VStack {
                               VStack {
                                 Button {
+                                    // Вибрация
+                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                    generator.impactOccurred()
+                                   
+                                    
                                     dismiss()
                                 } label: {
                                     Text("Back in Menu")
@@ -387,6 +406,10 @@ struct FlashCardView: View {
         }
     }
     private func handleSwipe(for card: Card, direction: SwipeDirection) {
+        // Вибрация
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        
         switch direction {
         case .left:
             handleHard(card)

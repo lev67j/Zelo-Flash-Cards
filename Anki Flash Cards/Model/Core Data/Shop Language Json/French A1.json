@@ -1,6 +1,7 @@
 
 
 {
+    "language": "French",
     "name": "French A1",
     "cards": [
   {"front": "Bonjour", "back": "Hello"},

@@ -1,5 +1,6 @@
 
 {
+    "language": "Chinese",
     "name": "Chinese A1",
     "cards": [
   {"front": "你好", "back": "Hello"},

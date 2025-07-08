@@ -1,5 +1,6 @@
 
 {
+    "language": "Russian",
     "name": "Russian A1",
     "cards": [
   {"front": "Привет", "back": "Hello"},

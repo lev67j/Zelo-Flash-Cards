@@ -15,8 +15,8 @@ struct HomeView: View {
         animation: .default)
     private var collections: FetchedResults<CardCollection>
     
+    @State private var navigateToCardShop = false
     @State private var showingAddCollection = false
-    @State private var selectedTab: String = "All"
     @ObservedObject private var vm = DesignVM()
     
     // Computed property to sort collections by priority
@@ -42,30 +42,30 @@ struct HomeView: View {
                     
                     // Search Language
                     search_language_button_and_settings
-                       
+                    
                     // Main content section
                     if sortedCollections.isEmpty {
                         empty_desk_user
-                     } else {
+                    } else {
                         VStack {
-                             ScrollView {
+                            ScrollView {
                                 HStack {
                                     Text("Sets")
                                         .foregroundColor(vm.color_title_sets)
                                         .font(.system(size: 17)).bold()
                                         .padding(.horizontal, 13)
-                                      
+                                    
                                     
                                     Spacer()
                                 }
-                                 ForEach(sortedCollections) { collection in
-                                     NavigationLink {
-                                         MainSetCardView(collection: collection)
-                                             .navigationBarBackButtonHidden(true)
-                                     } label: {
-                                         CollectionCardView(collection: collection)
-                                     }
-                                 }
+                                ForEach(sortedCollections) { collection in
+                                    NavigationLink {
+                                        MainSetCardView(collection: collection)
+                                            .navigationBarBackButtonHidden(true)
+                                    } label: {
+                                        CollectionCardView(collection: collection)
+                                    }
+                                }
                             }
                         }
                     }
@@ -84,11 +84,14 @@ struct HomeView: View {
             .onAppear {
                 if isFirstOpen == false {
                     isFirstOpen = true
-                    
-                    // In first open app show shop language
-                    selectedTab = "Card Shop"
+                     // In first open app show shop language
+                    navigateToCardShop = true
                 }
             }
+        }
+        .navigationDestination(isPresented: $navigateToCardShop) {
+            CardShopView()
+                .navigationBarBackButtonHidden(true)
         }
     }
     
@@ -97,15 +100,17 @@ struct HomeView: View {
             Spacer()
         }
     }
-        
+    
     var search_language_button_and_settings: some View {
         VStack {
             HStack {
                 // Search
                 VStack {
-                    NavigationLink {
-                        CardShopView()
-                            .navigationBarBackButtonHidden(true)
+                   // NavigationLink {
+                     //   CardShopView()
+                       //     .navigationBarBackButtonHidden(true)
+                    Button {
+                        navigateToCardShop = true
                     } label: {
                         VStack(alignment: .leading) {
                             ZStack {
@@ -113,7 +118,7 @@ struct HomeView: View {
                                     .fill(vm.color_back_button_search_home)
                                     .frame(height: 50)
                                     .cornerRadius(30)
-                                   
+                                
                                 HStack {
                                     VStack(alignment: .leading) {
                                         HStack {
@@ -138,25 +143,25 @@ struct HomeView: View {
                 
                 // Settings Button (Settings Screen In Development)
                 /*
-                VStack {
-                    NavigationLink {
-                        SettingsView()
-                    } label: {
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(.gray.opacity(0.2))
-                                    .frame(height: 50)
-                                
-                                Image(systemName: "gearshape.fill")
-                                    .foregroundStyle(Color(hex: "#546a50").opacity(0.7))
-                                    .font(.system(size: 20))
-                            }
-                        }
-                    }
-                }
-                .padding(5)
-*/
+                 VStack {
+                 NavigationLink {
+                 SettingsView()
+                 } label: {
+                 VStack {
+                 ZStack {
+                 Circle()
+                 .fill(.gray.opacity(0.2))
+                 .frame(height: 50)
+                 
+                 Image(systemName: "gearshape.fill")
+                 .foregroundStyle(Color(hex: "#546a50").opacity(0.7))
+                 .font(.system(size: 20))
+                 }
+                 }
+                 }
+                 }
+                 .padding(5)
+                 */
             }
             .padding(.bottom)
             .padding(.horizontal)
@@ -168,25 +173,23 @@ struct HomeView: View {
             Spacer()
             HStack {
                 Spacer()
-                if selectedTab == "All" {
-                    Button {
-                        showingAddCollection = true
-                        
-                        // Вибрация
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.impactOccurred()
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(size: 24, weight: .bold))
-                            .frame(width: 60, height: 60)
-                            .background(vm.color_back_button_add_collection_home)
-                            .foregroundColor(vm.color_text_button_add_collection_home)
-                            .cornerRadius(20)
-                            .shadow(color: .black.opacity(0.2), radius: 5)
-                    }
-                    .padding(.bottom, 85)
-                    .padding(.trailing, 20)
+                Button {
+                    showingAddCollection = true
+                    
+                    // Вибрация
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                    generator.impactOccurred()
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 24, weight: .bold))
+                        .frame(width: 60, height: 60)
+                        .background(vm.color_back_button_add_collection_home)
+                        .foregroundColor(vm.color_text_button_add_collection_home)
+                        .cornerRadius(20)
+                        .shadow(color: .black.opacity(0.2), radius: 5)
                 }
+                .padding(.bottom, 85)
+                .padding(.trailing, 20)
             }
         }
     }

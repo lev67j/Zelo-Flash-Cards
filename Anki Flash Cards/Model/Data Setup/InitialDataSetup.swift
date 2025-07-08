@@ -35,25 +35,25 @@ struct InitialDataSetup {
             language.priority = "middle"
             
             if language.name_language == "Spanish" {
-                language.priority = "middle"
+                language.priority = "high"
             } else if language.name_language == "English" {
+                language.priority = "high"
+            } else if language.name_language == "French" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
+            } else if language.name_language == "German" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
+            } else if language.name_language == "Chinese" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
+            } else if language.name_language == "Japanese" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
+            } else if language.name_language == "Russian" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
+            } else if language.name_language == "Italian" {
                 language.priority = "middle"
-            } else if language.name_language == "English" {
-                language.priority = "middle"
-            } else if language.name_language == "English" {
-                language.priority = "middle"
-            } else if language.name_language == "English" {
-                language.priority = "middle"
+            } else if language.name_language == "Portuguese" {
+                language.priority = "high"
+            } else if language.name_language == "Arabic" {
+                language.priority = "low"
             } else {
                 language.priority = "middle"
             }

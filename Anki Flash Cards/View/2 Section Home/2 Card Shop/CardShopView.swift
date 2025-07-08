@@ -23,11 +23,20 @@ struct CardShopView: View {
     @State private var searchText: String = ""
     
     // Computed property to sort collections by priority
-    private var sorted_shop_collections: [ShopCollection] {
+    private var sortedCollections: [ShopCollection] {
+        shopCollections.sorted { (lhs, rhs) -> Bool in
+            let priorityOrder = ["high": 3, "middle": 2, "low": 1]
+            let lhsPriority = priorityOrder[lhs.priority?.lowercased() ?? "middle"] ?? 2
+            let rhsPriority = priorityOrder[rhs.priority?.lowercased() ?? "middle"] ?? 2
+            return lhsPriority > rhsPriority
+        }
+    }
+ 
+    private var sorted_shop_collections_and_search: [ShopCollection] {
         if searchText.isEmpty {
-            return shopCollections.dropLast(0)
+            return sortedCollections
         } else {
-            return shopCollections.filter { collection in
+            return sortedCollections.filter { collection in
                 (collection.name?.lowercased().contains(searchText.lowercased()) ?? false) ||
                 (collection.language?.name_language?.lowercased().contains(searchText.lowercased()) ?? false)
             }
@@ -95,7 +104,7 @@ struct CardShopView: View {
                     VStack {
                         ScrollView {
                             VStack(spacing: 8) {
-                                ForEach(sorted_shop_collections) { collection in
+                                ForEach(sorted_shop_collections_and_search) { collection in
                                      NavigationLink {
                                          List_Crads_in_Shop_Language(collection: collection)
                                              .navigationBarBackButtonHidden(true)

@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		0B29FA342DE9A3B40013F1DA /* Zelo Cards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zelo Cards.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B29FA342DE9A3B40013F1DA /* Zelo AI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zelo AI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0B29FA472DE9A3B50013F1DA /* Exceptions for "Anki Flash Cards" folder in "Zelo Cards" target */ = {
+		0B29FA472DE9A3B50013F1DA /* Exceptions for "Anki Flash Cards" folder in "Zelo AI" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				All/Info.plist,
 			);
-			target = 0B29FA332DE9A3B40013F1DA /* Zelo Cards */;
+			target = 0B29FA332DE9A3B40013F1DA /* Zelo AI */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -24,7 +24,7 @@
 		0B29FA362DE9A3B40013F1DA /* Anki Flash Cards */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B29FA472DE9A3B50013F1DA /* Exceptions for "Anki Flash Cards" folder in "Zelo Cards" target */,
+				0B29FA472DE9A3B50013F1DA /* Exceptions for "Anki Flash Cards" folder in "Zelo AI" target */,
 			);
 			path = "Anki Flash Cards";
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 		0B29FA352DE9A3B40013F1DA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B29FA342DE9A3B40013F1DA /* Zelo Cards.app */,
+				0B29FA342DE9A3B40013F1DA /* Zelo AI.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,9 +61,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0B29FA332DE9A3B40013F1DA /* Zelo Cards */ = {
+		0B29FA332DE9A3B40013F1DA /* Zelo AI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0B29FA482DE9A3B50013F1DA /* Build configuration list for PBXNativeTarget "Zelo Cards" */;
+			buildConfigurationList = 0B29FA482DE9A3B50013F1DA /* Build configuration list for PBXNativeTarget "Zelo AI" */;
 			buildPhases = (
 				0B29FA302DE9A3B40013F1DA /* Sources */,
 				0B29FA312DE9A3B40013F1DA /* Frameworks */,
@@ -76,11 +76,11 @@
 			fileSystemSynchronizedGroups = (
 				0B29FA362DE9A3B40013F1DA /* Anki Flash Cards */,
 			);
-			name = "Zelo Cards";
+			name = "Zelo AI";
 			packageProductDependencies = (
 			);
 			productName = "Anki Flash Cards";
-			productReference = 0B29FA342DE9A3B40013F1DA /* Zelo Cards.app */;
+			productReference = 0B29FA342DE9A3B40013F1DA /* Zelo AI.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -112,7 +112,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0B29FA332DE9A3B40013F1DA /* Zelo Cards */,
+				0B29FA332DE9A3B40013F1DA /* Zelo AI */,
 			);
 		};
 /* End PBXProject section */
@@ -345,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0B29FA482DE9A3B50013F1DA /* Build configuration list for PBXNativeTarget "Zelo Cards" */ = {
+		0B29FA482DE9A3B50013F1DA /* Build configuration list for PBXNativeTarget "Zelo AI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0B29FA492DE9A3B50013F1DA /* Debug */,

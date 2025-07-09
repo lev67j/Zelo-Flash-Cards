@@ -102,10 +102,13 @@ struct InitialDataSetup {
     
     private static func priorityForLanguage(_ language: String) -> String {
         switch language {
-        case "Spanish", "English", "Portuguese":
+        case "Spanish", "French", "German", "Japanese", "Korean":
             return "high"
-        case "Arabic":
+        case "Italian", "Chinese", "Arabic", "Russian", "Portuguese":
+            return "middle"
+        case "English":
             return "low"
+            
         default:
             return "middle"
         }

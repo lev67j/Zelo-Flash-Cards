@@ -227,10 +227,11 @@ struct ProfileView: View {
             fetchStudiedCardsCount()
         }
     }
+    
     private func fetchStudiedCardsCount() {
         let request: NSFetchRequest<Card> = Card.fetchRequest()
-        request.predicate = NSPredicate(format: "isNew == NO")
-        
+        request.predicate = NSPredicate(format: "isNew == false")
+
         do {
             let count = try viewContext.count(for: request)
             studiedCardsCount = count

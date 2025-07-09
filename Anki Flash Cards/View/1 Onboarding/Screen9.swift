@@ -64,6 +64,10 @@ struct NineScreen: View {
                         }
                     }
                 }
+                // Вибрация
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+          
             }) {
                 Text("Continue")
                     .fontWeight(.bold)

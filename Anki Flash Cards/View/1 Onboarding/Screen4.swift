@@ -80,6 +80,11 @@ private struct StudyTimeButton: View {
             withAnimation {
                 currentPage += 1
             }
+            
+            // Вибрация
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+      
         }) {
             HStack {
                 HStack {

@@ -18,6 +18,9 @@ struct ProfileView: View {
     @ObservedObject private var vm = DesignVM()
     
     @State private var studiedCardsCount = 0
+    @State private var starsCount = 0
+    @AppStorage("totalTimeSpent") private var totalTimeSpent: Double = 0
+    @AppStorage("currentStreak") private var currentStreak: Int = 0
     
     var body: some View {
         ZStack {
@@ -108,7 +111,7 @@ struct ProfileView: View {
                                     }
                                     
                                     HStack {
-                                        Text("14 Days")
+                                        Text("\(currentStreak) Days")
                                             .foregroundColor(Color(hex: "#546a50"))
                                             .font(.system(size: 30).bold())
                                             .padding(.leading)
@@ -151,7 +154,7 @@ struct ProfileView: View {
                                     }
                                     
                                     HStack {
-                                        Text("55 min")
+                                        Text(formattedTimeSpent)
                                             .foregroundColor(Color(hex: "#546a50"))
                                             .font(.system(size: 30).bold())
                                             .padding(.leading)
@@ -193,7 +196,7 @@ struct ProfileView: View {
                                     }
                                     
                                     HStack {
-                                        Text("5 Stars")
+                                        Text("\(starsCount) Stars")
                                             .foregroundColor(Color(hex: "#546a50"))
                                             .font(.system(size: 30).bold())
                                             .padding(.leading)
@@ -231,11 +234,26 @@ struct ProfileView: View {
         do {
             let count = try viewContext.count(for: request)
             studiedCardsCount = count
+            
+            starsCount = max(0, count / 20)
         } catch {
             print("Ошибка при подсчёте изученных карточек: \(error)")
             studiedCardsCount = 0
         }
     }
+    
+    private var formattedTimeSpent: String {
+        let totalSeconds = Int(totalTimeSpent)
+        let minutes = totalSeconds / 60
+        if minutes < 60 {
+            return "\(minutes) min"
+        } else {
+            let hours = minutes / 60
+            let remainingMinutes = minutes % 60
+            return "\(hours) h \(remainingMinutes) min"
+        }
+    }
+
 }
 
 

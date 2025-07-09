@@ -15,7 +15,8 @@ struct HomeView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \CardCollection.creationDate, ascending: false)],
         animation: .default)
     private var collections: FetchedResults<CardCollection>
-    
+  
+    @State private var navigateToMainCard = false
     @State private var navigateToCardShop = false
     @State private var showingAddCollection = false
     @ObservedObject private var vm = DesignVM()

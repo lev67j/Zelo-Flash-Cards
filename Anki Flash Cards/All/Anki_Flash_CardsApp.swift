@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseAnalytics
 
 @main
 struct Anki_Flash_CardsApp: App {
@@ -19,6 +21,10 @@ struct Anki_Flash_CardsApp: App {
     
     @State private var sessionStart: Date? = nil
     
+    init() {
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
             OnboardingView()
@@ -28,17 +34,26 @@ struct Anki_Flash_CardsApp: App {
                     // Запуск сессии при старте приложения
                     sessionStart = Date()
                     updateStreak()
+                    
+                    // Логируем событие запуска приложения
+                    Analytics.logEvent("app_launch", parameters: nil)
                 }
                 .onChange(of: scenePhase) { newPhase, _ in
                     if newPhase == .active {
-                        // Возобновляем сессию, когда приложение активируется
+                        // Возобновляем сессию
                         sessionStart = Date()
+                        Analytics.logEvent("app_became_active", parameters: nil)
                     } else if newPhase == .inactive || newPhase == .background {
-                        // Сохраняем время при уходе в фон или неактивности
+                        // Сохраняем время
                         if let start = sessionStart {
                             let seconds = Date().timeIntervalSince(start)
                             totalTimeSpent += seconds
                             sessionStart = nil
+                            
+                            // Логируем время сессии
+                            Analytics.logEvent("session_end", parameters: [
+                                "duration": seconds
+                            ])
                         }
                     }
                 }
@@ -56,13 +71,18 @@ struct Anki_Flash_CardsApp: App {
             if diff == 1 {
                 currentStreak += 1
             } else if diff > 1 {
-                currentStreak = 1 // сбрасываем стрик, начинаем заново
+                currentStreak = 1
             }
-            // если diff == 0 — в тот же день, стрик не меняем
+            // diff == 0 — тот же день, не меняем
         } else {
-            currentStreak = 1 // первый запуск
+            currentStreak = 1
         }
         
         lastLaunchDate = formatter.string(from: today)
+        
+        // Логируем стрик
+        Analytics.logEvent("streak_updated", parameters: [
+            "current_streak": currentStreak
+        ])
     }
 }

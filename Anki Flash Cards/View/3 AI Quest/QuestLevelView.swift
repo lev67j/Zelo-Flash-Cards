@@ -42,7 +42,8 @@ struct QuestLevelView: View {
                 .padding(.horizontal, 20)
                 
                 Button {
-                    // TODO: Add donation action
+                    // TODO: Only click test
+                    
                     
                     // Вибрация
                     let generator = UIImpactFeedbackGenerator(style: .heavy)
@@ -54,7 +55,7 @@ struct QuestLevelView: View {
                         .foregroundColor(.white)
                         .padding(.vertical, 14)
                         .frame(maxWidth: .infinity)
-                        .background(Color(hex: "#546a50"))
+                        .background(Color(hex: "FBDA4B"))
                         .cornerRadius(15)
                         .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
                 }

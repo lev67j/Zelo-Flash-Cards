@@ -47,7 +47,7 @@ struct OnboardingView: View {
                 InitialDataSetup.setupInitialData(context: viewContext)
                 print("Language downloaded: \(languages.count)")
                 for language in languages {
-                    print("Language: \(language.name_language ?? ""), Collections: \(language.language_collections?.count ?? 0), Priority: \(language.priority ?? "")")
+                    print("Language: \(language.name_language ?? ""), Collections: \(language.language_collections?.count ?? 0), Priority: \(language.priority ?? 0)")
                 }
             }
         } else {

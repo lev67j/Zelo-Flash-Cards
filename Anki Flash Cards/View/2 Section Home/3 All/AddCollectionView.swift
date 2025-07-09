@@ -12,7 +12,7 @@ struct AddCollectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @State private var collectionName: String = ""
-    @State private var selectedPriority: String = "middle"
+    @State private var selectedPriority: Int64 = 50
     
     @State private var add_name_alert = false
 
@@ -60,16 +60,16 @@ struct AddCollectionView: View {
                                         .frame(width: 1.5, height: 20)
                                     
                                     HStack(spacing: 10) {
-                                        PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == "low") {
-                                            selectedPriority = "low"
+                                        PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == 20) {
+                                            selectedPriority = 20
                                         }
                                         
-                                        PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == "middle") {
-                                            selectedPriority = "middle"
+                                        PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == 50) {
+                                            selectedPriority = 50
                                         }
                                         
-                                        PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == "high") {
-                                            selectedPriority = "high"
+                                        PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == 100) {
+                                            selectedPriority = 100
                                         }
                                     }
                                 }

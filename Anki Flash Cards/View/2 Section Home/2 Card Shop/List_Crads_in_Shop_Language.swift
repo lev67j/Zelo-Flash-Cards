@@ -173,7 +173,7 @@ struct LookShopCardView_Previews: PreviewProvider {
         // Create sample ShopCollection
         let collection = ShopCollection(context: context)
         collection.name = "Spanish"
-        collection.priority = "middle"
+        collection.priority = 100
         collection.creationDate = Date()
         
         // Add sample ShopCards

@@ -21,11 +21,8 @@ struct HomeView: View {
     
     // Computed property to sort collections by priority
     private var sortedCollections: [CardCollection] {
-        collections.sorted { (lhs, rhs) -> Bool in
-            let priorityOrder = ["high": 3, "middle": 2, "low": 1]
-            let lhsPriority = priorityOrder[lhs.priority?.lowercased() ?? "middle"] ?? 2
-            let rhsPriority = priorityOrder[rhs.priority?.lowercased() ?? "middle"] ?? 2
-            return lhsPriority > rhsPriority
+        collections.sorted { lhs, rhs in
+            lhs.priority > rhs.priority
         }
     }
     

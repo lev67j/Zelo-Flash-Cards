@@ -6,8 +6,18 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ProfileView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \CardCollection.creationDate, ascending: false)],
+        animation: .default)
+    private var collections: FetchedResults<CardCollection>
+    
+    @ObservedObject private var vm = DesignVM()
+    
+    @State private var studiedCardsCount = 0
     
     var body: some View {
         ZStack {
@@ -15,7 +25,7 @@ struct ProfileView: View {
                 .ignoresSafeArea()
             
             VStack {
-              
+                
                 // User avatar, name
                 VStack {
                     Image("icon_image")
@@ -56,7 +66,7 @@ struct ProfileView: View {
                                     }
                                     
                                     HStack {
-                                        Text("285 Cards")
+                                        Text("\(studiedCardsCount) Cards")
                                             .foregroundColor(Color(hex: "#546a50"))
                                             .font(.system(size: 30).bold())
                                             .padding(.leading)
@@ -209,6 +219,21 @@ struct ProfileView: View {
                 
                 Spacer()
             }
+        }
+        .onAppear {
+            fetchStudiedCardsCount()
+        }
+    }
+    private func fetchStudiedCardsCount() {
+        let request: NSFetchRequest<Card> = Card.fetchRequest()
+        request.predicate = NSPredicate(format: "isNew == NO")
+        
+        do {
+            let count = try viewContext.count(for: request)
+            studiedCardsCount = count
+        } catch {
+            print("Ошибка при подсчёте изученных карточек: \(error)")
+            studiedCardsCount = 0
         }
     }
 }

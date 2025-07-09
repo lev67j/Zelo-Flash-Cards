@@ -24,14 +24,11 @@ struct CardShopView: View {
     
     // Computed property to sort collections by priority
     private var sortedCollections: [ShopCollection] {
-        shopCollections.sorted { (lhs, rhs) -> Bool in
-            let priorityOrder = ["high": 3, "middle": 2, "low": 1]
-            let lhsPriority = priorityOrder[lhs.priority?.lowercased() ?? "middle"] ?? 2
-            let rhsPriority = priorityOrder[rhs.priority?.lowercased() ?? "middle"] ?? 2
-            return lhsPriority > rhsPriority
+        shopCollections.sorted { lhs, rhs in
+            lhs.priority > rhs.priority
         }
     }
- 
+
     private var sorted_shop_collections_and_search: [ShopCollection] {
         if searchText.isEmpty {
             return sortedCollections
@@ -219,19 +216,7 @@ struct ShopCollectionCardView: View {
         return formatter.string(from: date)
     }
     
-    private func priorityColor(for priority: String) -> Color {
-        switch priority.lowercased() {
-        case "low":
-            return Color.blue
-        case "middle":
-            return Color.orange
-        case "high":
-            return Color.red
-        default:
-            return Color.gray
-        }
-    }
-    
+      
     private func addToUserCollections() {
         let userCollection = CardCollection(context: viewContext)
         userCollection.name = collection.name

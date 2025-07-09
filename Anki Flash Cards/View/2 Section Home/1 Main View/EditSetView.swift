@@ -13,13 +13,13 @@ struct EditSetView: View {
     @ObservedObject var collection: CardCollection
 
     @State private var collectionName: String
-    @State private var selectedPriority: String
+    @State private var selectedPriority: Int64
     @State private var add_name_alert = false
     
     init(collection: CardCollection) {
         self.collection = collection
         self._collectionName = State(initialValue: collection.name ?? "")
-        self._selectedPriority = State(initialValue: collection.priority ?? "middle")
+        self._selectedPriority = State(initialValue: Int64(collection.priority))
     }
     
     // For list cards
@@ -134,16 +134,16 @@ struct EditSetView: View {
                                                     .frame(width: 1.5, height: 20)
                                                 
                                                 HStack(spacing: 10) {
-                                                    PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == "low") {
-                                                        selectedPriority = "low"
+                                                    PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == 20) {
+                                                        selectedPriority = 20
                                                     }
                                                     
-                                                    PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == "middle") {
-                                                        selectedPriority = "middle"
+                                                    PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == 50) {
+                                                        selectedPriority = 50
                                                     }
                                                     
-                                                    PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == "high") {
-                                                        selectedPriority = "high"
+                                                    PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == 100) {
+                                                        selectedPriority = 100
                                                     }
                                                 }
                                             }
@@ -348,7 +348,7 @@ struct EditSetView_Previews: PreviewProvider {
         let collection = CardCollection(context: context)
         collection.name = "Sample Collection"
         collection.creationDate = Date()
-        collection.priority = "middle"
+        collection.priority = 50
         
         // Add sample cards
         let card1 = Card(context: context)

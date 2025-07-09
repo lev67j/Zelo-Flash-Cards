@@ -33,6 +33,10 @@ struct SixthScreen: View {
                 withAnimation {
                     currentPage += 1
                 }
+                // Вибрация
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+          
             }) {
                 Text("Let's go")
                     .fontWeight(.bold)

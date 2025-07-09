@@ -48,6 +48,11 @@ struct FirstScreen: View {
                         withAnimation {
                             currentPage += 1
                         }
+                        
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                  
                     }) {
                         Text("Get started")
                             .fontWeight(.bold)

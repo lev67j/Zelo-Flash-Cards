@@ -57,6 +57,11 @@ private struct LanguageSelectionView: View {
                         withAnimation {
                             currentPage += 1
                         }
+                        
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                  
                     }) {
                         LanguageItemView(
                             language: languages[index],

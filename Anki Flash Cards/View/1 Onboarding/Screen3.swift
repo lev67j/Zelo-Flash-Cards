@@ -57,6 +57,11 @@ private struct LevelButton: View {
             withAnimation {
                 currentPage += 1
             }
+            
+            // Вибрация
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+      
         } label: {
             VStack {
                 HStack {

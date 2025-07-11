@@ -54,6 +54,7 @@ struct HomeView: View {
                                         .padding(.horizontal, 13)
                                     Spacer()
                                 }
+                                
                                 ForEach(sortedCollections) { collection in
                                     NavigationLink {
                                         MainSetCardView(collection: collection)

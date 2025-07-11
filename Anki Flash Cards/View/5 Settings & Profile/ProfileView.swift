@@ -49,6 +49,7 @@ struct ProfileView: View {
                     } label: {
                         Text("Anonymous User")
                             .font(.system(size: 20).bold())
+                            .foregroundStyle(.black)
                     }
                 }.padding()
                 

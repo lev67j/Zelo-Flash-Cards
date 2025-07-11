@@ -349,8 +349,10 @@ struct FlashCardView: View {
                         // Test for flip card
                         VStack {
                             Spacer()
+                            
                             Text("Tap for flip card")
                                 .foregroundStyle(Color(hex: "#546a50"))
+                                .padding(.top, 50)
                                 .onTapGesture {
                                     Analytics.logEvent("flashcard_tap_for_flip_card_text_tapped", parameters: nil)
                                 }

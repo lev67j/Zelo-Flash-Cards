@@ -69,7 +69,7 @@ struct HomeView: View {
                                             }
                                     } label: {
                                         CollectionCardView(collection: collection)
-                                    }
+                                    } 
                                 }
                             }
                         }

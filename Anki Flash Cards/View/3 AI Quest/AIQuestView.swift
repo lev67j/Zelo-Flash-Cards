@@ -147,7 +147,7 @@ struct DuoStyleButton: View {
             Image(systemName: imageName)
                 .font(.system(size: 40, weight: .semibold))
                 .foregroundColor(.white)
-                .frame(width: 100, height: 100)
+                .frame(width: 90, height: 90)
                 .background(
                     LinearGradient(
                         gradient: Gradient(colors: [Color(hex: "#546a50").opacity(0.5), Color(hex: "#546a50").opacity(0.8)]),

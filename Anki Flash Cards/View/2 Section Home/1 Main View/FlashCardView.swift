@@ -168,7 +168,7 @@ struct FlashCardView: View {
                                                                 .padding()
                                                             
                                                             Picker("Number of cards", selection: $selectedCardCount) {
-                                                                ForEach(Array(stride(from: 5, through: 1000, by: 5)), id: \.self) { number in
+                                                                ForEach(Array(stride(from: 5, through: allCards.count, by: 5)), id: \.self) { number in
                                                                     Text("\(number)")
                                                                         .foregroundStyle(vm.color_text_number_cards_mainset)
                                                                         .tag(number)
@@ -222,19 +222,25 @@ struct FlashCardView: View {
                                                 Spacer()
                                                 
                                                 Button {
-                                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                                   let generator = UIImpactFeedbackGenerator(style: .medium)
                                                     generator.impactOccurred()
                                                     
                                                     Analytics.logEvent("flashcard_start_all_cards_button_tapped", parameters: ["allCardsCount": allCards.count])
-                                                    
-                                                    selectedCards = allCards
-                                                    
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                        navigateToFlashCards = true
+                                                 
+                                                    let today = Calendar.current.startOfDay(for: Date())
+                                                    let dueCards = allCards.filter { card in
+                                                        if card.lastGrade == .again || card.isNew { return true }
+                                                        if let scheduleDate = card.nextScheduleDate {
+                                                            let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
+                                                            return scheduleDay <= today
+                                                        }
+                                                        return false
                                                     }
                                                     
-                                                    open_sheet_custom_cards = false
+                                                    sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
+                                                    
                                                     open_sheet_settings_flashcards = false
+                                                    open_sheet_custom_cards = false
                                                 } label: {
                                                     HStack {
                                                         Text("Start")

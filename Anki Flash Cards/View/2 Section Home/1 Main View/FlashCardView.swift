@@ -94,10 +94,8 @@ struct FlashCardView: View {
                             Spacer()
                             
                             Button {
-                                if !sessionCards.isEmpty {
                                     Analytics.logEvent("flashcard_open_settings_button_tapped", parameters: nil)
                                     open_sheet_settings_flashcards = true
-                                }
                             } label: {
                                 Image(systemName: "gearshape.fill")
                                     .font(.system(size: 20)).bold()

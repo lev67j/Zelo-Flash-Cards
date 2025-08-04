@@ -426,7 +426,7 @@ struct FlashCardView: View {
                                 }
                                 .padding(.top, 25)
                                 .padding(.horizontal, 15)
-                                .padding(.leading, 180)
+                               // .padding(.leading, 180)
                             }
                             
                                 
@@ -450,11 +450,44 @@ struct FlashCardView: View {
                                         .foregroundColor(.white)
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(Color(hex: "#546a50"))
+                                        .background(Color(hex: "#546a50").opacity(0.6))
                                         .cornerRadius(10)
                                         .padding(.horizontal)
                                 }
                             }
+                            
+                            VStack {
+                              Button {
+                                  let generator = UIImpactFeedbackGenerator(style: .medium)
+                                   generator.impactOccurred()
+                                   
+                                  Analytics.logEvent("flashcard_practice_more_button_tapped", parameters: nil)
+                                 
+                                   let today = Calendar.current.startOfDay(for: Date())
+                                   let dueCards = allCards.filter { card in
+                                       if card.lastGrade == .again || card.isNew { return true }
+                                       if let scheduleDate = card.nextScheduleDate {
+                                           let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
+                                           return scheduleDay <= today
+                                       }
+                                       return false
+                                   }
+                                   
+                                   sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
+                                   
+                                   open_sheet_settings_flashcards = false
+                                   open_sheet_custom_cards = false
+                              } label: {
+                                  Text("Practice More")
+                                      .fontWeight(.bold)
+                                      .foregroundColor(.white)
+                                      .padding()
+                                      .frame(maxWidth: .infinity)
+                                      .background(Color(hex: "#546a50"))
+                                      .cornerRadius(10)
+                                      .padding(.horizontal)
+                              }
+                          }
                         }
                     }
                 }

@@ -26,7 +26,7 @@ struct TabBarElements: View {
                     case .notes:
                         NotesView()
                     case .day_quest:
-                        AIQuestView()
+                        AIThemesView()
                     case .profile:
                         ProfileView()
                     }
@@ -91,7 +91,7 @@ struct CustomTabBar: View {
                 
                 TabButton(selectedTab: $selectedTab, icon: "tray.full.fill",
                           tab: .day_quest,
-                          name: "AI Quest",
+                          name: "AI Themes",
                           select_color: vm.color_3_tab_button_selected_tabbar,
                           no_select_color: vm.color_3_tab_button_no_selected_tabbar)
                 TabButton(selectedTab: $selectedTab,

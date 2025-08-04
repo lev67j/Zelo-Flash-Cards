@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 FCM Token: \(fcmToken ?? "нет токена")")
+        print("🔥 FCM Token: \(fcmToken ?? "нет токена")")
 
         guard let token = fcmToken else { return }
         // Подписка на топик allUsers — пуши будут всем, кто подписан

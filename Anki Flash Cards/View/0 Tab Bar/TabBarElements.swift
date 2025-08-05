@@ -25,8 +25,8 @@ struct TabBarElements: View {
                         HomeView()
                     case .notes:
                         NotesView()
-                    case .day_quest:
-                        AIThemesView()
+                    case .ai_chat:
+                        AIChatView()
                     case .profile:
                         ProfileView()
                     }
@@ -90,8 +90,8 @@ struct CustomTabBar: View {
                 
                 
                 TabButton(selectedTab: $selectedTab, icon: "tray.full.fill",
-                          tab: .day_quest,
-                          name: "AI Themes",
+                          tab: .ai_chat,
+                          name: "AI Chat",
                           select_color: vm.color_3_tab_button_selected_tabbar,
                           no_select_color: vm.color_3_tab_button_no_selected_tabbar)
                 TabButton(selectedTab: $selectedTab,
@@ -148,5 +148,5 @@ struct TabButton: View {
 }
 
 enum TabName: String {
-    case home, day_quest, notes, profile
+    case home, ai_chat, notes, profile
 }

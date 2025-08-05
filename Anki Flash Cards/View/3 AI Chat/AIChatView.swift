@@ -1,5 +1,5 @@
 //
-//  AIThemesView.swift
+//  AIChatView.swift
 //  Zelo Cards
 //
 //  Created by Lev Vlasov on 2025-06-21.
@@ -8,7 +8,7 @@
 import SwiftUI
 import FirebaseAnalytics
 
-struct AIThemesView: View {
+struct AIChatView: View {
     
     @ObservedObject private var vm = DesignVM()
     
@@ -20,7 +20,7 @@ struct AIThemesView: View {
         ZStack {
             Color(hex: "#ddead1").ignoresSafeArea()
             
-            // Header "AI Themes"
+            // Header "AI Chat"
             VStack {
                 GeometryReader { geometry in
                     ZStack {
@@ -36,7 +36,7 @@ struct AIThemesView: View {
                                 .frame(height: 2)
                         }
                         
-                        Text("AI Themes")
+                        Text("AI Chat")
                             .font(.system(size: 17).bold())
                             .foregroundStyle(.black.opacity(0.8))
                     }
@@ -171,5 +171,5 @@ struct ThemeButton: View {
 
 
 #Preview {
-    AIThemesView()
+    AIChatView()
 }

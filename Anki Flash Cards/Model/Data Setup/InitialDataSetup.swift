@@ -15,6 +15,32 @@ struct InitialDataSetup {
         Analytics.logEvent("initial_data_setup_start", parameters: nil)
         let setupStartTime = Date()
         
+        // Проверка, существует ли User
+        let userRequest: NSFetchRequest<User> = User.fetchRequest()
+        userRequest.fetchLimit = 1
+
+        do {
+            let existingUsers = try context.fetch(userRequest)
+            if existingUsers.isEmpty {
+                let newUser = User(context: context)
+                newUser.age = 0
+                newUser.onboarding_select_language = ""
+                newUser.time_study_per_day = 0
+                
+                print("✅ User создан")
+                Analytics.logEvent("initial_data_setup_user_created", parameters: nil)
+            } else {
+                print("ℹ️ User уже существует, пропускаем создание")
+                Analytics.logEvent("initial_data_setup_user_already_exists", parameters: nil)
+            }
+        } catch {
+            print("❌ Ошибка при проверке/создании User: \(error)")
+            Analytics.logEvent("initial_data_setup_user_error", parameters: [
+                "error_description": error.localizedDescription
+            ])
+        }
+
+        
         guard let jsonFiles = Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: nil) else {
             print("Не найдено JSON-файлов в бандле")
             Analytics.logEvent("initial_data_setup_no_json_files", parameters: nil)
@@ -53,6 +79,9 @@ struct InitialDataSetup {
                     Analytics.logEvent("initial_data_setup_skipped_existing_collection", parameters: ["collection": cardModel.name, "language": cardModel.language])
                     continue
                 }
+                
+                // Создать User
+                  
                 
                 // Найти или создать язык
                 let language: ShopLanguages

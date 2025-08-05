@@ -11,13 +11,16 @@ import FirebaseAnalytics
 // Пятый экран - выбор возраста
 struct FifthScreen: View {
     @Binding var currentPage: Int
-    @Binding var selectedAgeRange: String?
     @Environment(\.managedObjectContext) private var viewContext
-    
     @ObservedObject var vm: OnboardingVM
-    
     @State private var startTime: Date?
-    
+
+    @FetchRequest(
+        entity: User.entity(),
+        sortDescriptors: [],
+        animation: .default
+    ) private var users: FetchedResults<User>
+
     var body: some View {
         VStack(spacing: 20) {
             Text("How old are you?")
@@ -27,25 +30,24 @@ struct FifthScreen: View {
                 .padding(.top)
             
             VStack(spacing: 10) {
-                AgeButton(ageRange: "From 13 to 17 years old", color: Color(red: 1.0, green: 0.8, blue: 0.8), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "18 to 24 years old", color: Color(red: 1.0, green: 0.9, blue: 0.7), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "25 to 34 years old", color: Color(red: 1.0, green: 0.9, blue: 0.6), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "35 to 44 years old", color: Color(red: 1.0, green: 0.9, blue: 0.6), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "45 to 54 years old", color: Color(red: 0.8, green: 1.0, blue: 0.8), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "55 to 64 years old", color: Color(red: 0.7, green: 1.0, blue: 0.9), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
-                Divider().background(Color(hex: "#546a50").opacity(0.5)).padding(.horizontal)
-                
-                AgeButton(ageRange: "65+ years old", color: Color(red: 0.7, green: 0.9, blue: 1.0), selectedAgeRange: $selectedAgeRange, currentPage: $currentPage)
+                ForEach(ageOptions, id: \.label) { option in
+                    AgeButton(
+                        ageRange: option.label,
+                        color: option.color
+                    ) {
+                        saveAge(option.value)
+                        logSelection(option.label)
+                        withAnimation {
+                            currentPage += 1
+                        }
+                    }
+                    
+                    if option.label != ageOptions.last?.label {
+                        Divider()
+                            .background(Color(hex: "#546a50").opacity(0.5))
+                            .padding(.horizontal)
+                    }
+                }
             }
             .padding(.horizontal)
             .background(Color(hex: "#546a50").opacity(0.3))
@@ -67,65 +69,53 @@ struct FifthScreen: View {
                 ])
             }
         }
-        .onChange(of: selectedAgeRange) {
-            saveAge()
+    }
+
+    private func saveAge(_ age: Int64) {
+        guard let user = users.first else {
+            print("❌ Не найден user для сохранения возраста")
+            return
+        }
+
+        user.age = age
+        do {
+            try viewContext.save()
+            print("✅ Age saved to CoreData: \(age)")
+        } catch {
+            print("❌ Ошибка при сохранении возраста: \(error)")
         }
     }
-    
-    private func saveAge() {
-        if let ageRange = selectedAgeRange {
-            let user = User(context: viewContext)
-            let ageValue: Int64 = {
-                switch ageRange {
-                case "From 13 to 17 years old": return 15
-                case "18 to 24 years old": return 21
-                case "25 to 34 years old": return 29
-                case "35 to 44 years old": return 39
-                case "45 to 54 years old": return 49
-                case "55 to 64 years old": return 59
-                case "65+ years old": return 65
-                default: return 0
-                }
-            }()
-            user.age = ageValue
-            do {
-                try viewContext.save()
-            } catch {
-                print("Ошибка при сохранении возраста: \(error)")
-            }
-        }
+
+    private func logSelection(_ label: String) {
+        Analytics.logEvent("age_range_selected", parameters: [
+            "age_range": label
+        ])
+        Analytics.logEvent("fifth_screen_next_page", parameters: [
+            "new_page": currentPage + 1
+        ])
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    private var ageOptions: [(label: String, value: Int64, color: Color)] {
+        return [
+            ("From 13 to 17 years old", 15, Color(red: 1.0, green: 0.8, blue: 0.8)),
+            ("18 to 24 years old", 21, Color(red: 1.0, green: 0.9, blue: 0.7)),
+            ("25 to 34 years old", 29, Color(red: 1.0, green: 0.9, blue: 0.6)),
+            ("35 to 44 years old", 39, Color(red: 1.0, green: 0.9, blue: 0.6)),
+            ("45 to 54 years old", 49, Color(red: 0.8, green: 1.0, blue: 0.8)),
+            ("55 to 64 years old", 59, Color(red: 0.7, green: 1.0, blue: 0.9)),
+            ("65+ years old", 65, Color(red: 0.7, green: 0.9, blue: 1.0))
+        ]
     }
 }
 
 private struct AgeButton: View {
     let ageRange: String
     let color: Color
-    @Binding var selectedAgeRange: String?
-    @Binding var currentPage: Int
-    
+    let onSelect: () -> Void
+
     var body: some View {
-        Button(action: {
-            selectedAgeRange = ageRange
-            
-            // Логируем выбранный возраст
-            Analytics.logEvent("age_range_selected", parameters: [
-                "age_range": ageRange
-            ])
-            
-            withAnimation {
-                currentPage += 1
-            }
-            
-            // Логируем переход
-            Analytics.logEvent("fifth_screen_next_page", parameters: [
-                "new_page": currentPage
-            ])
-            
-            // Вибрация
-            let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
-            
-        }) {
+        Button(action: onSelect) {
             HStack {
                 Circle()
                     .fill(color)

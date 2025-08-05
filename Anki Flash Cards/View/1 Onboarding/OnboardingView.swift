@@ -25,10 +25,6 @@ struct OnboardingView: View {
         }
     }
     
-    @State private var selectedLanguage: ShopLanguages? = nil
-    @State private var selectedStudyTime: Int? = nil
-    @State private var selectedAgeRange: String? = nil
-    
     @State private var startTime: Date?
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
@@ -43,9 +39,6 @@ struct OnboardingView: View {
             VStack {
                 HeaderView(currentPage: $currentPage)
                 SwitchView(currentPage: $currentPage,
-                           selectedLanguage: $selectedLanguage,
-                           selectedStudyTime: $selectedStudyTime,
-                           selectedAgeRange: $selectedAgeRange,
                            languages: languages,
                            vm: vm
                 )
@@ -88,9 +81,6 @@ struct OnboardingView: View {
 // Основное содержимое онбординга
 struct SwitchView: View {
     @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    @Binding var selectedStudyTime: Int?
-    @Binding var selectedAgeRange: String?
     let languages: FetchedResults<ShopLanguages>
     
     @ObservedObject var vm: OnboardingVM
@@ -102,13 +92,13 @@ struct SwitchView: View {
                 if currentPage == 0 {
                     FirstScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 1 {
-                    SecondScreen(currentPage: $currentPage, selectedLanguage: $selectedLanguage, languages: languages, vm: vm)
+                    SecondScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 2 {
                     ThirdScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 3 {
-                    FourthScreen(currentPage: $currentPage, selectedStudyTime: $selectedStudyTime, vm: vm)
+                    FourthScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 4 {
-                    FifthScreen(currentPage: $currentPage, selectedAgeRange: $selectedAgeRange, vm: vm)
+                    FifthScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 5 {
                     SixthScreen(currentPage: $currentPage, vm: vm)
                 } else if currentPage == 6 {

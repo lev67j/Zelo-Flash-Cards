@@ -7,21 +7,29 @@
 
 import SwiftUI
 import FirebaseAnalytics
+import CoreData
 
 // Второй экран онбординга
 struct SecondScreen: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: User.entity(), sortDescriptors: []) private var users: FetchedResults<User>
+    
     @Binding var currentPage: Int
-    @Binding var selectedLanguage: ShopLanguages?
-    let languages: FetchedResults<ShopLanguages>
-    
     @ObservedObject var vm: OnboardingVM
-    
     @State private var startTime: Date?
+    
+    // Жёстко заданный список языков
+    private let staticLanguages = ["English"]
     
     var body: some View {
         VStack(spacing: 20) {
             TitleView(vm: vm)
-            LanguageSelectionView(languages: languages, selectedLanguage: $selectedLanguage, currentPage: $currentPage)
+            LanguageSelectionView(
+                languages: staticLanguages,
+                currentPage: $currentPage,
+                viewContext: viewContext,
+                user: users.first
+            )
         }
         .padding(.horizontal)
         .onAppear {
@@ -30,7 +38,6 @@ struct SecondScreen: View {
         }
         .onDisappear {
             Analytics.logEvent("second_screen_disappear", parameters: nil)
-            
             if let start = startTime {
                 let duration = Date().timeIntervalSince(start)
                 Analytics.logEvent("second_screen_time_spent", parameters: [
@@ -58,39 +65,51 @@ private struct TitleView: View {
 
 // Подкомпонент для выбора языка
 private struct LanguageSelectionView: View {
-    let languages: FetchedResults<ShopLanguages>
-    @Binding var selectedLanguage: ShopLanguages?
+    let languages: [String]
+    @State var selectedLanguage = ""
     @Binding var currentPage: Int
+    let viewContext: NSManagedObjectContext
+    let user: User?
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
                 ForEach(languages.indices, id: \.self) { index in
+                    let lang = languages[index]
                     Button(action: {
-                        selectedLanguage = languages[index]
+                        selectedLanguage = lang
                         
-                        // Логируем выбор языка
                         Analytics.logEvent("language_selected", parameters: [
-                            "language": languages[index].name_language ?? "unknown"
+                            "language": lang
                         ])
                         
+                        // Сохраняем в Core Data
+                        if let user = user {
+                            user.onboarding_select_language = lang
+                            do {
+                                try viewContext.save()
+                                print("✅ Language saved to CoreData: \(lang)")
+                            } catch {
+                                print("❌ Failed to save language: \(error.localizedDescription)")
+                            }
+                        } else {
+                            print("❌ No user found to update language")
+                        }
+
                         withAnimation {
                             currentPage += 1
                         }
-                        
-                        // Логируем переход
+
                         Analytics.logEvent("second_screen_next_page", parameters: [
                             "new_page": currentPage
                         ])
-                        
-                        // Вибрация
+
                         let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
-                        
                     }) {
                         LanguageItemView(
-                            language: languages[index],
-                            isSelected: selectedLanguage == languages[index],
+                            language: lang,
+                            isSelected: selectedLanguage == lang,
                             showDivider: index < languages.count - 1
                         )
                     }
@@ -105,17 +124,17 @@ private struct LanguageSelectionView: View {
 
 // Подкомпонент для элемента языка
 private struct LanguageItemView: View {
-    let language: ShopLanguages
+    let language: String
     let isSelected: Bool
     let showDivider: Bool
     
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Image(uiImage: flagImage(for: language.name_language ?? ""))
+                Image(uiImage: flagImage(for: language))
                     .resizable()
                     .frame(width: 30, height: 20)
-                Text(language.name_language ?? "")
+                Text(language)
                     .font(.headline)
                     .foregroundColor(isSelected ? .white : .black)
                 Spacer()
@@ -137,14 +156,6 @@ private struct LanguageItemView: View {
     private func flagImage(for language: String) -> UIImage {
         switch language.lowercased() {
         case "english": return UIImage(named: "flag_uk") ?? UIImage()
-        case "spanish": return UIImage(named: "flag_spain") ?? UIImage()
-        case "japanese": return UIImage(named: "flag_japan") ?? UIImage()
-        case "french": return UIImage(named: "flag_france") ?? UIImage()
-        case "portuguese": return UIImage(named: "flag_portugal") ?? UIImage()
-        case "german": return UIImage(named: "flag_germany") ?? UIImage()
-        case "italian": return UIImage(named: "flag_italy") ?? UIImage()
-        case "korean": return UIImage(named: "flag_southkorea") ?? UIImage()
-        case "russian": return UIImage(named: "flag_russia") ?? UIImage()
         default: return UIImage()
         }
     }

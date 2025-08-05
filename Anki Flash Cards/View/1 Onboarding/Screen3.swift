@@ -7,13 +7,14 @@
 
 import SwiftUI
 import FirebaseAnalytics
+import CoreData
 
 // Третий экран - выбор уровня владения языком
 struct ThirdScreen: View {
-    @Binding var currentPage: Int
-    @ObservedObject var vm: OnboardingVM
-    
-    @State private var startTime: Date?
+       @Binding var currentPage: Int
+       @ObservedObject var vm: OnboardingVM
+        @Environment(\.managedObjectContext) private var context
+       @State private var startTime: Date?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -24,22 +25,22 @@ struct ThirdScreen: View {
                 .padding(.top)
             
             VStack {
-                LevelButton(level: "Beginner", currentPage: $currentPage)
+                LevelButton(level: "Beginner", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Elementary", currentPage: $currentPage)
+                LevelButton(level: "Elementary", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Intermediate", currentPage: $currentPage)
+                LevelButton(level: "Intermediate", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Advanced", currentPage: $currentPage)
+                LevelButton(level: "Advanced", currentPage: $currentPage, context: context)
             }
             .background(Color(hex: "#546a50").opacity(0.3))
             .cornerRadius(20)
@@ -65,10 +66,13 @@ struct ThirdScreen: View {
 
 private struct LevelButton: View {
     let level: String
-    @Binding var currentPage: Int
+     @Binding var currentPage: Int
+     let context: NSManagedObjectContext
     
     var body: some View {
         Button {
+            saveLanguageLevel(level)
+            
             // Логируем выбранный уровень
             Analytics.logEvent("language_level_selected", parameters: [
                 "level": level
@@ -119,5 +123,21 @@ private struct LevelButton: View {
             }
         }
     }
+    
+    private func saveLanguageLevel(_ level: String) {
+         let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+         fetchRequest.fetchLimit = 1
+         do {
+             if let user = try context.fetch(fetchRequest).first {
+                 user.level_selected_language = level
+                 try context.save()
+                 print("✅ Сохранён уровень языка: \(level)")
+                 Analytics.logEvent("language_level_saved", parameters: ["level": level])
+             }
+         } catch {
+             print("❌ Ошибка при сохранении уровня языка: \(error)")
+             Analytics.logEvent("language_level_save_error", parameters: ["error_description": error.localizedDescription])
+         }
+     }
 }
 

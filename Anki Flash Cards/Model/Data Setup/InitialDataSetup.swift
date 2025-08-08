@@ -14,6 +14,9 @@ struct InitialDataSetup {
         Analytics.logEvent("initial_data_setup_start", parameters: nil)
         let setupStartTime = Date()
         
+        // Очистка Core Data перед началом
+        clearCoreData(context: context)
+        
         // Проверка, существует ли User
         let userRequest: NSFetchRequest<User> = User.fetchRequest()
         userRequest.fetchLimit = 1
@@ -58,14 +61,14 @@ struct InitialDataSetup {
         
         for fileURL in jsonFiles {
             let fileStartTime = Date()
+            print("🔍 Начало обработки файла: \(fileURL.lastPathComponent)")
             do {
                 let data = try Data(contentsOf: fileURL)
-                let decoder = JSONDecoder()
                 
                 // Пробуем декодировать как LanguageCourse
                 do {
-                    let course = try decoder.decode(LanguageCourse.self, from: data)
-                    print("📄 Обработка \(fileURL.lastPathComponent) как LanguageCourse")
+                    let course = try JSONDecoder().decode(LanguageCourse.self, from: data)
+                    print("📄 Успешно декодирован \(fileURL.lastPathComponent) как LanguageCourse")
                     
                     let combinationKey = "\(course.language)|\(course.name)"
                     if processedCombinations.contains(combinationKey) {
@@ -85,6 +88,7 @@ struct InitialDataSetup {
                     let language: ShopLanguages
                     if let foundLanguage = existingLanguages.first(where: { $0.name_language == course.language }) {
                         language = foundLanguage
+                        print("🌐 Используется существующий язык: \(course.language)")
                     } else {
                         language = ShopLanguages(context: context)
                         language.name_language = course.language
@@ -103,7 +107,7 @@ struct InitialDataSetup {
                         collection.priority = language.priority
                         collection.language = language
                         newCollectionsCount += 1
-                        print("📚 Создана коллекция: \(theme.title)")
+                        print("📚 Создана коллекция: \(theme.title) с \(theme.cards.count) карточками")
                         
                         // Создать карточки
                         for cardData in theme.cards {
@@ -129,8 +133,8 @@ struct InitialDataSetup {
                 } catch {
                     print("⚠️ Не удалось декодировать \(fileURL.lastPathComponent) как LanguageCourse: \(error)")
                     // Пробуем декодировать как CardModel
-                    let cardModel = try decoder.decode(CardModel.self, from: data)
-                    print("📄 Обработка \(fileURL.lastPathComponent) как CardModel")
+                    let cardModel = try JSONDecoder().decode(CardModel.self, from: data)
+                    print("📄 Успешно декодирован \(fileURL.lastPathComponent) как CardModel")
                     
                     let combinationKey = "\(cardModel.language)|\(cardModel.name)"
                     if processedCombinations.contains(combinationKey) {
@@ -150,6 +154,7 @@ struct InitialDataSetup {
                     let language: ShopLanguages
                     if let foundLanguage = existingLanguages.first(where: { $0.name_language == cardModel.language }) {
                         language = foundLanguage
+                        print("🌐 Используется существующий язык: \(cardModel.language)")
                     } else {
                         language = ShopLanguages(context: context)
                         language.name_language = cardModel.language
@@ -167,7 +172,7 @@ struct InitialDataSetup {
                     collection.priority = language.priority
                     collection.language = language
                     newCollectionsCount += 1
-                    print("📚 Создана коллекция: \(cardModel.name)")
+                    print("📚 Создана коллекция: \(cardModel.name) с \(cardModel.cards.count) карточками")
                     
                     // Создать карточки
                     for cardData in cardModel.cards {
@@ -231,6 +236,21 @@ struct InitialDataSetup {
         ])
     }
     
+    private static func clearCoreData(context: NSManagedObjectContext) {
+        let entities = ["ShopLanguages", "ShopCollection", "ShopCard"]
+        for entity in entities {
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
+            do {
+                try context.execute(deleteRequest)
+                try context.save()
+                print("🧹 Очищена сущность \(entity)")
+            } catch {
+                print("❌ Ошибка при очистке \(entity): \(error)")
+            }
+        }
+    }
+    
     private static func fetchExistingLanguages(context: NSManagedObjectContext) -> [ShopLanguages] {
         let request: NSFetchRequest<ShopLanguages> = ShopLanguages.fetchRequest()
         do {
@@ -283,5 +303,3 @@ struct CardModel: Decodable {
     let name: String
     let cards: [CardData]
 }
-
-

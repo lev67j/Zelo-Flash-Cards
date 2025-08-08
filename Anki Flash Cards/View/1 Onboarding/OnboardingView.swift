@@ -50,7 +50,7 @@ struct OnboardingView: View {
                 startTime = Date()
                 Analytics.logEvent("onboarding_screen_appear", parameters: nil)
                 
-              //  InitialDataSetup.setupInitialData(context: viewContext)
+               InitialDataSetup.setupInitialData(context: viewContext)
                 
                 Analytics.logEvent("onboarding_languages_loaded", parameters: [
                     "languages_count": languages.count

@@ -19,7 +19,7 @@ struct SecondScreen: View {
     @State private var startTime: Date?
     
     // Жёстко заданный список языков
-    private let staticLanguages = ["English"]
+    private let staticLanguages = ["English", "Spanish"]
     
     var body: some View {
         VStack(spacing: 20) {

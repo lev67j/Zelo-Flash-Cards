@@ -5,7 +5,6 @@
 //  Created by Lev Vlasov on 2025-08-06.
 //
 
-
 import Foundation
 import SwiftUI
 import CoreData
@@ -28,6 +27,7 @@ final class HomeVM: ObservableObject {
     init(context: NSManagedObjectContext) {
         self.viewContext = context
         loadDataFromCoreData()
+        debugCoreDataContents()
     }
 
     func loadDataFromCoreData() {
@@ -35,16 +35,43 @@ final class HomeVM: ObservableObject {
         request.predicate = NSPredicate(format: "language.name_language == %@", "English")
         do {
             let collections = try viewContext.fetch(request)
+            print("📚 Найдено коллекций для English: \(collections.count)")
             themes = collections.enumerated().map { (index, collection) in
                 let cards = (collection.cards?.allObjects as? [ShopCard])?.map { CardData(front: $0.frontText ?? "", back: $0.backText ?? "") } ?? []
+                print("Коллекция \(collection.name ?? "N/A"): \(cards.count) карточек")
                 return Theme(title: collection.name ?? "Theme \(index + 1)", cards: cards, imageName: collection.name?.lowercased().replacingOccurrences(of: " ", with: "_") ?? "")
             }
             print("Loaded \(themes.count) themes from Core Data for English")
             Analytics.logEvent("home_coredata_load_success", parameters: ["theme_count": themes.count])
             distributeCardsIntoLevels()
         } catch {
-            print("Ошибка при загрузке коллекций из Core Data: \(error)")
+            print("❌ Ошибка при загрузке коллекций из Core Data: \(error)")
             Analytics.logEvent("home_coredata_load_error", parameters: ["error": error.localizedDescription])
+        }
+    }
+
+    func debugCoreDataContents() {
+        let languageRequest: NSFetchRequest<ShopLanguages> = ShopLanguages.fetchRequest()
+        do {
+            let languages = try viewContext.fetch(languageRequest)
+            print("🌐 Все языки (\(languages.count)):")
+            for language in languages {
+                print("Язык: \(language.name_language ?? "N/A")")
+            }
+        } catch {
+            print("❌ Ошибка при получении языков: \(error)")
+        }
+        
+        let collectionRequest: NSFetchRequest<ShopCollection> = ShopCollection.fetchRequest()
+        do {
+            let collections = try viewContext.fetch(collectionRequest)
+            print("📚 Все коллекции (\(collections.count)):")
+            for collection in collections {
+                let cardCount = (collection.cards?.allObjects as? [ShopCard])?.count ?? 0
+                print("Коллекция: \(collection.name ?? "N/A"), Язык: \(collection.language?.name_language ?? "N/A"), Карточек: \(cardCount)")
+            }
+        } catch {
+            print("❌ Ошибка при получении коллекций: \(error)")
         }
     }
 

@@ -9,6 +9,8 @@ import SwiftUI
 import FirebaseAnalytics
 
 struct TabBarElements: View {
+    
+    @Environment(\.managedObjectContext) private var context
     @State private var selectedTab: TabName = .home
     @EnvironmentObject var stateProperties: StatePropertiesVM
     @ObservedObject private var vm = DesignVM()
@@ -22,7 +24,7 @@ struct TabBarElements: View {
                 VStack {
                     switch selectedTab {
                     case .home:
-                        HomeView()
+                        HomeView(context: context)
                     case .notes:
                         NotesView()
                     case .ai_chat:

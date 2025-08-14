@@ -170,7 +170,7 @@ struct ProfileView: View {
         do {
             let count = try viewContext.count(for: request)
             studiedCardsCount = count
-            starsCount = max(0, count / 20)
+            starsCount = max(0, count / 10)
             
             Analytics.logEvent("profile_data_loaded", parameters: [
                 "studied_cards": count,

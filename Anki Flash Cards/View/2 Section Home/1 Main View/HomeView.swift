@@ -22,94 +22,125 @@ struct HomeView: View {
         NavigationStack {
             ZStack {
                 design.color_back_home_view.ignoresSafeArea()
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack {
-                        ForEach(vm.themes.indices, id: \.self) { themeIndex in
-                            let theme = vm.themes[themeIndex]
-                            VStack(spacing: 16) {
-                                VStack(alignment: .leading, spacing: 3) {
-                                    HStack {
-                                        Text(theme.title)
-                                            .font(.title3)
-                                            .foregroundColor(design.color_name_language_cell_set_home)
-                                        Spacer()
+                VStack {
+                    // Горизонтальный скролл с языками
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(vm.availableLanguages) { language in
+                                Button(action: {
+                                    vm.switchLanguage(to: language.name)
+                                    Analytics.logEvent("home_language_button_tapped", parameters: ["language": language.name])
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Text(language.flag)
+                                            .font(.system(size: 24))
+                                        Text(language.name)
+                                            .font(.headline)
+                                            .foregroundColor(vm.selectedLanguage == language.name ? .white : .gray)
                                     }
-                                    Rectangle()
-                                        .frame(height: 1)
-                                        .foregroundColor(design.color_line_cell_set_home)
-                                    HStack {
-                                        Text("\(theme.cards.count) words")
-                                            .foregroundColor(design.color_number_cards_cell_set_home)
-                                            .font(.system(size: 17))
-                                        Spacer()
-                                    }
-                                    HStack {
-                                        Image(theme.imageName)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 40, height: 40)
-                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(vm.selectedLanguage == language.name ? Color.blue : Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
                                 }
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .frame(height: 150)
-                                .background(design.color_back_cell_set_home)
-                                .overlay(RoundedRectangle(cornerRadius: 12)
-                                    .stroke(design.color_overlay_cell_set_home, lineWidth: 8))
-                                .cornerRadius(12)
-                                .padding(.horizontal)
-                                .padding(.vertical, 4)
-
-                                VStack(spacing: 16) {
-                                    ForEach(1...11, id: \.self) { level in
-                                        Button(action: {
-                                            vm.selectedThemeIndex = themeIndex
-                                            vm.selectedLevel = level
-                                            let cards = vm.getCardsForLevel(themeIndex: themeIndex, level: level)
-                                            Analytics.logEvent("home_level_selected", parameters: [
-                                                "theme": theme.title,
-                                                "level": level,
-                                                "card_count": cards.count
-                                            ])
-                                            if !cards.isEmpty {
-                                                vm.navigateToFlashCard = true
-                                            } else {
-                                                print("No cards for theme \(theme.title), level \(level)")
-                                            }
-                                        }) {
-                                            Text("\(level)")
-                                                .font(.headline)
-                                                .foregroundColor(.white)
-                                                .frame(width: 50, height: 50)
-                                                .background(Circle().fill(Color.blue))
-                                                .shadow(radius: 4)
-                                        }
-                                    }
-                                }
-
-                                HStack(spacing: 8) {
-                                    Rectangle()
-                                        .fill(design.color_line_cell_set_home)
-                                        .frame(height: 1)
-                                    Image(systemName: "lock.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 14, height: 14)
-                                        .foregroundColor(.gray)
-                                    Rectangle()
-                                        .fill(design.color_line_cell_set_home)
-                                        .frame(height: 1)
-                                }
-                                .padding(.horizontal)
-                                .padding(.vertical, 10)
                             }
                         }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
-                    .onAppear {
-                        Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
+
+                    // Основной контент
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack {
+                            ForEach(vm.themes.indices, id: \.self) { themeIndex in
+                                let theme = vm.themes[themeIndex]
+                                VStack(spacing: 16) {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        HStack {
+                                            Text(theme.title)
+                                                .font(.title3)
+                                                .foregroundColor(design.color_name_language_cell_set_home)
+                                            Spacer()
+                                        }
+                                        Rectangle()
+                                            .frame(height: 1)
+                                            .foregroundColor(design.color_line_cell_set_home)
+                                        HStack {
+                                            Text("\(theme.cards.count) words")
+                                                .foregroundColor(design.color_number_cards_cell_set_home)
+                                                .font(.system(size: 17))
+                                            Spacer()
+                                        }
+                                        HStack {
+                                            Image(theme.imageName)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40, height: 40)
+                                        }
+                                    }
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(height: 150)
+                                    .background(design.color_back_cell_set_home)
+                                    .overlay(RoundedRectangle(cornerRadius: 12)
+                                        .stroke(design.color_overlay_cell_set_home, lineWidth: 8))
+                                    .cornerRadius(12)
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 4)
+
+                                    VStack(spacing: 16) {
+                                        ForEach(1...11, id: \.self) { level in
+                                            Button(action: {
+                                                vm.selectedThemeIndex = themeIndex
+                                                vm.selectedLevel = level
+                                                let cards = vm.getCardsForLevel(themeIndex: themeIndex, level: level)
+                                                Analytics.logEvent("home_level_selected", parameters: [
+                                                    "theme": theme.title,
+                                                    "level": level,
+                                                    "card_count": cards.count
+                                                ])
+                                                if !cards.isEmpty {
+                                                    vm.navigateToFlashCard = true
+                                                } else {
+                                                    print("No cards for theme \(theme.title), level \(level)")
+                                                }
+                                            }) {
+                                                Text("\(level)")
+                                                    .font(.headline)
+                                                    .foregroundColor(.white)
+                                                    .frame(width: 50, height: 50)
+                                                    .background(Circle().fill(Color.blue))
+                                                    .shadow(radius: 4)
+                                            }
+                                        }
+                                    }
+
+                                    HStack(spacing: 8) {
+                                        Rectangle()
+                                            .fill(design.color_line_cell_set_home)
+                                            .frame(height: 1)
+                                        Image(systemName: "lock.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 14, height: 14)
+                                            .foregroundColor(.gray)
+                                        Rectangle()
+                                            .fill(design.color_line_cell_set_home)
+                                            .frame(height: 1)
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.vertical, 10)
+                                }
+                            }
+                        }
+                        .padding(.bottom, 70)
+                        .onAppear {
+                            Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
+                        }
                     }
                 }
-
+                // Add collection button
+/*
                 VStack {
                     Spacer()
                     HStack {
@@ -133,6 +164,7 @@ struct HomeView: View {
                         .padding(.trailing, 20)
                     }
                 }
+ */
             }
             .sheet(isPresented: $vm.showingAddCollection) {
                 AddCollectionView()
@@ -148,16 +180,19 @@ struct HomeView: View {
             .onAppear {
                 vm.screenEnterTime = Date()
                 vm.lastActionTime = Date()
-                Analytics.logEvent("home_screen_appear", parameters: nil)
+                Analytics.logEvent("home_screen_appear", parameters: ["language": vm.selectedLanguage])
                 if !vm.isFirstOpen {
                     vm.isFirstOpen = true
-                    Analytics.logEvent("home_first_open", parameters: nil)
+                    Analytics.logEvent("home_first_open", parameters: ["language": vm.selectedLanguage])
                 }
             }
             .onDisappear {
                 if let start = vm.screenEnterTime {
                     let duration = Date().timeIntervalSince(start)
-                    Analytics.logEvent("home_screen_disappear", parameters: ["duration_seconds": duration])
+                    Analytics.logEvent("home_screen_disappear", parameters: [
+                        "duration_seconds": duration,
+                        "language": vm.selectedLanguage
+                    ])
                 }
             }
             .navigationDestination(isPresented: $vm.navigateToFlashCard) {
@@ -169,7 +204,6 @@ struct HomeView: View {
                         card.backText = cardData.back
                         return card
                     }
-               
                     FlashCardView(collection: CardCollection(context: viewContext), optionalCards: cards)
                         .navigationBarBackButtonHidden(true)
                         .environment(\.managedObjectContext, viewContext)

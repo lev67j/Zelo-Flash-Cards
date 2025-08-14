@@ -45,28 +45,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				All/Info.plist,
-				"Model/Core Data/Shop Language Json/English.json",
 			);
 			target = 0B29FA332DE9A3B40013F1DA /* Zelo AI */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		0B39D8262E436C1600580C12 /* Exceptions for "Anki Flash Cards" folder in "Compile Sources" phase from "Zelo AI" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 0B29FA302DE9A3B40013F1DA /* Sources */;
-			membershipExceptions = (
-				"Model/Core Data/Shop Language Json/English.json",
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0B29FA362DE9A3B40013F1DA /* Anki Flash Cards */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				0B29FA472DE9A3B50013F1DA /* Exceptions for "Anki Flash Cards" folder in "Zelo AI" target */,
-				0B39D8262E436C1600580C12 /* Exceptions for "Anki Flash Cards" folder in "Compile Sources" phase from "Zelo AI" target */,
 			);
 			path = "Anki Flash Cards";
 			sourceTree = "<group>";

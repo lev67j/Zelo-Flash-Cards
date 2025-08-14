@@ -14,9 +14,6 @@ struct InitialDataSetup {
         Analytics.logEvent("initial_data_setup_start", parameters: nil)
         let setupStartTime = Date()
         
-        // Очистка Core Data перед началом
-        clearCoreData(context: context)
-        
         // Проверка, существует ли User
         let userRequest: NSFetchRequest<User> = User.fetchRequest()
         userRequest.fetchLimit = 1

@@ -199,7 +199,7 @@ struct EditSetView: View {
                                     ForEach(cards) { card in
                                         CardCell(card: card, shouldFocusFront: card == cardToFocus)
                                             .environment(\.managedObjectContext, viewContext)
-                                            .onChange(of: cardToFocus) { newValue in
+                                            .onChange(of: cardToFocus) { newValue, _ in
                                                 if newValue != cardToFocus {
                                                     cardToFocus = nil // сбрасываем после фокусировки
                                                 }

@@ -10,15 +10,12 @@ import CoreData
 import FirebaseAnalytics
 
 // MARK: - HomeView
-
 struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject private var vm: HomeVM
     @ObservedObject private var design = DesignVM()
 
     @State private var showLanguageScroll = false
-
-    // для слежения за позициями разделителей и якоря таблички
     @State private var separatorYs: [Int: CGFloat] = [:]
     @State private var themeCardAnchorY: CGFloat = 0
 
@@ -30,139 +27,7 @@ struct HomeView: View {
         NavigationStack {
             ZStack {
                 design.color_back_home_view.ignoresSafeArea()
-
-                VStack(spacing: 0) {
-
-                    // Верхняя панель — по центру
-                    HStack {
-                        Spacer(minLength: 0)
-                        HStack(spacing: 12) {
-                            // Кнопка языка — как все, не круг
-                            Button {
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                                    showLanguageScroll.toggle()
-                                }
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            } label: {
-                                pill {
-                                    HStack(spacing: 6) {
-                                        Text(vm.flagForLanguage(vm.selectedLanguage))
-                                            .font(.system(size: 18))
-                                        Image(systemName: showLanguageScroll ? "chevron.up" : "chevron.down")
-                                            .font(.system(size: 13, weight: .semibold))
-                                    }
-                                }
-                            }
-
-                            pillStat(icon: "flame.fill", value: vm.currentStreak)
-                            pillStat(icon: "rectangle.on.rectangle.fill", value: vm.studiedCardsCount)
-                            pillStat(icon: "bolt.fill", value: vm.starsCount)
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-
-                    // Горизонтальный скролл языков (выезжающий)
-                    if showLanguageScroll {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(vm.availableLanguages) { language in
-                                    Button {
-                                        vm.switchLanguage(to: language.name)
-                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                                            showLanguageScroll = false // (1) скрываем после выбора
-                                        }
-                                    } label: {
-                                        HStack(spacing: 6) {
-                                            Text(language.flag).font(.system(size: 22))
-                                            Text(language.name)
-                                                .font(.headline)
-                                                .foregroundColor(vm.selectedLanguage == language.name ? .white : .gray)
-                                        }
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 6)
-                                        .background(vm.selectedLanguage == language.name ? Color.blue : Color.gray.opacity(0.2))
-                                        .cornerRadius(12)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                        .frame(height: 70)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-
-                    // Разделитель
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(design.color_line_cell_set_home.opacity(0.9))
-                        .padding(.bottom, 15)
-
-                    // Табличка темы (с якорем для вычисления пересечений)
-                    if let currentTheme = vm.currentTheme {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Words \(currentTheme.cards.count)")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.gray)
-                            Text(currentTheme.title)
-                                .font(.system(size: 22, weight: .bold))
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white)
-                                .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
-                        )
-                        .padding(.horizontal)
-                        .padding(.bottom, 10)
-                        .background(
-                            GeometryReader { proxy in
-                                Color.clear
-                                    .preference(key: ThemeCardAnchorKey.self,
-                                                value: proxy.frame(in: .named("scrollSpace")).midY)
-                            }
-                        )
-                        .animation(.easeInOut(duration: 0.15), value: currentTheme.title)
-                    }
-
-                    // Скролл уровней со змейкой и разделителями
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 30) {
-                            ForEach(vm.themes.indices, id: \.self) { themeIndex in
-                                let theme = vm.themes[themeIndex]
-                                snakeLevels(for: theme, themeIndex: themeIndex)
-
-                                // Разделитель с замочком (его позицию трекаем)
-                                HStack(spacing: 8) {
-                                    Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
-                                    Image(systemName: "lock.fill")
-                                        .resizable().scaledToFit()
-                                        .frame(width: 14, height: 14)
-                                        .foregroundColor(.gray)
-                                    Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
-                                }
-                                .padding(.horizontal)
-                                .padding(.vertical, 10)
-                                .background(
-                                    GeometryReader { proxy in
-                                        Color.clear
-                                            .preference(key: ThemeSeparatorKey.self,
-                                                        value: [ThemeSeparator(index: themeIndex,
-                                                                               y: proxy.frame(in: .named("scrollSpace")).midY)])
-                                    }
-                                )
-                            }
-                        }
-                        .padding(.bottom, 70)
-                        .onAppear {
-                            Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
-                        }
-                    }
-                    .coordinateSpace(name: "scrollSpace")
-                }
+                mainContent
             }
             .sheet(isPresented: $vm.showingAddCollection) {
                 AddCollectionView()
@@ -193,22 +58,9 @@ struct HomeView: View {
                     ])
                 }
             }
-            // Навигация к флеш-картам
             .navigationDestination(isPresented: $vm.navigateToFlashCard) {
-                if let themeIndex = vm.selectedThemeIndex, let level = vm.selectedLevel {
-                    let cardDataArray = vm.getCardsForLevel(themeIndex: themeIndex, level: level)
-                    let cards = cardDataArray.map { cardData in
-                        let card = Card(context: viewContext)
-                        card.frontText = cardData.front
-                        card.backText = cardData.back
-                        return card
-                    }
-                    FlashCardView(collection: CardCollection(context: viewContext), optionalCards: cards)
-                        .navigationBarBackButtonHidden(true)
-                        .environment(\.managedObjectContext, viewContext)
-                }
+                navigationDestinationView
             }
-            // Реакция на изменения якорей/разделителей — быстрое обновление таблички темы (4)
             .onPreferenceChange(ThemeCardAnchorKey.self) { y in
                 themeCardAnchorY = y
                 recomputeActiveTheme()
@@ -219,6 +71,181 @@ struct HomeView: View {
             }
             .onChange(of: vm.currentThemeIndex) { _ in
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            }
+        }
+    }
+
+    // MARK: - Subviews
+
+    private var mainContent: some View {
+        VStack(spacing: 0) {
+            topBar
+            languageScroll
+            divider
+            themeCard
+            levelsScroll
+        }
+    }
+
+    private var topBar: some View {
+        HStack {
+            Spacer(minLength: 0)
+            HStack(spacing: 12) {
+                languageButton
+                pillStat(icon: "flame.fill", value: vm.currentStreak)
+                pillStat(icon: "rectangle.on.rectangle.fill", value: vm.studiedCardsCount)
+                pillStat(icon: "bolt.fill", value: vm.starsCount)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+    }
+
+    private var languageButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                showLanguageScroll.toggle()
+            }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        } label: {
+            pill {
+                HStack(spacing: 6) {
+                    Text(vm.flagForLanguage(vm.selectedLanguage))
+                        .font(.system(size: 18))
+                    Image(systemName: showLanguageScroll ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+            }
+        }
+    }
+
+    private var languageScroll: some View {
+        Group {
+            if showLanguageScroll {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(vm.availableLanguages) { language in
+                            Button {
+                                vm.switchLanguage(to: language.name)
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                                    showLanguageScroll = false
+                                }
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Text(language.flag).font(.system(size: 22))
+                                    Text(language.name)
+                                        .font(.headline)
+                                        .foregroundColor(vm.selectedLanguage == language.name ? .white : .gray)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 6)
+                                .background(vm.selectedLanguage == language.name ? Color.blue : Color.gray.opacity(0.2))
+                                .cornerRadius(12)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .frame(height: 70)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .frame(height: 1)
+            .foregroundColor(design.color_line_cell_set_home.opacity(0.9))
+            .padding(.bottom, 15)
+    }
+
+    private var themeCard: some View {
+        Group {
+            if let currentTheme = vm.currentTheme {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Words \(currentTheme.cards.count)")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.gray)
+                    Text(currentTheme.title)
+                        .font(.system(size: 22, weight: .bold))
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
+                        .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+                )
+                .padding(.horizontal)
+                .padding(.bottom, 10)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(key: ThemeCardAnchorKey.self,
+                                        value: proxy.frame(in: .named("scrollSpace")).midY)
+                    }
+                )
+                .animation(.easeInOut(duration: 0.15), value: currentTheme.title)
+            }
+        }
+    }
+
+    private var levelsScroll: some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(spacing: 30) {
+                ForEach(vm.themes.indices, id: \.self) { themeIndex in
+                    let theme = vm.themes[themeIndex]
+                    snakeLevels(for: theme, themeIndex: themeIndex)
+                    separator(themeIndex: themeIndex)
+                }
+            }
+            .padding(.bottom, 70)
+            .onAppear {
+                Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
+            }
+        }
+        .coordinateSpace(name: "scrollSpace")
+    }
+
+    private func separator(themeIndex: Int) -> some View {
+        HStack(spacing: 8) {
+            Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
+            Image(systemName: "lock.fill")
+                .resizable().scaledToFit()
+                .frame(width: 14, height: 14)
+                .foregroundColor(.gray)
+            Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: ThemeSeparatorKey.self,
+                                value: [ThemeSeparator(index: themeIndex,
+                                                       y: proxy.frame(in: .named("scrollSpace")).midY)])
+            }
+        )
+    }
+
+    private var navigationDestinationView: some View {
+        Group {
+            if let themeIndex = vm.selectedThemeIndex, let level = vm.selectedLevel {
+                let themeTitle = vm.themes[themeIndex].title
+                let cards = vm.getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: true)
+                FlashCardView(
+                    collection: CardCollection(context: viewContext),
+                    optionalCards: cards,
+                    themeTitle: themeTitle,
+                    level: level,
+                    onLevelCompleted: {
+                        vm.checkLevelCompletion(themeIndex: themeIndex, level: level)
+                    }
+                )
+                .navigationBarBackButtonHidden(true)
+                .environment(\.managedObjectContext, viewContext)
             }
         }
     }
@@ -248,48 +275,85 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Змейка уровней (7 — плавная)
+    // MARK: - Змейка уровней
     private func snakeLevels(for theme: Theme, themeIndex: Int) -> some View {
         VStack(spacing: 22) {
             ForEach(1...11, id: \.self) { level in
-                let isUnlocked = vm.isLevelUnlocked(themeIndex: themeIndex, level: level) // (2)
-                let isCompleted = vm.isLevelCompleted(themeIndex: themeIndex, level: level)
-                let icon = iconName(for: level)
-
-                Button {
-                    if isUnlocked {
-                        let cards = vm.getCardsForLevel(themeIndex: themeIndex, level: level)
-                        if !cards.isEmpty {
-                            vm.selectedThemeIndex = themeIndex
-                            vm.selectedLevel = level
-                            vm.navigateToFlashCard = true
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }
-                    } else {
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-                    }
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(circleFill(isCompleted: isCompleted))
-                            .frame(width: 64, height: 64)
-                            .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white.opacity(isCompleted ? 0.35 : 0.15), lineWidth: 2)
-                            )
-
-                        Image(systemName: icon)
-                            .font(.system(size: 26, weight: .bold))
-                            .foregroundColor(isCompleted ? .white : .white.opacity(0.9))
-                            .opacity(isUnlocked ? 1.0 : 0.45) // (3) непройденные серые, но со своими значками
-                    }
-                }
-                .disabled(!isUnlocked)
-                .offset(x: xOffset(for: level)) // плавный синус
-                .animation(.easeOut(duration: 0.2), value: isCompleted)
+                LevelButton(theme: theme, themeIndex: themeIndex, level: level, vm: vm)
+                    .offset(x: xOffset(for: level))
+                    .animation(.easeOut(duration: 0.2), value: vm.isLevelCompleted(themeIndex: themeIndex, level: level))
             }
         }
+    }
+
+    private func xOffset(for level: Int) -> CGFloat {
+        let amplitude: CGFloat = 68
+        let w = Double.pi / 3.6
+        return CGFloat(sin(Double(level) * w)) * amplitude
+    }
+
+    // MARK: - Активная тема
+    private func recomputeActiveTheme() {
+        guard !vm.themes.isEmpty else { return }
+        let candidates = separatorYs.filter { $0.value > themeCardAnchorY }.map { $0.key }
+        let nextIndex = candidates.min() ?? (vm.themes.count - 1)
+        vm.updateCurrentThemeIndex(nextIndex)
+    }
+}
+
+// MARK: - LevelButton
+struct LevelButton: View {
+    let theme: Theme
+    let themeIndex: Int
+    let level: Int
+    @ObservedObject var vm: HomeVM
+
+    private var isUnlocked: Bool { vm.isLevelUnlocked(themeIndex: themeIndex, level: level) }
+    private var isCompleted: Bool { vm.isLevelCompleted(themeIndex: themeIndex, level: level) }
+    private var isCurrent: Bool { isUnlocked && !isCompleted }
+    private var progress: Double { vm.progressForLevel(themeIndex: themeIndex, level: level) }
+    private var icon: String {
+        let set = ["heart.fill", "airplane", "star.fill", "bolt.fill", "book.fill"]
+        return set[(level - 1) % set.count]
+    }
+
+    var body: some View {
+        Button {
+            if isUnlocked {
+                let cards = vm.getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: true)
+                if !cards.isEmpty {
+                    vm.selectedThemeIndex = themeIndex
+                    vm.selectedLevel = level
+                    vm.navigateToFlashCard = true
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
+            } else {
+                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+            }
+        } label: {
+            ZStack {
+                if isCurrent {
+                    Circle()
+                        .trim(from: 0, to: progress)
+                        .stroke(Color.blue.opacity(0.8), style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                        .frame(width: 74, height: 74)
+                        .rotationEffect(.degrees(-90))
+                }
+                Circle()
+                    .fill(circleFill(isCompleted: isCompleted))
+                    .frame(width: 64, height: 64)
+                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white.opacity(isCompleted ? 0.35 : 0.15), lineWidth: 2)
+                    )
+                Image(systemName: icon)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(isCompleted ? .white : .white.opacity(0.9))
+                    .opacity(isUnlocked ? 1.0 : 0.45)
+            }
+        }
+        .disabled(!isUnlocked)
     }
 
     private func circleFill(isCompleted: Bool) -> LinearGradient {
@@ -300,30 +364,9 @@ struct HomeView: View {
                                   startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
-
-    private func xOffset(for level: Int) -> CGFloat {
-        // плавная «змейка» на синусе
-        let amplitude: CGFloat = 68
-        let w = Double.pi / 3.6
-        return CGFloat(sin(Double(level) * w)) * amplitude
-    }
-
-    private func iconName(for level: Int) -> String {
-        let set = ["heart.fill", "airplane", "star.fill", "bolt.fill", "book.fill"]
-        return set[(level - 1) % set.count]
-    }
-
-    // MARK: - Активная тема по пересечению разделителя и таблички (4)
-    private func recomputeActiveTheme() {
-        guard !vm.themes.isEmpty else { return }
-        // ищем первый разделитель, который ниже якоря таблички
-        let candidates = separatorYs.filter { $0.value > themeCardAnchorY }.map { $0.key }
-        let nextIndex = candidates.min() ?? (vm.themes.count - 1)
-        vm.updateCurrentThemeIndex(nextIndex)
-    }
 }
 
-// MARK: - Preferences для трекинга позиций
+// MARK: - Preferences
 private struct ThemeSeparator: Equatable, Hashable {
     let index: Int
     let y: CGFloat
@@ -350,5 +393,3 @@ struct HomeView_Previews: PreviewProvider {
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
-
-

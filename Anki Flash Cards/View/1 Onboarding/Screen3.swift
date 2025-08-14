@@ -25,22 +25,22 @@ struct ThirdScreen: View {
                 .padding(.top)
             
             VStack {
-                LevelButton(level: "Beginner", currentPage: $currentPage, context: context)
+                LevelButton_Onboarding(level: "Beginner", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Elementary", currentPage: $currentPage, context: context)
+                LevelButton_Onboarding(level: "Elementary", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Intermediate", currentPage: $currentPage, context: context)
+                LevelButton_Onboarding(level: "Intermediate", currentPage: $currentPage, context: context)
                 Divider()
                     .background(Color(hex: "#546a50").opacity(0.5))
                     .padding(.horizontal)
                 
-                LevelButton(level: "Advanced", currentPage: $currentPage, context: context)
+                LevelButton_Onboarding(level: "Advanced", currentPage: $currentPage, context: context)
             }
             .background(Color(hex: "#546a50").opacity(0.3))
             .cornerRadius(20)
@@ -64,7 +64,7 @@ struct ThirdScreen: View {
     }
 }
 
-private struct LevelButton: View {
+private struct LevelButton_Onboarding: View {
     let level: String
      @Binding var currentPage: Int
      let context: NSManagedObjectContext

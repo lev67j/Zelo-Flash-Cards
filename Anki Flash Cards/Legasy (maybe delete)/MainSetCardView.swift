@@ -5,6 +5,7 @@
 //  Created by Lev Vlasov on 2025-06-21.
 //
 
+/*
 import SwiftUI
 import CoreData
 import FirebaseAnalytics
@@ -305,7 +306,7 @@ struct BarChartView: View {
         .cornerRadius(12)
     }
 }
-
+*/
 
 
 /*

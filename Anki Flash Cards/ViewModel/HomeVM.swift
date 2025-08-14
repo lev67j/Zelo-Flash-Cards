@@ -10,9 +10,7 @@ import CoreData
 import FirebaseAnalytics
 
 // MARK: - HomeVM
-
 final class HomeVM: ObservableObject {
-    // MARK: AppStorage / State
     @AppStorage("isFirstOpenKey") var isFirstOpen = false
     @AppStorage("selectedLanguage") var selectedLanguage = "English"
     @AppStorage("currentStreak") var currentStreak: Int = 0
@@ -25,30 +23,21 @@ final class HomeVM: ObservableObject {
     @Published var selectedThemeIndex: Int? = nil
     @Published var selectedLevel: Int? = nil
     @Published var availableLanguages: [LanguageOption] = []
-
     @Published var languageCourse: LanguageCourse?
     @Published var themes: [Theme] = []
-
-    // счётчики для топ-бара
     @Published var studiedCardsCount: Int = 0
     @Published var starsCount: Int = 0
-
-    // текущая тема для "таблички темы"
     @Published var currentThemeIndex: Int = 0
+
     var currentTheme: Theme? {
         guard themes.indices.contains(currentThemeIndex) else { return nil }
         return themes[currentThemeIndex]
     }
 
-    // Разбивка карточек по уровням: [themeIndex: [level: [CardData]]]
     private var levelsByTheme: [Int: [Int: [CardData]]] = [:]
-
-    // Прогресс уровней: ключ — язык::тема, значение — максимальный пройденный уровень (0 если ничего)
     @AppStorage("levelProgressDict") private var levelProgressDictJSON: String = "{}"
-
     private let viewContext: NSManagedObjectContext
 
-    // MARK: Init
     init(context: NSManagedObjectContext) {
         self.viewContext = context
         loadAvailableLanguages()
@@ -79,7 +68,6 @@ final class HomeVM: ObservableObject {
         selectedLanguage = language
         loadDataFromCoreData()
         fetchStudiedCardsCount()
-        // при смене языка возвращаемся к первой теме
         currentThemeIndex = 0
         Analytics.logEvent("home_language_switched", parameters: ["language": language])
     }
@@ -124,9 +112,17 @@ final class HomeVM: ObservableObject {
                 print("Коллекция: \(collection.name ?? "N/A"), Язык: \(collection.language?.name_language ?? "N/A"), Карточек: \(cardCount)")
             }
         }
+
+        let cardRequest: NSFetchRequest<Card> = Card.fetchRequest()
+        if let cards = try? viewContext.fetch(cardRequest) {
+            print("🃏 Все карточки (\(cards.count)):")
+            for card in cards {
+                print("Карточка: front=\(card.frontText ?? "N/A"), back=\(card.backText ?? "N/A"), grade=\(card.lastGrade.rawValue), isNew=\(card.isNew)")
+            }
+        }
     }
 
-    // MARK: - Разбивка карточек по уровням (1...11)
+    // MARK: - Разбивка карточек по уровням
     private func distributeCardsIntoLevels() {
         levelsByTheme.removeAll()
         for (themeIndex, theme) in themes.enumerated() {
@@ -135,13 +131,10 @@ final class HomeVM: ObservableObject {
                 levelsByTheme[themeIndex] = [:]
                 continue
             }
-
-            // Равномерное распределение, остаток докидываем в последний уровень
             let base = max(1, totalCards / 11)
             var remaining = totalCards
             var start = 0
             var map: [Int: [CardData]] = [:]
-
             for level in 1...11 {
                 if remaining <= 0 {
                     map[level] = []
@@ -157,37 +150,82 @@ final class HomeVM: ObservableObject {
         }
     }
 
-    func getCardsForLevel(themeIndex: Int, level: Int) -> [CardData] {
-        levelsByTheme[themeIndex]?[level] ?? []
+    func getCardsForLevel(themeIndex: Int, level: Int, createIfMissing: Bool = false) -> [Card] {
+        let cardDatas = levelsByTheme[themeIndex]?[level] ?? []
+        var cards: [Card] = []
+        for cardData in cardDatas {
+            let request: NSFetchRequest<Card> = Card.fetchRequest()
+            request.predicate = NSPredicate(format: "frontText == %@ AND backText == %@", cardData.front, cardData.back)
+            if let existing = try? viewContext.fetch(request).first {
+                cards.append(existing)
+            } else if createIfMissing {
+                let newCard = Card(context: viewContext)
+                newCard.frontText = cardData.front
+                newCard.backText = cardData.back
+                newCard.isNew = true
+                newCard.lastGrade = .new
+                cards.append(newCard)
+            }
+        }
+        if createIfMissing && !cards.isEmpty {
+            do {
+                try viewContext.save()
+                Analytics.logEvent("home_cards_created", parameters: [
+                    "themeIndex": themeIndex,
+                    "level": level,
+                    "cardCount": cards.count
+                ])
+            } catch {
+                print("Error saving cards: \(error)")
+                Analytics.logEvent("home_cards_save_error", parameters: ["error": error.localizedDescription])
+            }
+        }
+        return cards
+    }
+
+    func progressForLevel(themeIndex: Int, level: Int) -> Double {
+        let cards = getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: false)
+        let goodCount = cards.filter { $0.lastGrade == .good }.count
+        let total = levelsByTheme[themeIndex]?[level]?.count ?? 1
+        return Double(goodCount) / Double(total)
+    }
+
+    func checkLevelCompletion(themeIndex: Int, level: Int) {
+        let cards = getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: false)
+        let allGood = cards.allSatisfy { $0.lastGrade == .good }
+        print("Checking level completion: theme \(themeIndex), level \(level), allGood: \(allGood), card count: \(cards.count)")
+        Analytics.logEvent("check_level_completion", parameters: [
+            "themeIndex": themeIndex,
+            "level": level,
+            "allGood": allGood,
+            "cardCount": cards.count
+        ])
+        if allGood {
+            markLevelCompleted(themeIndex: themeIndex, level: level)
+            objectWillChange.send()
+        }
     }
 
     // MARK: - Прогресс по темам и уровням
-
-    /// Завершён ли уровень (пройден)
     func isLevelCompleted(themeIndex: Int, level: Int) -> Bool {
         level <= maxPassedLevel(themeIndex: themeIndex)
     }
 
-    /// Можно ли открыть тему
     func isThemeUnlocked(themeIndex: Int) -> Bool {
-        guard themeIndex > 0 else { return true } // первая тема доступна всегда
-        // все предыдущие темы должны быть пройдены полностью
-        for i in 0..<(themeIndex) {
+        guard themeIndex > 0 else { return true }
+        for i in 0..<themeIndex {
             if maxPassedLevel(themeIndex: i) < 11 { return false }
         }
         return true
     }
 
-    /// Можно ли открыть конкретный уровень темы
     func isLevelUnlocked(themeIndex: Int, level: Int) -> Bool {
         guard isThemeUnlocked(themeIndex: themeIndex) else { return false }
-        let maxPassed = maxPassedLevel(themeIndex: themeIndex)
-        // первый уровень первой темы — доступен по дефолту
         if themeIndex == 0 && level == 1 { return true }
+        let maxPassed = maxPassedLevel(themeIndex: themeIndex)
         return level <= maxPassed + 1
     }
 
-    /// Пометить уровень как завершённый
     func markLevelCompleted(themeIndex: Int, level: Int) {
         let key = progressKey(themeIndex: themeIndex)
         var dict = loadProgressDict()
@@ -195,11 +233,13 @@ final class HomeVM: ObservableObject {
         if level > current {
             dict[key] = min(level, 11)
             saveProgressDict(dict)
+            print("Level completed: theme \(themeIndex), level \(level), progress dict: \(dict)")
             Analytics.logEvent("home_level_completed", parameters: [
                 "language": selectedLanguage,
                 "theme": themes[safe: themeIndex]?.title ?? "N/A",
                 "level": level
             ])
+            objectWillChange.send()
         }
     }
 
@@ -261,7 +301,6 @@ final class HomeVM: ObservableObject {
         lastActionTime = now
     }
 
-    // MARK: - Текущая тема для «таблички»
     func updateCurrentThemeIndex(_ index: Int) {
         guard themes.indices.contains(index) else { return }
         if currentThemeIndex != index {
@@ -321,7 +360,6 @@ struct CardData: Decodable {
     let back: String
 }
 
-// MARK: - Safe subscript
 private extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil

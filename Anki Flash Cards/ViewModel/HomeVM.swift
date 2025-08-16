@@ -5,6 +5,7 @@
 //  Created by Lev Vlasov on 2025-08-06.
 //
 
+
 import SwiftUI
 import CoreData
 import FirebaseAnalytics
@@ -36,6 +37,9 @@ final class HomeVM: ObservableObject {
 
     // levelsByTheme: deterministic split of cards into levels (1..11)
     private var levelsByTheme: [Int: [Int: [CardData]]] = [:]
+    
+    // NEW: deterministic split of questions into levels (1..11), mirroring cards
+    private var levelsByThemeForQuestions: [Int: [Int: [String]]] = [:]
 
     // progress dictionary stored as JSON in AppStorage (keyed by language::themeIndex -> maxPassedLevel)
     @AppStorage("levelProgressDict") private var levelProgressDictJSON: String = "{}"
@@ -105,8 +109,6 @@ final class HomeVM: ObservableObject {
                 "Nature & Environment",
                 "Social Issues & News"
             ]
-
-            
             let orderMap = Dictionary(uniqueKeysWithValues: desiredOrder.enumerated().map { ($1, $0) })
             
             let sortedCollections = collections.sorted { a, b in
@@ -115,18 +117,46 @@ final class HomeVM: ObservableObject {
                 return idxA < idxB
             }
             
+            // Проверка наличия сущности/атрибута для вопросов
+            let hasShopQuestionEntity = viewContext.persistentStoreCoordinator?
+                .managedObjectModel.entitiesByName["ShopQuestion"] != nil
+            
+            let hasQuestionsJSONAttribute: Bool = {
+                guard let entity = NSEntityDescription.entity(forEntityName: "ShopCollection", in: viewContext) else { return false }
+                return entity.attributesByName["questionsJSON"] != nil
+            }()
+            
             themes = sortedCollections.enumerated().map { (index, collection) in
+                // Cards
                 let cards = (collection.cards?.allObjects as? [ShopCard])?
                     .sorted(by: { ($0.frontText ?? "") < ($1.frontText ?? "") }) ?? []
                 
+                // Questions
+                var questions: [String] = []
+                
+                if hasShopQuestionEntity, let set = collection.value(forKey: "questions") as? NSSet {
+                    let qObjects = (set.allObjects as? [NSManagedObject]) ?? []
+                    questions = qObjects.compactMap { $0.value(forKey: "text") as? String }
+                        .sorted()
+                } else if hasQuestionsJSONAttribute, let data = collection.value(forKey: "questionsJSON") as? Data {
+                    if let qs = try? JSONDecoder().decode([String].self, from: data) {
+                        questions = qs
+                    }
+                } else {
+                    // нет хранения — окей, идём без вопросов
+                }
+                
                 return Theme(
                     title: collection.name ?? "Theme \(index + 1)",
+                    questions: questions,
                     cards: cards.map { CardData(front: $0.frontText ?? "", back: $0.backText ?? "") },
                     imageName: collection.name?.lowercased().replacingOccurrences(of: " ", with: "_") ?? ""
                 )
             }
             
             distributeCardsIntoLevels()
+            distributeQuestionsIntoLevels() // NEW: Distribute questions after cards
+            
             currentThemeIndex = min(currentThemeIndex, max(0, themes.count - 1))
             
         } catch {
@@ -190,6 +220,35 @@ final class HomeVM: ObservableObject {
             levelsByTheme[themeIndex] = map
         }
     }
+    
+    // NEW: Разбивка вопросов по уровням (mirroring cards distribution)
+    private func distributeQuestionsIntoLevels() {
+        levelsByThemeForQuestions.removeAll()
+        for (themeIndex, theme) in themes.enumerated() {
+            let totalQuestions = theme.questions.count
+            guard totalQuestions > 0 else {
+                levelsByThemeForQuestions[themeIndex] = [:]
+                continue
+            }
+            // Deterministic distribution: try to make levels as equal as possible, earlier levels get 1 extra if remainder
+            var map: [Int: [String]] = [:]
+            let base = totalQuestions / 11
+            var remainder = totalQuestions % 11
+            var cursor = 0
+            for level in 1...11 {
+                let take = base + (remainder > 0 ? 1 : 0)
+                remainder = max(0, remainder - 1)
+                let end = min(cursor + take, totalQuestions)
+                if take > 0 && cursor < end {
+                    map[level] = Array(theme.questions[cursor..<end])
+                } else {
+                    map[level] = []
+                }
+                cursor = end
+            }
+            levelsByThemeForQuestions[themeIndex] = map
+        }
+    }
 
     // MARK: - Level <-> Card mapping and fetching
     // To avoid collisions between cards from different themes (same front/back), we persist created Card objectIDs per themeIndex+level.
@@ -205,9 +264,11 @@ final class HomeVM: ObservableObject {
     private func saveLevelCardMap(_ map: [String: [String]]) {
         let data = (try? JSONEncoder().encode(map)) ?? Data()
         levelCardMapJSON = String(data: data, encoding: .utf8) ?? "{}"
-        objectWillChange.send()
+        DispatchQueue.main.async { [weak self] in
+            self?.objectWillChange.send()
+        }
     }
-
+    
     /// Возвращает реальные CoreData Card объекты для themeIndex/level.
     /// Если createIfMissing == true — создаёт Card'ы и сохраняет их objectID'ы в levelCardMap.
     func getCardsForLevel(themeIndex: Int, level: Int, createIfMissing: Bool = false) -> [Card] {
@@ -265,6 +326,11 @@ final class HomeVM: ObservableObject {
         }
 
         return createdOrFound
+    }
+    
+    // NEW: Returns questions for a specific theme and level (deterministic, no creation needed)
+    func getQuestionsForLevel(themeIndex: Int, level: Int) -> [String] {
+        return levelsByThemeForQuestions[themeIndex]?[level] ?? []
     }
 
     // MARK: - Progress and completion logic
@@ -432,11 +498,13 @@ struct LanguageCourse: Decodable {
 
 struct JSONTheme: Decodable {
     let title: String
+    let questions: [String]?
     let cards: [CardData]
 }
 
 struct Theme {
     let title: String
+    let questions: [String]
     let cards: [CardData]
     let imageName: String
 }

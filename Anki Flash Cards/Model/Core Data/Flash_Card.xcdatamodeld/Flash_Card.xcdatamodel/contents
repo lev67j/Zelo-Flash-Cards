@@ -36,12 +36,18 @@
         <attribute name="priority" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="cards" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShopCard" inverseName="collection" inverseEntity="ShopCard"/>
         <relationship name="language" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShopLanguages" inverseName="language_collections" inverseEntity="ShopLanguages"/>
+        <relationship name="questions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShopQuestion" inverseName="collection" inverseEntity="ShopQuestion"/>
     </entity>
     <entity name="ShopLanguages" representedClassName="ShopLanguages" syncable="YES" codeGenerationType="class">
         <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name_language" optional="YES" attributeType="String"/>
         <attribute name="priority" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="language_collections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ShopCollection" inverseName="language" inverseEntity="ShopCollection"/>
+    </entity>
+    <entity name="ShopQuestion" representedClassName="ShopQuestion" syncable="YES" codeGenerationType="class">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <relationship name="collection" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ShopCollection" inverseName="questions" inverseEntity="ShopCollection"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
         <attribute name="age" optional="YES" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES"/>

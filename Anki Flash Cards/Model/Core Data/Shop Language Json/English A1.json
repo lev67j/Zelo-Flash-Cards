@@ -4,6 +4,11 @@
   "themes": [
     {
       "title": "Personal Identity",
+      "questions": [
+        "What is your name?",
+        "How old are you?",
+        "Can you describe yourself in three words?"
+      ],
       "cards": [
         { "front": "Name", "back": "Имя" },
         { "front": "Age", "back": "Возраст" },
@@ -12,6 +17,11 @@
     },
     {
       "title": "Daily Routine",
+      "questions": [
+        "What time do you usually wake up?",
+        "Do you brush your teeth in the morning or evening?",
+        "What is your daily work or study routine?"
+      ],
       "cards": [
         { "front": "Wake", "back": "Просыпаться" },
         { "front": "Brush", "back": "Чистить щеткой" },
@@ -20,6 +30,11 @@
     },
     {
       "title": "Food & Drink",
+      "questions": [
+        "What is your favorite food?",
+        "How often do you drink water?",
+        "Can you cook your favorite meal?"
+      ],
       "cards": [
         { "front": "Eat", "back": "Есть" },
         { "front": "Drink", "back": "Пить" },
@@ -28,6 +43,11 @@
     },
     {
       "title": "Travel & Transportation",
+      "questions": [
+        "How do you usually travel to school or work?",
+        "Have you ever flown on an airplane?",
+        "Do you prefer driving or taking public transport?"
+      ],
       "cards": [
         { "front": "Drive", "back": "Водить" },
         { "front": "Ride", "back": "Ездить верхом" },
@@ -36,6 +56,11 @@
     },
     {
       "title": "Health & Body",
+      "questions": [
+        "How do you keep your body healthy?",
+        "What do you do if you get hurt?",
+        "Do you think breathing exercises are helpful?"
+      ],
       "cards": [
         { "front": "Breathe", "back": "Дышать" },
         { "front": "Hurt", "back": "Причинять боль" },
@@ -44,6 +69,11 @@
     },
     {
       "title": "Shopping & Money",
+      "questions": [
+        "What do you usually buy when you go shopping?",
+        "Have you ever sold something online?",
+        "Do you prefer to pay by cash or card?"
+      ],
       "cards": [
         { "front": "Buy", "back": "Покупать" },
         { "front": "Sell", "back": "Продавать" },
@@ -52,6 +82,11 @@
     },
     {
       "title": "Housing & Household",
+      "questions": [
+        "Do you clean your room every day?",
+        "Who repairs things in your home?",
+        "Have you ever moved to a new house?"
+      ],
       "cards": [
         { "front": "Clean", "back": "Чистить" },
         { "front": "Repair", "back": "Чинить" },
@@ -60,6 +95,11 @@
     },
     {
       "title": "Emergencies & Survival",
+      "questions": [
+        "What would you do if there was a fire?",
+        "Who do you call in an emergency?",
+        "How can people survive in the forest?"
+      ],
       "cards": [
         { "front": "Escape", "back": "Сбегать" },
         { "front": "Rescue", "back": "Спасать" },
@@ -68,6 +108,11 @@
     },
     {
       "title": "Work & Career",
+      "questions": [
+        "What job would you like to apply for?",
+        "How can you earn money as a student?",
+        "Do you want to manage your own company one day?"
+      ],
       "cards": [
         { "front": "Apply", "back": "Подавать заявку" },
         { "front": "Earn", "back": "Зарабатывать" },
@@ -76,6 +121,11 @@
     },
     {
       "title": "Technology & Gadgets",
+      "questions": [
+        "What app do you download most often?",
+        "How often do you update your phone?",
+        "How long does your phone take to charge?"
+      ],
       "cards": [
         { "front": "Download", "back": "Скачивать" },
         { "front": "Update", "back": "Обновлять" },
@@ -84,6 +134,11 @@
     },
     {
       "title": "Relationships & Communication",
+      "questions": [
+        "Who do you love the most?",
+        "How often do you talk with friends?",
+        "Do you argue with your family sometimes?"
+      ],
       "cards": [
         { "front": "Love", "back": "Любить" },
         { "front": "Talk", "back": "Говорить" },
@@ -92,6 +147,11 @@
     },
     {
       "title": "Emotions & Mindset",
+      "questions": [
+        "How do you feel today?",
+        "What do you usually think about before sleep?",
+        "Do you believe in luck?"
+      ],
       "cards": [
         { "front": "Feel", "back": "Чувствовать" },
         { "front": "Think", "back": "Думать" },
@@ -100,6 +160,11 @@
     },
     {
       "title": "Culture & Entertainment",
+      "questions": [
+        "Can you sing a song in English?",
+        "Do you like to dance at parties?",
+        "What movie did you watch last week?"
+      ],
       "cards": [
         { "front": "Sing", "back": "Петь" },
         { "front": "Dance", "back": "Танцевать" },
@@ -108,6 +173,11 @@
     },
     {
       "title": "Education & Learning",
+      "questions": [
+        "What do you like to learn?",
+        "How do you study new words?",
+        "Do you want to teach others one day?"
+      ],
       "cards": [
         { "front": "Learn", "back": "Учить" },
         { "front": "Study", "back": "Изучать" },
@@ -116,6 +186,11 @@
     },
     {
       "title": "Nature & Environment",
+      "questions": [
+        "What plants grow near your home?",
+        "Have you ever planted a tree?",
+        "How can we protect the environment?"
+      ],
       "cards": [
         { "front": "Grow", "back": "Расти" },
         { "front": "Plant", "back": "Сажать" },
@@ -124,6 +199,11 @@
     },
     {
       "title": "Social Issues & News",
+      "questions": [
+        "What was the last news you read?",
+        "Have you ever voted in an election?",
+        "Why do people protest?"
+      ],
       "cards": [
         { "front": "Protest", "back": "Протестовать" },
         { "front": "Vote", "back": "Голосовать" },

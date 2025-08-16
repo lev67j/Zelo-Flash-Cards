@@ -19,7 +19,18 @@ struct SecondScreen: View {
     @State private var startTime: Date?
     
     // Жёстко заданный список языков
-    private let staticLanguages = ["English", "Spanish"]
+    private let staticLanguages = [
+        "English",     // ~1.5 млрд носителей и изучающих
+        "Chinese",     // ~1.1 млрд (в основном мандарин)
+        "Spanish",     // ~600 млн
+        "Arabic",      // ~370 млн (все диалекты)
+        "French",      // ~300 млн
+        "Russian",     // ~260 млн
+        "Portuguese",  // ~260 млн
+        "German",      // ~130 млн
+        "Japanese",    // ~125 млн
+        "Italian"      // ~70 млн
+    ]
     
     var body: some View {
         VStack(spacing: 20) {

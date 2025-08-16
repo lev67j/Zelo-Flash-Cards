@@ -212,7 +212,7 @@ struct HomeView: View {
     private func separator(themeIndex: Int) -> some View {
         HStack(spacing: 8) {
             Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
-            Image(systemName: "lock.fill")
+            Image(systemName: vm.isThemeUnlocked(themeIndex: themeIndex) ? "lock.open.fill" : "lock.fill")
                 .resizable().scaledToFit()
                 .frame(width: 14, height: 14)
                 .foregroundColor(.gray)
@@ -241,6 +241,7 @@ struct HomeView: View {
                     themeTitle: themeTitle,
                     level: level,
                     onLevelCompleted: {
+                        // after finishing session we re-check completion; if everything good - mark and update UI
                         vm.checkLevelCompletion(themeIndex: themeIndex, level: level)
                     }
                 )
@@ -311,7 +312,7 @@ struct LevelButton: View {
     private var isUnlocked: Bool { vm.isLevelUnlocked(themeIndex: themeIndex, level: level) }
     private var isCompleted: Bool { vm.isLevelCompleted(themeIndex: themeIndex, level: level) }
     private var isCurrent: Bool { isUnlocked && !isCompleted }
-    private var progress: Double { vm.progressForLevel(themeIndex: themeIndex, level: level) }
+    private var progress: Double { min(1.0, vm.progressForLevel(themeIndex: themeIndex, level: level)) }
     private var icon: String {
         let set = ["heart.fill", "airplane", "star.fill", "bolt.fill", "book.fill"]
         return set[(level - 1) % set.count]
@@ -338,6 +339,16 @@ struct LevelButton: View {
                         .stroke(Color.blue.opacity(0.8), style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .frame(width: 74, height: 74)
                         .rotationEffect(.degrees(-90))
+                        .onChange(of: progress) { newValue in
+                            // if fully filled -> mark completed instantly (safety: only once)
+                            if newValue >= 1.0 {
+                                vm.markLevelCompleted(themeIndex: themeIndex, level: level)
+                            }
+                        }
+                } else if isCompleted {
+                    Circle()
+                        .stroke(Color.green.opacity(0.9), lineWidth: 5)
+                        .frame(width: 74, height: 74)
                 }
                 Circle()
                     .fill(circleFill(isCompleted: isCompleted))

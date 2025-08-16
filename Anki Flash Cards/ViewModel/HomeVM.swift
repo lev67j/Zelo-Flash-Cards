@@ -34,8 +34,14 @@ final class HomeVM: ObservableObject {
         return themes[currentThemeIndex]
     }
 
+    // levelsByTheme: deterministic split of cards into levels (1..11)
     private var levelsByTheme: [Int: [Int: [CardData]]] = [:]
+
+    // progress dictionary stored as JSON in AppStorage (keyed by language::themeIndex -> maxPassedLevel)
     @AppStorage("levelProgressDict") private var levelProgressDictJSON: String = "{}"
+    // explicit mapping of created Card objectID.uriRepresentation strings per themeIndex+level
+    @AppStorage("levelCardMapJSON") private var levelCardMapJSON: String = "{}"
+
     private let viewContext: NSManagedObjectContext
 
     init(context: NSManagedObjectContext) {
@@ -76,24 +82,58 @@ final class HomeVM: ObservableObject {
     func loadDataFromCoreData() {
         let request: NSFetchRequest<ShopCollection> = ShopCollection.fetchRequest()
         request.predicate = NSPredicate(format: "language.name_language == %@", selectedLanguage)
+        
         do {
             let collections = try viewContext.fetch(request)
-            themes = collections.enumerated().map { (index, collection) in
+            
+            // Жёсткий порядок
+            let desiredOrder = [
+                "Personal Identity",
+                "Daily Routine",
+                "Food & Drink",
+                "Travel & Transportation",
+                "Health & Body",
+                "Shopping & Money",
+                "Housing & Household",
+                "Emergencies & Survival",
+                "Work & Career",
+                "Technology & Gadgets",
+                "Relationships & Communication",
+                "Emotions & Mindset",
+                "Culture & Entertainment",
+                "Education & Learning",
+                "Nature & Environment",
+                "Social Issues & News"
+            ]
+
+            
+            let orderMap = Dictionary(uniqueKeysWithValues: desiredOrder.enumerated().map { ($1, $0) })
+            
+            let sortedCollections = collections.sorted { a, b in
+                let idxA = orderMap[a.name ?? ""] ?? Int.max
+                let idxB = orderMap[b.name ?? ""] ?? Int.max
+                return idxA < idxB
+            }
+            
+            themes = sortedCollections.enumerated().map { (index, collection) in
                 let cards = (collection.cards?.allObjects as? [ShopCard])?
-                    .map { CardData(front: $0.frontText ?? "", back: $0.backText ?? "") } ?? []
+                    .sorted(by: { ($0.frontText ?? "") < ($1.frontText ?? "") }) ?? []
+                
                 return Theme(
                     title: collection.name ?? "Theme \(index + 1)",
-                    cards: cards,
+                    cards: cards.map { CardData(front: $0.frontText ?? "", back: $0.backText ?? "") },
                     imageName: collection.name?.lowercased().replacingOccurrences(of: " ", with: "_") ?? ""
                 )
             }
+            
             distributeCardsIntoLevels()
             currentThemeIndex = min(currentThemeIndex, max(0, themes.count - 1))
-            Analytics.logEvent("home_coredata_load_success", parameters: ["theme_count": themes.count, "language": selectedLanguage])
+            
         } catch {
-            Analytics.logEvent("home_coredata_load_error", parameters: ["error": error.localizedDescription, "language": selectedLanguage])
+            print("Error loading themes: \(error)")
         }
     }
+
 
     func debugCoreDataContents() {
         let languageRequest: NSFetchRequest<ShopLanguages> = ShopLanguages.fetchRequest()
@@ -131,69 +171,114 @@ final class HomeVM: ObservableObject {
                 levelsByTheme[themeIndex] = [:]
                 continue
             }
-            let base = max(1, totalCards / 11)
-            var remaining = totalCards
-            var start = 0
+            // Deterministic distribution: try to make levels as equal as possible, earlier levels get 1 extra if remainder
             var map: [Int: [CardData]] = [:]
+            let base = totalCards / 11
+            var remainder = totalCards % 11
+            var cursor = 0
             for level in 1...11 {
-                if remaining <= 0 {
+                let take = base + (remainder > 0 ? 1 : 0)
+                remainder = max(0, remainder - 1)
+                let end = min(cursor + take, totalCards)
+                if take > 0 && cursor < end {
+                    map[level] = Array(theme.cards[cursor..<end])
+                } else {
                     map[level] = []
-                    continue
                 }
-                let take = (level == 11) ? remaining : min(base, remaining)
-                let end = min(start + take, totalCards)
-                map[level] = Array(theme.cards[start..<end])
-                start = end
-                remaining = totalCards - end
+                cursor = end
             }
             levelsByTheme[themeIndex] = map
         }
     }
 
+    // MARK: - Level <-> Card mapping and fetching
+    // To avoid collisions between cards from different themes (same front/back), we persist created Card objectIDs per themeIndex+level.
+    private func levelCardMapKey(themeIndex: Int, level: Int) -> String {
+        return "\(selectedLanguage)::themeIndex:\(themeIndex)::level:\(level)"
+    }
+
+    private func loadLevelCardMap() -> [String: [String]] {
+        guard let data = levelCardMapJSON.data(using: .utf8) else { return [:] }
+        return (try? JSONDecoder().decode([String: [String]].self, from: data)) ?? [:]
+    }
+
+    private func saveLevelCardMap(_ map: [String: [String]]) {
+        let data = (try? JSONEncoder().encode(map)) ?? Data()
+        levelCardMapJSON = String(data: data, encoding: .utf8) ?? "{}"
+        objectWillChange.send()
+    }
+
+    /// Возвращает реальные CoreData Card объекты для themeIndex/level.
+    /// Если createIfMissing == true — создаёт Card'ы и сохраняет их objectID'ы в levelCardMap.
     func getCardsForLevel(themeIndex: Int, level: Int, createIfMissing: Bool = false) -> [Card] {
+        // 1. try load mapping
+        var result: [Card] = []
+        let mapKey = levelCardMapKey(themeIndex: themeIndex, level: level)
+        var cardMap = loadLevelCardMap()
+        if let uriStrings = cardMap[mapKey], !uriStrings.isEmpty {
+            for uri in uriStrings {
+                if let url = URL(string: uri), let objID = viewContext.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: url) {
+                    if let card = try? viewContext.existingObject(with: objID) as? Card {
+                        result.append(card)
+                    }
+                }
+            }
+            // If mapping existed but some objects missing, fallthrough to attempt to (re)create from CardData
+            if !result.isEmpty || !createIfMissing { return result }
+        }
+
+        // 2. fallback: create/fetch by content
         let cardDatas = levelsByTheme[themeIndex]?[level] ?? []
-        var cards: [Card] = []
+        var createdOrFound: [Card] = []
         for cardData in cardDatas {
+            // Try to find an exact Card matching front+back and language (if Card has language attribute — if not, we still match content)
             let request: NSFetchRequest<Card> = Card.fetchRequest()
             request.predicate = NSPredicate(format: "frontText == %@ AND backText == %@", cardData.front, cardData.back)
             if let existing = try? viewContext.fetch(request).first {
-                cards.append(existing)
+                createdOrFound.append(existing)
             } else if createIfMissing {
                 let newCard = Card(context: viewContext)
                 newCard.frontText = cardData.front
                 newCard.backText = cardData.back
                 newCard.isNew = true
                 newCard.lastGrade = .new
-                cards.append(newCard)
+                createdOrFound.append(newCard)
             }
         }
-        if createIfMissing && !cards.isEmpty {
+
+        if createIfMissing && !createdOrFound.isEmpty {
             do {
                 try viewContext.save()
+                // persist mapping
+                let uris = createdOrFound.map { $0.objectID.uriRepresentation().absoluteString }
+                cardMap[mapKey] = uris
+                saveLevelCardMap(cardMap)
                 Analytics.logEvent("home_cards_created", parameters: [
                     "themeIndex": themeIndex,
                     "level": level,
-                    "cardCount": cards.count
+                    "cardCount": createdOrFound.count
                 ])
             } catch {
                 print("Error saving cards: \(error)")
                 Analytics.logEvent("home_cards_save_error", parameters: ["error": error.localizedDescription])
             }
         }
-        return cards
+
+        return createdOrFound
     }
 
+    // MARK: - Progress and completion logic
     func progressForLevel(themeIndex: Int, level: Int) -> Double {
         let cards = getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: false)
         let goodCount = cards.filter { $0.lastGrade == .good }.count
-        let total = levelsByTheme[themeIndex]?[level]?.count ?? 1
+        let total = levelsByTheme[themeIndex]?[level]?.count ?? cards.count
+        guard total > 0 else { return 0.0 }
         return Double(goodCount) / Double(total)
     }
 
     func checkLevelCompletion(themeIndex: Int, level: Int) {
         let cards = getCardsForLevel(themeIndex: themeIndex, level: level, createIfMissing: false)
-        let allGood = cards.allSatisfy { $0.lastGrade == .good }
-        print("Checking level completion: theme \(themeIndex), level \(level), allGood: \(allGood), card count: \(cards.count)")
+        let allGood = !cards.isEmpty && cards.allSatisfy { $0.lastGrade == .good }
         Analytics.logEvent("check_level_completion", parameters: [
             "themeIndex": themeIndex,
             "level": level,
@@ -206,9 +291,8 @@ final class HomeVM: ObservableObject {
         }
     }
 
-    // MARK: - Прогресс по темам и уровням
     func isLevelCompleted(themeIndex: Int, level: Int) -> Bool {
-        level <= maxPassedLevel(themeIndex: themeIndex)
+        return level <= maxPassedLevel(themeIndex: themeIndex)
     }
 
     func isThemeUnlocked(themeIndex: Int) -> Bool {
@@ -227,8 +311,8 @@ final class HomeVM: ObservableObject {
     }
 
     func markLevelCompleted(themeIndex: Int, level: Int) {
-        let key = progressKey(themeIndex: themeIndex)
         var dict = loadProgressDict()
+        let key = progressKey(themeIndex: themeIndex)
         let current = dict[key] ?? 0
         if level > current {
             dict[key] = min(level, 11)
@@ -236,9 +320,11 @@ final class HomeVM: ObservableObject {
             print("Level completed: theme \(themeIndex), level \(level), progress dict: \(dict)")
             Analytics.logEvent("home_level_completed", parameters: [
                 "language": selectedLanguage,
-                "theme": themes[safe: themeIndex]?.title ?? "N/A",
-                "level": level
+                "themeIndex": themeIndex,
+                "level": level,
+                "theme": themes[safe: themeIndex]?.title ?? "N/A"
             ])
+            // unlock next level implicitly via isLevelUnlocked logic
             objectWillChange.send()
         }
     }
@@ -254,8 +340,8 @@ final class HomeVM: ObservableObject {
     }
 
     private func progressKey(themeIndex: Int) -> String {
-        let themeName = themes[safe: themeIndex]?.title ?? "unknown"
-        return "\(selectedLanguage)::\(themeName)"
+        // Use stable key: language + numeric themeIndex, avoids title collisions and ordering issues.
+        return "\(selectedLanguage)::themeIndex:\(themeIndex)"
     }
 
     private func loadProgressDict() -> [String: Int] {

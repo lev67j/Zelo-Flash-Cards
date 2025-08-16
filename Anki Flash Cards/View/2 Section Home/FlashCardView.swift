@@ -56,14 +56,12 @@ struct FlashCardView: View {
             Analytics.logEvent(open_sheet_settings_flashcards ? "flashcard_settings_sheet_opened" : "flashcard_settings_sheet_closed", parameters: nil)
         }
     }
-    @State private var open_sheet_custom_cards = false {
-        didSet {
-            Analytics.logEvent(open_sheet_custom_cards ? "flashcard_custom_cards_sheet_opened" : "flashcard_custom_cards_sheet_closed", parameters: nil)
-        }
-    }
     
     @ObservedObject private var vm = DesignVM()
     @State private var screenEnterTime = Date()
+    @State private var completedCards: [Card] = []
+    @EnvironmentObject var appNavVM: AppNavigationVM
+    @State private var userVocabulary: String = ""
     
     var body: some View {
         ZStack {
@@ -142,84 +140,6 @@ struct FlashCardView: View {
                                                 .padding(.horizontal)
                                             }
                                             
-                                            // Start Custom Cards "5-10-15..."
-                                            VStack {
-                                                Button {
-                                                    Analytics.logEvent("flashcard_open_custom_cards_button_tapped", parameters: nil)
-                                                    open_sheet_custom_cards = true
-                                                } label: {
-                                                    HStack {
-                                                        Text("Custom cards (\(selectedCardCount))")
-                                                            .font(.headline)
-                                                            .foregroundColor(vm.color_text_start_custom_cards_sheet_flash_card_mainset)
-                                                        Spacer()
-                                                    }
-                                                    .padding()
-                                                    .background(vm.color_back_start_custom_cards_sheet_flash_card_mainset)
-                                                    .cornerRadius(12)
-                                                }
-                                                .padding(.horizontal)
-                                                .sheet(isPresented: $open_sheet_custom_cards) {
-                                                    ZStack {
-                                                        vm.color_back_sheet_start_custom_cards_mainset
-                                                            .ignoresSafeArea()
-                                                        
-                                                        VStack {
-                                                            Text("Select number of cards")
-                                                                .foregroundStyle(vm.color_text_select_number_cards_mainset)
-                                                                .font(.headline)
-                                                                .padding()
-                                                            
-                                                            Picker("Number of cards", selection: $selectedCardCount) {
-                                                                ForEach(Array(stride(from: 5, through: allCards.count, by: 5)), id: \.self) { number in
-                                                                    Text("\(number)")
-                                                                        .foregroundStyle(vm.color_text_number_cards_mainset)
-                                                                        .tag(number)
-                                                                }
-                                                            }
-                                                            .pickerStyle(.wheel)
-                                                            .onChange(of: selectedCardCount) { newValue,_ in
-                                                                Analytics.logEvent("flashcard_picker_selected_number_changed", parameters: ["selectedCardCount": newValue])
-                                                            }
-                                                            
-                                                            Button {
-                                                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                                                generator.impactOccurred()
-                                                                
-                                                                Analytics.logEvent("flashcard_custom_start_button_tapped", parameters: ["selectedCardCount": selectedCardCount])
-                                                                
-                                                                let today = Calendar.current.startOfDay(for: Date())
-                                                                let dueCards = allCards.filter { card in
-                                                                    if card.lastGrade == .again || card.isNew { return true }
-                                                                    if let scheduleDate = card.nextScheduleDate {
-                                                                        let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
-                                                                        return scheduleDay <= today
-                                                                    }
-                                                                    return false
-                                                                }
-                                                                
-                                                                sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
-                                                                
-                                                                open_sheet_settings_flashcards = false
-                                                                open_sheet_custom_cards = false
-                                                            } label: {
-                                                                HStack {
-                                                                    Text("Start")
-                                                                        .font(.headline)
-                                                                        .foregroundColor(vm.color_text_button_start_mainset)
-                                                                }
-                                                                .padding()
-                                                                .padding(.horizontal, 100)
-                                                                .background(vm.color_back_button_start_mainset)
-                                                                .cornerRadius(12)
-                                                                .shadow(radius: 5)
-                                                            }
-                                                        }
-                                                    }
-                                                    .presentationDetents([.height(300)])
-                                                }
-                                            }
-                                            
                                             // Start Button
                                             VStack {
                                                 Spacer()
@@ -228,22 +148,7 @@ struct FlashCardView: View {
                                                    let generator = UIImpactFeedbackGenerator(style: .medium)
                                                     generator.impactOccurred()
                                                     
-                                                    Analytics.logEvent("flashcard_start_all_cards_button_tapped", parameters: ["allCardsCount": allCards.count])
-                                                 
-                                                    let today = Calendar.current.startOfDay(for: Date())
-                                                    let dueCards = allCards.filter { card in
-                                                        if card.lastGrade == .again || card.isNew { return true }
-                                                        if let scheduleDate = card.nextScheduleDate {
-                                                            let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
-                                                            return scheduleDay <= today
-                                                        }
-                                                        return false
-                                                    }
-                                                    
-                                                    sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
-                                                    
                                                     open_sheet_settings_flashcards = false
-                                                    open_sheet_custom_cards = false
                                                 } label: {
                                                     HStack {
                                                         Text("Start")
@@ -264,7 +169,7 @@ struct FlashCardView: View {
                                         Spacer()
                                     }
                                 }
-                                .presentationDetents([.height(300)])
+                                .presentationDetents([.height(200)])
                             }
                         }
                         .padding(.bottom, 10)
@@ -325,9 +230,9 @@ struct FlashCardView: View {
                     }
                 }
                 
-                // Card stack
-                VStack {
-                    if !sessionCards.isEmpty {
+                // Card stack or Chat
+                if !sessionCards.isEmpty {
+                    VStack {
                         ZStack {
                             ForEach(Array(sessionCards.enumerated().prefix(3)), id: \.element) { (index, card) in
                                 let isTop = index == currentCardIndex
@@ -367,144 +272,29 @@ struct FlashCardView: View {
                                 }
                         }
                     }
-                }
-                
-                // Finish Screen
-                VStack {
-                    if sessionCards.isEmpty {
-                         // Text "Nice Work..." and Image Win or Lose
-                        VStack {
-                            HStack {
-                                Text("Nice work! Your progress has improved, you've learned even more cards!")
-                                .font(.system(size: 20).bold())
-                                .foregroundStyle(Color(hex: "#546a50"))
-                                .padding(.leading)
-                                .onAppear {
-                                    Analytics.logEvent("flashcard_finish_screen_appeared", parameters: ["hard_cards": hard_cards, "good_cards": good_cards])
-                                }
-                                
-                                Spacer()
-                                
-                                Image("cake_for_zelo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 157)
-                                    .clipShape(.rect(cornerRadius: 70))
-                            } .padding(.vertical)
-                        }
-                        
-                        // Circle "Your Progress" and number of cards know/still learning
-                        VStack {
-                            HStack {
-                                 // Circle
-                                VStack {
-                                    
-                                }
-                                
-                                // Capsule know/still learning
-                                VStack(spacing: 40) {
-                                    Text("\(hard_cards)")
-                                        .foregroundStyle(.black.opacity(0.6))
-                                        .fontWeight(.bold)
-                                        .background(
-                                            Capsule()
-                                                .fill(.orange.opacity(0.4))
-                                                .frame(width: 200, height: 50)
-                                                .overlay(
-                                                    Capsule()
-                                                        .stroke(Color.orange, lineWidth: 2)
-                                                )
-                                        )
-                                    
-                                    Text("\(good_cards)")
-                                        .foregroundStyle(.black.opacity(0.6))
-                                        .fontWeight(.bold)
-                                        .background(
-                                            Capsule()
-                                                .fill(.green.opacity(0.4))
-                                                .frame(width: 200, height: 50)
-                                                .overlay(
-                                                    Capsule()
-                                                        .stroke(Color.green, lineWidth: 2)
-                                                )
-                                        )
-                                }
-                                .padding(.top, 25)
-                                .padding(.horizontal, 15)
-                               // .padding(.leading, 180)
-                            }
-                            
-                                
-                                
-                            Spacer()
-                        }
-                        
-                        // Buttons: "Back in Menu" and "Practice hard cards"
-                        VStack {
-                              VStack {
-                                Button {
-                                    let generator = UIImpactFeedbackGenerator(style: .medium)
-                                    generator.impactOccurred()
-                                    
-                                    Analytics.logEvent("flashcard_back_to_menu_button_tapped", parameters: nil)
-                                    
-                                    dismiss()
-                                } label: {
-                                    Text("Back in Menu")
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color(hex: "#546a50").opacity(0.6))
-                                        .cornerRadius(10)
-                                        .padding(.horizontal)
-                                }
-                            }
-                            
-                            VStack {
-                              Button {
-                                  let generator = UIImpactFeedbackGenerator(style: .medium)
-                                   generator.impactOccurred()
-                                   
-                                  Analytics.logEvent("flashcard_practice_more_button_tapped", parameters: nil)
-                                 
-                                   let today = Calendar.current.startOfDay(for: Date())
-                                   let dueCards = allCards.filter { card in
-                                       if card.lastGrade == .again || card.isNew { return true }
-                                       if let scheduleDate = card.nextScheduleDate {
-                                           let scheduleDay = Calendar.current.startOfDay(for: scheduleDate)
-                                           return scheduleDay <= today
-                                       }
-                                       return false
-                                   }
-                                   
-                                   sessionCards = Array(dueCards.shuffled().prefix(selectedCardCount))
-                                   
-                                   open_sheet_settings_flashcards = false
-                                   open_sheet_custom_cards = false
-                              } label: {
-                                  Text("Practice More")
-                                      .fontWeight(.bold)
-                                      .foregroundColor(.white)
-                                      .padding()
-                                      .frame(maxWidth: .infinity)
-                                      .background(Color(hex: "#546a50"))
-                                      .cornerRadius(10)
-                                      .padding(.horizontal)
-                              }
-                          }
-                        }
-                    }
+                } else {
+                    ChatView(theme: themeTitle, vocabulary: userVocabulary)
                 }
             }
             .onAppear {
                 screenEnterTime = Date()
                 Analytics.logEvent("flashcard_screen_appeared", parameters: ["collectionId": collection.objectID.uriRepresentation().absoluteString])
                 prepareSession()
+                fetchUserVocabulary()
             }
             .onDisappear {
                 logScreenDuration()
             }
+        }
+    }
+    
+    private func fetchUserVocabulary() {
+        let request: NSFetchRequest<User> = User.fetchRequest()
+        do {
+            let users = try viewContext.fetch(request)
+            userVocabulary = users.first?.vocabulary_all_words ?? ""
+        } catch {
+            print("Error fetching user: \(error)")
         }
     }
     
@@ -700,6 +490,7 @@ extension FlashCardView {
         cardsSeen = 0
         totalCards = sessionCards.count
         currentCardIndex = 0
+        completedCards = []
 
         // Логируем старт сессии
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: sessionStartTimeKey)
@@ -754,6 +545,8 @@ extension FlashCardView {
             "currentIndex": currentCardIndex
         ])
         
+        completedCards.append(card)
+        
         card.nextScheduleDate = nextScheduleDateForHard()
         card.lastGrade = .hard
         card.isNew = false
@@ -782,6 +575,8 @@ extension FlashCardView {
             "responseTime": responseTime,
             "currentIndex": currentCardIndex
         ])
+        
+        completedCards.append(card)
         
         card.nextScheduleDate = nextScheduleDateForGood()
         card.lastGrade = .good
@@ -829,7 +624,6 @@ extension FlashCardView {
     }
 }
 
-
 // MARK: - Stack Modifier
 extension View {
     func stacked(at position: Int, in total: Int) -> some View {
@@ -840,25 +634,3 @@ extension View {
             .scaleEffect(scale)
     }
 }
-/*
-// MARK: - Preview
-struct FlashCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        let context = PersistenceController.preview.container.viewContext
-        let collection = CardCollection(context: context)
-        collection.name = "Test Collection"
-        
-        for i in 1...500 {
-            let card = Card(context: context)
-            card.frontText = "Front \(i)"
-            card.backText = "Back \(i)"
-            card.creationDate = Calendar.current.startOfDay(for: Date())
-            card.isNew = true
-            collection.addToCards(card)
-        }
-        try? context.save()
-        
-        return FlashCardView(collection: collection, optionalCards: (collection.cards?.allObjects as? [Card]))
-            .environment(\.managedObjectContext, context)
-    }
-}*/

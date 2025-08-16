@@ -4,7 +4,7 @@
 //
 //  Created by Lev Vlasov on 2025-08-05.
 //
-
+/*
 import SwiftUI
 
 struct ThemeLanguageView: View {
@@ -16,3 +16,4 @@ struct ThemeLanguageView: View {
 #Preview {
     ThemeLanguageView()
 }
+*/

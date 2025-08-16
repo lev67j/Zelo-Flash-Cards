@@ -10,6 +10,7 @@ import SwiftUI
 final class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
     @Published var currentInput: String = ""
+    @Published var systemPrompt: String = ""
     
     private let apiKey = "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"
     private let model = "deepseek/deepseek-r1"
@@ -32,9 +33,16 @@ final class ChatViewModel: ObservableObject {
     private func callOpenRouterAPI(prompt: String) async -> String? {
         guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else { return nil }
         
+        var messageHistory: [[String: String]] = []
+        if !systemPrompt.isEmpty {
+            messageHistory.append(["role": "system", "content": systemPrompt])
+        }
+        messageHistory += messages.map { ["role": $0.role, "content": $0.content] }
+        messageHistory.append(["role": "user", "content": prompt])
+        
         let payload: [String: Any] = [
             "model": model,
-            "messages": messages.map { ["role": $0.role, "content": $0.content] } + [["role": "user", "content": prompt]]
+            "messages": messageHistory
         ]
         
         var request = URLRequest(url: url)

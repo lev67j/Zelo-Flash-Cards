@@ -184,139 +184,24 @@ struct AddCollectionView_Previews: PreviewProvider {
     }
 }
 
-/*
-struct AddCollectionView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.dismiss) private var dismiss
-    @State private var collectionName: String = ""
-    @State private var selectedPriority: Int64 = 50
-    
-    @State private var add_name_alert = false
 
+// Custom Priority Button
+struct PriorityButton: View {
+    let title: String
+    let color: Color
+    let isSelected: Bool
+    let action: () -> Void
+    
     var body: some View {
-        ZStack {
-            Color(hex: "#ddead1")
-                .ignoresSafeArea()
-            
-            VStack {
-                // Title + Priority
-                VStack(spacing: 15) {
-                    // Name Field
-                    VStack {
-                        TextField("Collection Name", text: $collectionName)
-                            .padding(.horizontal)
-                            .foregroundStyle(Color(hex: "#546a50"))
-                        
-                        Rectangle()
-                            .foregroundStyle(Color(hex: "#546a50"))
-                            .frame(height: 1.3)
-                            .padding(.horizontal)
-                        
-                        HStack {
-                            Text("Title")
-                                .foregroundStyle(Color(hex: "#546a50"))
-                                .font(.system(size: 13))
-                                .padding(.horizontal)
-                            
-                            Spacer()
-                        }
-                    }
-                    .padding(.bottom, 25)
-                    
-                    // Priority Selection
-                    VStack {
-                        HStack {
-                            VStack {
-                                HStack {
-                                    Text("Priority")
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                    
-                                    Rectangle()
-                                        .foregroundStyle(Color(hex: "#546a50").opacity(0.3))
-                                        .frame(width: 1.5, height: 20)
-                                    
-                                    HStack(spacing: 10) {
-                                        PriorityButton(title: "Low", color: Color(hex: "d4d0b9"), isSelected: selectedPriority == 20) {
-                                            selectedPriority = 20
-                                        }
-                                        
-                                        PriorityButton(title: "Middle", color: Color(hex: "9ea99c"), isSelected: selectedPriority == 50) {
-                                            selectedPriority = 50
-                                        }
-                                        
-                                        PriorityButton(title: "High", color: Color(hex: "90997f"), isSelected: selectedPriority == 100) {
-                                            selectedPriority = 100
-                                        }
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                            
-                            Spacer()
-                        }
-                    }
-                }
-                .padding(.top, 30)
-                
-                Spacer()
-                
-                VStack {
-                    Button {
-                        // Вибрация
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.impactOccurred()
-                        
-                        if collectionName != "" && collectionName != " " && collectionName != "  " {
-                            addCollection()
-                         } else {
-                            add_name_alert = true
-                        }
-                    } label: {
-                        Text("Create Collection")
-                            .font(.headline)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(hex: "FBDA4B"))
-                            .foregroundColor(.black)
-                            .cornerRadius(12)
-                            .shadow(radius: 5)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
-                }
-            }
-           .alert(isPresented: $add_name_alert) {
-                Alert(
-                    title: Text("Please add name"),
-                    message: Text(""),
-                    dismissButton: .cancel()
-                )
-            }
-        }
-    }
-    
-    private func addCollection() {
-        let newCollection = CardCollection(context: viewContext)
-        newCollection.name = collectionName
-        newCollection.creationDate = Date()
-        newCollection.priority = selectedPriority
-        
-        do {
-            try viewContext.save()
-            collectionName = ""
-            dismiss()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(isSelected ? color : Color.gray.opacity(0.2))
+                .foregroundColor(isSelected ? .white : .black)
+               .cornerRadius(20)
         }
     }
 }
 
-struct AddCollectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddCollectionView()
-            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-    }
-}
-*/

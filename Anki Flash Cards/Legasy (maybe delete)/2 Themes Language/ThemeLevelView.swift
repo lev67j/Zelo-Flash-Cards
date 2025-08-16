@@ -4,7 +4,7 @@
 //
 //  Created by Lev Vlasov on 2025-07-01.
 //
-
+/*
 import SwiftUI
 import FirebaseAnalytics
 
@@ -135,3 +135,4 @@ struct ThemeLevelView: View {
 #Preview {
     ThemeLevelView()
 }
+*/

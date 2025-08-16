@@ -11,24 +11,24 @@ import FirebaseAnalytics
 struct TabBarElements: View {
     
     @Environment(\.managedObjectContext) private var context
-    @State private var selectedTab: TabName = .home
     @EnvironmentObject var stateProperties: StatePropertiesVM
     @ObservedObject private var vm = DesignVM()
     
     // Для отслеживания времени на экране
     @State private var startTime: Date?
+    @StateObject private var appNavVM = AppNavigationVM()
     
     var body: some View {
         NavigationStack {
             ZStack {
                 VStack {
-                    switch selectedTab {
+                    switch appNavVM.selectedTab {
                     case .home:
                         HomeView(context: context)
                     case .notes:
                         NotesView()
                     case .ai_chat:
-                        AIChatView()
+                        AIChatView(cardsText: $appNavVM.cardsTextForChat)
                     case .profile:
                         ProfileView()
                     }
@@ -38,7 +38,7 @@ struct TabBarElements: View {
                     VStack {
                         Spacer()
                         
-                        CustomTabBar(selectedTab: $selectedTab)
+                        CustomTabBar(selectedTab: $appNavVM.selectedTab)
                             .frame(width: 400)
                             .background(
                                 Rectangle()
@@ -62,6 +62,7 @@ struct TabBarElements: View {
                 }
             }
         }
+        .environmentObject(appNavVM)
     }
 }
 

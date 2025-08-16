@@ -48,5 +48,6 @@
         <attribute name="level_selected_language" optional="YES" attributeType="String"/>
         <attribute name="onboarding_select_language" optional="YES" attributeType="String"/>
         <attribute name="time_study_per_day" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="vocabulary_all_words" optional="YES" attributeType="String"/>
     </entity>
 </model>

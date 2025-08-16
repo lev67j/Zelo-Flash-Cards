@@ -5,7 +5,6 @@
 //  Created by Lev Vlasov on 2025-06-23.
 //
 
-
 import SwiftUI
 import CoreData
 import FirebaseAnalytics
@@ -62,6 +61,7 @@ struct FlashCardView: View {
     @State private var completedCards: [Card] = []
     @EnvironmentObject var appNavVM: AppNavigationVM
     @State private var userVocabulary: String = ""
+    @State private var homeVM: HomeVM?
     
     var body: some View {
         ZStack {
@@ -69,165 +69,183 @@ struct FlashCardView: View {
                 .ignoresSafeArea()
             
             VStack {
-                // Header
-                VStack {
-                    // buttons + progress
-                    VStack(spacing: 10) {
-                        
-                        HStack {
-                            Button {
-                                Analytics.logEvent("flashcard_dismiss_button_tapped", parameters: nil)
-                                logScreenDurationAndDismiss()
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 20)).bold()
-                                    .foregroundStyle(Color(hex: "#546a50"))
-                            }
-                            .padding(.horizontal)
+                if !sessionCards.isEmpty {
+                    // Full header for flashcards
+                    VStack {
+                        // buttons + progress
+                        VStack(spacing: 10) {
                             
-                            Spacer()
-                            
-                            Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
-                                .font(.headline)
-                                .foregroundColor(.black)
-                                .onAppear {
-                                    Analytics.logEvent("flashcard_progress_text_appeared", parameters: ["cardsSeen": cardsSeen, "cardsLeft": sessionCards.count])
+                            HStack {
+                                Button {
+                                    Analytics.logEvent("flashcard_dismiss_button_tapped", parameters: nil)
+                                    logScreenDurationAndDismiss()
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 20)).bold()
+                                        .foregroundStyle(Color(hex: "#546a50"))
                                 }
+                                .padding(.horizontal)
+                                
+                                Spacer()
+                                
+                                Text("\(cardsSeen) / \(cardsSeen + sessionCards.count)")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                    .onAppear {
+                                        Analytics.logEvent("flashcard_progress_text_appeared", parameters: ["cardsSeen": cardsSeen, "cardsLeft": sessionCards.count])
+                                    }
+                                
+                                Spacer()
+                                
+                                Button {
+                                        Analytics.logEvent("flashcard_open_settings_button_tapped", parameters: nil)
+                                        open_sheet_settings_flashcards = true
+                                } label: {
+                                    Image(systemName: "gearshape.fill")
+                                        .font(.system(size: 20)).bold()
+                                        .foregroundStyle(Color(hex: "#546a50"))
+                                }
+                                .padding(.horizontal)
+                                .sheet(isPresented: $open_sheet_settings_flashcards) {
+                                    ZStack {
+                                        vm.color_back_sheet_flash_card_mainset
+                                            .ignoresSafeArea()
+                                        
+                                        VStack {
+                                            VStack {
+                                                // Toggle Front and Back Sides
+                                                VStack {
+                                                    HStack {
+                                                        Toggle(isOn: Binding(
+                                                            get: { collection.swapSides },
+                                                            set: { newValue in
+                                                                collection.swapSides = newValue
+                                                                try? viewContext.save()
+                                                                Analytics.logEvent("flashcard_toggle_swap_sides_changed", parameters: ["swapSides": newValue])
+                                                            }
+                                                        )) {
+                                                            Text("Swap Front and Back Sides")
+                                                                .font(.headline)
+                                                                .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
+                                                        }
+                                                        .onTapGesture {
+                                                            let generator = UIImpactFeedbackGenerator(style: .soft)
+                                                            generator.impactOccurred()
+                                                            Analytics.logEvent("flashcard_toggle_swap_sides_tapped", parameters: nil)
+                                                        }
+                                                        .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
+                                                        .padding()
+                                                        .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
+                                                        .cornerRadius(12)
+                                                    }
+                                                    .padding(.horizontal)
+                                                }
+                                                
+                                                // Start Button
+                                                VStack {
+                                                    Spacer()
+                                                    
+                                                    Button {
+                                                       let generator = UIImpactFeedbackGenerator(style: .medium)
+                                                        generator.impactOccurred()
+                                                        
+                                                        open_sheet_settings_flashcards = false
+                                                    } label: {
+                                                        HStack {
+                                                            Text("Start")
+                                                                .font(.headline)
+                                                                .foregroundColor(vm.color_main_text_button_start_mainset)
+                                                        }
+                                                        .padding()
+                                                        .padding(.horizontal, 100)
+                                                        .background(vm.color_main_back_button_start_mainset)
+                                                        .cornerRadius(12)
+                                                        .shadow(radius: 5)
+                                                    }
+                                                    .padding(.horizontal)
+                                                }
+                                            }
+                                            .padding(.top)
+                                            
+                                            Spacer()
+                                        }
+                                    }
+                                    .presentationDetents([.height(200)])
+                                }
+                            }
+                            .padding(.bottom, 10)
+                            .padding(.top, 5)
                             
-                            Spacer()
-                            
-                            Button {
-                                    Analytics.logEvent("flashcard_open_settings_button_tapped", parameters: nil)
-                                    open_sheet_settings_flashcards = true
-                            } label: {
-                                Image(systemName: "gearshape.fill")
-                                    .font(.system(size: 20)).bold()
-                                    .foregroundStyle(Color(hex: "#546a50"))
+                            ZStack {
+                                ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
+                                    .progressViewStyle(LinearProgressViewStyle())
+                                    .frame(height: 5)
+                                    .onAppear {
+                                        Analytics.logEvent("flashcard_progress_view_appeared", parameters: ["cardsSeen": cardsSeen, "cardsLeft": sessionCards.count])
+                                    }
                             }
                             .padding(.horizontal)
-                            .sheet(isPresented: $open_sheet_settings_flashcards) {
-                                ZStack {
-                                    vm.color_back_sheet_flash_card_mainset
-                                        .ignoresSafeArea()
-                                    
-                                    VStack {
-                                        VStack {
-                                            // Toggle Front and Back Sides
-                                            VStack {
-                                                HStack {
-                                                    Toggle(isOn: Binding(
-                                                        get: { collection.swapSides },
-                                                        set: { newValue in
-                                                            collection.swapSides = newValue
-                                                            try? viewContext.save()
-                                                            Analytics.logEvent("flashcard_toggle_swap_sides_changed", parameters: ["swapSides": newValue])
-                                                        }
-                                                    )) {
-                                                        Text("Swap Front and Back Sides")
-                                                            .font(.headline)
-                                                            .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
-                                                    }
-                                                    .onTapGesture {
-                                                        let generator = UIImpactFeedbackGenerator(style: .soft)
-                                                        generator.impactOccurred()
-                                                        Analytics.logEvent("flashcard_toggle_swap_sides_tapped", parameters: nil)
-                                                    }
-                                                    .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
-                                                    .padding()
-                                                    .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
-                                                    .cornerRadius(12)
-                                                }
-                                                .padding(.horizontal)
+                        }
+                        
+                        // 18 hard | 36 good
+                        VStack {
+                            if !sessionCards.isEmpty {
+                                VStack {
+                                    HStack {
+                                        Text("\(hard_cards)")
+                                            .background(
+                                                Rectangle()
+                                                    .fill(.orange.opacity(0.4))
+                                                    .frame(width: 45, height: 30)
+                                                    .overlay(
+                                                        Rectangle()
+                                                            .stroke(Color.orange, lineWidth: 2)
+                                                    )
+                                            )
+                                            .onAppear {
+                                                Analytics.logEvent("flashcard_hard_cards_label_appeared", parameters: ["hard_cards": hard_cards])
                                             }
-                                            
-                                            // Start Button
-                                            VStack {
-                                                Spacer()
-                                                
-                                                Button {
-                                                   let generator = UIImpactFeedbackGenerator(style: .medium)
-                                                    generator.impactOccurred()
-                                                    
-                                                    open_sheet_settings_flashcards = false
-                                                } label: {
-                                                    HStack {
-                                                        Text("Start")
-                                                            .font(.headline)
-                                                            .foregroundColor(vm.color_main_text_button_start_mainset)
-                                                    }
-                                                    .padding()
-                                                    .padding(.horizontal, 100)
-                                                    .background(vm.color_main_back_button_start_mainset)
-                                                    .cornerRadius(12)
-                                                    .shadow(radius: 5)
-                                                }
-                                                .padding(.horizontal)
-                                            }
-                                        }
-                                        .padding(.top)
                                         
                                         Spacer()
+                                        
+                                        Text("\(good_cards)")
+                                            .background(
+                                                Rectangle()
+                                                    .fill(.green.opacity(0.4))
+                                                    .frame(width: 45, height: 30)
+                                                    .overlay(
+                                                        Rectangle()
+                                                            .stroke(Color.green, lineWidth: 2)
+                                                    )
+                                                
+                                            )
+                                            .onAppear {
+                                                Analytics.logEvent("flashcard_good_cards_label_appeared", parameters: ["good_cards": good_cards])
+                                            }
                                     }
+                                    .padding(.top, 25)
+                                    .padding(.horizontal, 15)
                                 }
-                                .presentationDetents([.height(200)])
+                                .padding(.bottom, 30)
                             }
                         }
-                        .padding(.bottom, 10)
-                        .padding(.top, 5)
-                        
-                        ZStack {
-                            ProgressView(value: Float(cardsSeen), total: Float(cardsSeen + sessionCards.count))
-                                .progressViewStyle(LinearProgressViewStyle())
-                                .frame(height: 5)
-                                .onAppear {
-                                    Analytics.logEvent("flashcard_progress_view_appeared", parameters: ["cardsSeen": cardsSeen, "cardsLeft": sessionCards.count])
-                                }
+                    }
+                } else {
+                    // Simplified header for chat: only exit button
+                    HStack {
+                        Button {
+                            Analytics.logEvent("flashcard_dismiss_button_tapped", parameters: nil)
+                            logScreenDurationAndDismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(Color(hex: "#546a50"))
                         }
                         .padding(.horizontal)
+                        
+                        Spacer()
                     }
-                    
-                    // 18 hard | 36 good
-                    VStack {
-                        if !sessionCards.isEmpty {
-                            VStack {
-                                HStack {
-                                    Text("\(hard_cards)")
-                                        .background(
-                                            Rectangle()
-                                                .fill(.orange.opacity(0.4))
-                                                .frame(width: 45, height: 30)
-                                                .overlay(
-                                                    Rectangle()
-                                                        .stroke(Color.orange, lineWidth: 2)
-                                                )
-                                        )
-                                        .onAppear {
-                                            Analytics.logEvent("flashcard_hard_cards_label_appeared", parameters: ["hard_cards": hard_cards])
-                                        }
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(good_cards)")
-                                        .background(
-                                            Rectangle()
-                                                .fill(.green.opacity(0.4))
-                                                .frame(width: 45, height: 30)
-                                                .overlay(
-                                                    Rectangle()
-                                                        .stroke(Color.green, lineWidth: 2)
-                                                )
-                                            
-                                        )
-                                        .onAppear {
-                                            Analytics.logEvent("flashcard_good_cards_label_appeared", parameters: ["good_cards": good_cards])
-                                        }
-                                }
-                                .padding(.top, 25)
-                                .padding(.horizontal, 15)
-                            }
-                            .padding(.bottom, 30)
-                        }
-                    }
+                    .padding(.vertical, 10)
                 }
                 
                 // Card stack or Chat
@@ -273,7 +291,10 @@ struct FlashCardView: View {
                         }
                     }
                 } else {
-                    ChatView(theme: themeTitle, vocabulary: userVocabulary)
+                    let themeIndex = homeVM?.themes.firstIndex(where: { $0.title == themeTitle }) ?? 0
+                    let questions = homeVM?.getQuestionsForLevel(themeIndex: themeIndex, level: level) ?? []
+                    ChatView(theme: themeTitle, vocabulary: userVocabulary, questions: questions)
+                        .environmentObject(vm)
                 }
             }
             .onAppear {
@@ -281,9 +302,13 @@ struct FlashCardView: View {
                 Analytics.logEvent("flashcard_screen_appeared", parameters: ["collectionId": collection.objectID.uriRepresentation().absoluteString])
                 prepareSession()
                 fetchUserVocabulary()
+                if homeVM == nil {
+                    homeVM = HomeVM(context: viewContext)
+                }
             }
             .onDisappear {
                 logScreenDuration()
+                finishSession()
             }
         }
     }

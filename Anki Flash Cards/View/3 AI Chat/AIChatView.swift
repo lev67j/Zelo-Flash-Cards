@@ -4,39 +4,71 @@
 //
 //  Created by Lev Vlasov on 2025-06-21.
 //
+
 import SwiftUI
 
 struct ChatView: View {
     let theme: String
     let vocabulary: String
+    let questions: [String]
     @StateObject private var viewModel = ChatViewModel()
+    @EnvironmentObject var design: DesignVM
 
     var body: some View {
         VStack {
-            List(viewModel.messages) { message in
-                VStack(alignment: message.role == "user" ? .trailing : .leading) {
-                    Text(message.content)
-                        .padding()
-                        .background(message.role == "user" ? Color.blue : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 12) {
+                    ForEach(viewModel.messages) { message in
+                        if message.role == "user" {
+                            HStack {
+                                Spacer()
+                                Text(message.content)
+                                    .padding(12)
+                                    .background(Color(hex: "#546a50"))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                                    .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .trailing)
+                            }
+                        } else {
+                            Text(message.content)
+                                .padding(12)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: UIScreen.main.bounds.width * 0.8, alignment: .leading)
+                        }
+                    }
                 }
+                .padding()
             }
             
             HStack {
                 TextField("Type your message...", text: $viewModel.currentInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(12)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(30)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 30)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
                 
-                Button("Send") {
+                Button {
                     viewModel.sendMessage()
+                } label: {
+                    Circle()
+                        .fill(Color(hex: "#546a50"))
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Image(systemName: "paperplane.fill")
+                                .foregroundColor(.white)
+                        )
                 }
             }
             .padding()
         }
         .onAppear {
-            viewModel.systemPrompt = "You are a helpful teacher. The user has just completed a lesson on the theme: \(theme). Their vocabulary includes: \(vocabulary). Ask a couple of questions one by one to test their knowledge on this theme, using the vocabulary. Wait for responses before asking the next question."
-            viewModel.currentInput = "Start the quiz please."
-            viewModel.sendMessage()
+            viewModel.systemPrompt = "You are a helpful language teacher for the theme: \(theme). The user's vocabulary includes: \(vocabulary). You must ask the following questions one by one, waiting for the user's response before asking the next. If the user asks something else, answer it helpfully, then continue with the next question. Questions:\n\(questions.joined(separator: "\n"))"
+            if viewModel.messages.isEmpty && !questions.isEmpty {
+                viewModel.messages.append(Message(role: "assistant", content: questions[0]))
+            }
         }
     }
 }
@@ -71,7 +103,7 @@ struct AIChatView: View {
                     }
                     .padding()
                 }
-                .onChange(of: vm.messages.count) { 
+                .onChange(of: vm.messages.count) {
                     if let lastID = vm.messages.last?.id {
                         withAnimation {
                             proxy.scrollTo(lastID, anchor: .bottom)

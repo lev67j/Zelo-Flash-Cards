@@ -69,7 +69,6 @@ final class ChatViewModel: ObservableObject {
     }
 }
 
-
 struct Message: Identifiable {
     let id = UUID()
     let role: String // "user" или "assistant"

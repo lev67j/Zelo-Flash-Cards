@@ -13,6 +13,9 @@ struct ChatView: View {
     let questions: [String]
     @StateObject private var viewModel = ChatViewModel()
     @EnvironmentObject var design: DesignVM
+    
+    @AppStorage("selectedLanguage") var selectedLanguage = "English"
+   
 
     var body: some View {
         VStack {
@@ -65,10 +68,12 @@ struct ChatView: View {
             .padding()
         }
         .onAppear {
-            viewModel.systemPrompt = "You are a helpful language teacher for the theme: \(theme). The user's vocabulary includes: \(vocabulary). You must ask the following questions one by one, waiting for the user's response before asking the next. If the user asks something else, answer it helpfully, then continue with the next question. Questions:\n\(questions.joined(separator: "\n"))"
+            viewModel.systemPrompt = "You are helping a friend learn a language \(selectedLanguage) on the topic: \(theme). Your friend's vocabulary includes: \(vocabulary). You need to ask the following questions, ask them on your own without sleeping that you have a script, one after another, waiting for the user to answer before asking the next one. If the user asks another question, answer it, and then ask the next question from the list. Questions: \n\(questions.joined(separator: "\n")). You can chat with the user on any topic that interests them. You don't need to constantly focus on learning the language, you should weave language learning into a normal conversation with your friend. At the beginning of the message, indicate where the user made a mistake, and just ask questions one at a time."
             if viewModel.messages.isEmpty && !questions.isEmpty {
                 viewModel.messages.append(Message(role: "assistant", content: questions[0]))
             }
+            
+            print(viewModel.systemPrompt)
         }
     }
 }

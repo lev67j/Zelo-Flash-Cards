@@ -293,7 +293,7 @@ struct FlashCardView: View {
                 } else {
                     let themeIndex = homeVM?.themes.firstIndex(where: { $0.title == themeTitle }) ?? 0
                     let questions = homeVM?.getQuestionsForLevel(themeIndex: themeIndex, level: level) ?? []
-                    ChatView(theme: themeTitle, vocabulary: userVocabulary, questions: questions)
+                     ChatView(theme: themeTitle, vocabulary: userVocabulary, questions: questions)
                         .environmentObject(vm)
                 }
             }

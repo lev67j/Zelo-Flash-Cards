@@ -13,16 +13,15 @@ final class ChatViewModel: ObservableObject {
     @Published var systemPrompt: String = ""
     
     private let apiKey = "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"
-    private let model = "deepseek/deepseek-r1"
+    private let model = "deepseek/deepseek-r1-0528:free"
 
     func sendMessage() {
         let userMessage = Message(role: "user", content: currentInput)
         messages.append(userMessage)
-        let prompt = currentInput
         currentInput = ""
 
         Task {
-            if let reply = await callOpenRouterAPI(prompt: prompt) {
+            if let reply = await generateResponse() {
                 DispatchQueue.main.async {
                     self.messages.append(Message(role: "assistant", content: reply))
                 }
@@ -30,7 +29,7 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
-    private func callOpenRouterAPI(prompt: String) async -> String? {
+    private func generateResponse() async -> String? {
         guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else { return nil }
         
         var messageHistory: [[String: String]] = []
@@ -38,7 +37,6 @@ final class ChatViewModel: ObservableObject {
             messageHistory.append(["role": "system", "content": systemPrompt])
         }
         messageHistory += messages.map { ["role": $0.role, "content": $0.content] }
-        messageHistory.append(["role": "user", "content": prompt])
         
         let payload: [String: Any] = [
             "model": model,

@@ -5,9 +5,9 @@
 //  Created by Lev Vlasov on 2025-06-07.
 //
 
-
 import SwiftUI
 import FirebaseAnalytics
+import CoreData
 
 struct TenScreen: View {
     @Binding var currentPage: Int
@@ -17,6 +17,9 @@ struct TenScreen: View {
     
     private let isOnboardingCompletedKey = "isOnboardingCompleted"
     @AppStorage("isOnboardingCompletedKey") private var isOnboardingCompleted = false
+    @AppStorage("selectedLanguage") var selectedLanguage = "English"
+    
+    @Environment(\.managedObjectContext) private var viewContext
     
     @State private var startTime: Date?
     
@@ -120,6 +123,17 @@ struct TenScreen: View {
             
             // Завершение онбординга с логом
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                // Fetch language from Core Data User entity
+                let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+                do {
+                    let users = try viewContext.fetch(fetchRequest)
+                    if let user = users.first, let language = user.onboarding_select_language {
+                        selectedLanguage = language
+                    }
+                } catch {
+                    print("Error fetching user: \(error)")
+                }
+                
                 withAnimation() {
                     isOnboardingCompleted = true
                     Analytics.logEvent("ten_screen_onboarding_completed", parameters: nil)

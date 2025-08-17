@@ -27,7 +27,7 @@ struct TabBarElements: View {
                     case .notes:
                         NotesView()
                     case .ai_chat:
-                        AIChatView(cardsText: $appNavVM.cardsTextForChat)
+                        AIChatView(appNavVM: appNavVM, cardsText: $appNavVM.cardsTextForChat)
                     case .profile:
                         ProfileView()
                     }

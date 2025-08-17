@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAnalytics
 import CoreData
+import FirebaseMessaging
 
 // Второй экран онбординга
 struct SecondScreen: View {
@@ -105,6 +106,15 @@ private struct LanguageSelectionView: View {
                             }
                         } else {
                             print("❌ No user found to update language")
+                        }
+                        
+                        // Подписываем на топик по языку
+                        Messaging.messaging().subscribe(toTopic: "\(lang)") { error in
+                            if let error = error {
+                                print("Ошибка подписки на топик \(lang): \(error.localizedDescription)")
+                            } else {
+                                print("Успешно подписались на топик allUsers")
+                            }
                         }
 
                         withAnimation {

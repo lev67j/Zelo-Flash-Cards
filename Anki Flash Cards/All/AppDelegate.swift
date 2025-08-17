@@ -26,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         print("🔥 FCM Token: \(fcmToken ?? "нет токена")")
 
         guard let token = fcmToken else { return }
+        
         // Подписка на топик allUsers — пуши будут всем, кто подписан
         Messaging.messaging().subscribe(toTopic: "allUsers") { error in
             if let error = error {

@@ -11,6 +11,7 @@ final class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
     @Published var currentInput: String = ""
     @Published var systemPrompt: String = ""
+    @Published var isLoading: Bool = false
     
     private let apiKey = "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"
     private let model = "deepseek/deepseek-r1-0528:free"
@@ -19,11 +20,23 @@ final class ChatViewModel: ObservableObject {
         let userMessage = Message(role: "user", content: currentInput)
         messages.append(userMessage)
         currentInput = ""
-
+        
+        isLoading = true
+        
         Task {
+            defer {
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+            }
+            
             if let reply = await generateResponse() {
                 DispatchQueue.main.async {
                     self.messages.append(Message(role: "assistant", content: reply))
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.messages.append(Message(role: "assistant", content: "⚠️ Error while receiving response"))
                 }
             }
         }
@@ -66,9 +79,19 @@ final class ChatViewModel: ObservableObject {
         return nil
     }
 }
-
 struct Message: Identifiable {
     let id = UUID()
-    let role: String // "user" или "assistant"
+    let role: String
     let content: String
+    private let _attributedContent: NSAttributedString?
+    
+    var attributedContent: NSAttributedString {
+        _attributedContent ?? content.parseMarkdownToAttributedString()
+    }
+    
+    init(role: String, content: String) {
+        self.role = role
+        self.content = content
+        self._attributedContent = content.parseMarkdownToAttributedString()
+    }
 }

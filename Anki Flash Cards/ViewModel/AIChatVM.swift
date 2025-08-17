@@ -8,7 +8,7 @@
 import SwiftUI
 
 final class ChatViewModel: ObservableObject {
-    @Published var messages: [Message] = []
+    @Published var messages: [ChatMessage] = []
     @Published var currentInput: String = ""
     @Published var systemPrompt: String = ""
     @Published var isLoading: Bool = false
@@ -17,7 +17,7 @@ final class ChatViewModel: ObservableObject {
     private let model = "deepseek/deepseek-r1-0528:free"
 
     func sendMessage() {
-        let userMessage = Message(role: "user", content: currentInput)
+        let userMessage = ChatMessage(role: "user", content: currentInput)
         messages.append(userMessage)
         currentInput = ""
         
@@ -32,11 +32,11 @@ final class ChatViewModel: ObservableObject {
             
             if let reply = await generateResponse() {
                 DispatchQueue.main.async {
-                    self.messages.append(Message(role: "assistant", content: reply))
+                    self.messages.append(ChatMessage(role: "assistant", content: reply))
                 }
             } else {
                 DispatchQueue.main.async {
-                    self.messages.append(Message(role: "assistant", content: "⚠️ Error while receiving response"))
+                    self.messages.append(ChatMessage(role: "assistant", content: "⚠️ Error while receiving response"))
                 }
             }
         }
@@ -79,7 +79,8 @@ final class ChatViewModel: ObservableObject {
         return nil
     }
 }
-struct Message: Identifiable {
+
+struct ChatMessage: Identifiable {
     let id = UUID()
     let role: String
     let content: String

@@ -76,7 +76,6 @@ struct HomeView: View {
     }
 
     // MARK: - Subviews
-
     private var mainContent: some View {
         VStack(spacing: 0) {
             topBar
@@ -88,18 +87,14 @@ struct HomeView: View {
     }
 
     private var topBar: some View {
-        HStack {
-            Spacer(minLength: 0)
-            HStack(spacing: 12) {
-                languageButton
-                pillStat(icon: "flame.fill", value: vm.currentStreak)
-                pillStat(icon: "rectangle.on.rectangle.fill", value: vm.studiedCardsCount)
-                pillStat(icon: "bolt.fill", value: vm.starsCount)
-            }
-            Spacer(minLength: 0)
+        HStack(spacing: 12) {
+            languageButton
+            pillStat(icon: "flame.fill", value: vm.currentStreak)
+            pillStat(icon: "rectangle.on.rectangle.fill", value: vm.studiedCardsCount)
+            pillStat(icon: "bolt.fill", value: vm.starsCount)
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.bottom, 12)
     }
 
     private var languageButton: some View {
@@ -110,12 +105,8 @@ struct HomeView: View {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         } label: {
             pill {
-                HStack(spacing: 6) {
-                    Text(vm.flagForLanguage(vm.selectedLanguage))
-                        .font(.system(size: 18))
-                    Image(systemName: showLanguageScroll ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 13, weight: .semibold))
-                }
+                Text(vm.flagForLanguage(vm.selectedLanguage))
+                    .font(.system(size: 18))
             }
         }
     }
@@ -160,14 +151,14 @@ struct HomeView: View {
             .foregroundColor(design.color_line_cell_set_home.opacity(0.9))
             .padding(.bottom, 15)
     }
-
+  
     private var themeCard: some View {
         Group {
             if let currentTheme = vm.currentTheme {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Words \(currentTheme.cards.count)")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.black)
                     Text(currentTheme.title)
                         .font(.system(size: 22, weight: .bold))
                 }
@@ -175,7 +166,7 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white)
+                        .fill(Color(hex: "#FBDA4B"))
                         .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
                 )
                 .padding(.horizontal)
@@ -255,20 +246,20 @@ struct HomeView: View {
 
     private func pill<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         content()
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(Color.white.opacity(0.95))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.clear)
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
     }
 
     private func pillStat(icon: String, value: Int) -> some View {
         pill {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(icon == "flame.fill" ? .orange : icon == "bolt.fill" ? .yellow : .gray.opacity(0.4))
                 Text("\(value)")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 18, weight: .medium))
             }
         }
         .onTapGesture {
@@ -347,7 +338,7 @@ struct LevelButton: View {
                         }
                 } else if isCompleted {
                     Circle()
-                        .stroke(Color.green.opacity(0.9), lineWidth: 5)
+                        .stroke(Color(hex: "#FBDA4B"), lineWidth: 5)
                         .frame(width: 74, height: 74)
                 }
                 Circle()
@@ -366,10 +357,28 @@ struct LevelButton: View {
         }
         .disabled(!isUnlocked)
     }
+    /*
+     Color(hex: "#F4863E") // orange
+     Color(hex: "#83A5F2") // blue
+     Color(hex: "#ED9BBfd") // lavanda
 
+     Color(hex: "#ddead1") // soft green
+     Color(hex: "#546a50") // dark green
+     Color(hex: "#E6A7FA") // pink
+     
+     
+     // green - pink - yellow (palette 19)
+     #1E3309 // dark green
+     #849A28 // green
+     #E23260 // dark pink
+     #F2678E // cerise pink
+     #FCA9AA // soft pink
+     #FBDA4B // yellow
+     #FAE36F // soft yellow
+    */
     private func circleFill(isCompleted: Bool) -> LinearGradient {
         if isCompleted {
-            return LinearGradient(colors: [Color.green, Color.blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return LinearGradient(colors: [Color(hex: "#FBDA4B"), Color(hex: "#FBDA4B")], startPoint: .topLeading, endPoint: .bottomTrailing)
         } else {
             return LinearGradient(colors: [Color.gray.opacity(0.7), Color.gray.opacity(0.45)],
                                   startPoint: .topLeading, endPoint: .bottomTrailing)

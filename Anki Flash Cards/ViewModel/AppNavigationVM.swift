@@ -10,8 +10,5 @@ import SwiftUI
 final class AppNavigationVM: ObservableObject {
     @Published var selectedTab: TabName = .home
     @Published var cardsTextForChat = ""
-    
-    
-    // Need replace with string from state propirties in app navigation
     @Published var isTabBarVisible = true
 }

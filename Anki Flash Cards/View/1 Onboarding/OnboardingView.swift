@@ -32,7 +32,7 @@ struct OnboardingView: View {
     
     @ObservedObject private var vm = OnboardingVM()
     
-    @StateObject private var stateProperties = StatePropertiesVM()
+    @StateObject private var appNavVM = AppNavigationVM()
     
     var body: some View {
         if !isOnboardingCompleted {
@@ -73,7 +73,7 @@ struct OnboardingView: View {
         } else {
             // Переход на основное представление после онбординга
             TabBarElements()
-                .environmentObject(stateProperties)
+                .environmentObject(appNavVM)
         }
     }
 }

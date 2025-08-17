@@ -11,12 +11,11 @@ import FirebaseAnalytics
 struct TabBarElements: View {
     
     @Environment(\.managedObjectContext) private var context
-    @EnvironmentObject var stateProperties: StatePropertiesVM
+    @EnvironmentObject var appNavVM: AppNavigationVM
     @ObservedObject private var vm = DesignVM()
     
     // Для отслеживания времени на экране
     @State private var startTime: Date?
-    @StateObject private var appNavVM = AppNavigationVM()
     
     var body: some View {
         NavigationStack {
@@ -34,7 +33,7 @@ struct TabBarElements: View {
                     }
                 }
                 
-                if stateProperties.isTabBarVisible {
+                if appNavVM.isTabBarVisible {
                     VStack {
                         Spacer()
                         

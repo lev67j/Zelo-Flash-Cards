@@ -68,9 +68,20 @@ private struct LevelButton_Onboarding: View {
     let level: String
      @Binding var currentPage: Int
      let context: NSManagedObjectContext
+     @State private var isButtonTapped = false
+   
     
     var body: some View {
         Button {
+            // Вибрация
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            
+            // Проверяем, был ли уже переход
+            guard !isButtonTapped else { return }
+            isButtonTapped = true
+          
+            
             saveLanguageLevel(level)
             
             // Логируем выбранный уровень
@@ -86,10 +97,6 @@ private struct LevelButton_Onboarding: View {
             Analytics.logEvent("third_screen_next_page", parameters: [
                 "new_page": currentPage
             ])
-            
-            // Вибрация
-            let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
             
         } label: {
             VStack {

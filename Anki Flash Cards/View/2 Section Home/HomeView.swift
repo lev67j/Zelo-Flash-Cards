@@ -156,7 +156,7 @@ struct HomeView: View {
         Group {
             if let currentTheme = vm.currentTheme {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Words \(currentTheme.cards.count)")
+                    Text("Words \(currentTheme.cards.count)") // \(currentTheme.cards.count)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.black)
                     Text(currentTheme.title)
@@ -192,6 +192,7 @@ struct HomeView: View {
                     separator(themeIndex: themeIndex)
                 }
             }
+            .padding(.top, 5)
             .padding(.bottom, 70)
             .onAppear {
                 Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)

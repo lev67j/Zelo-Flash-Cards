@@ -14,6 +14,7 @@ struct FirstScreen: View {
     @ObservedObject var vm: OnboardingVM
     
     @State private var startTime: Date?
+    @State private var isButtonTapped = false
     
     var body: some View {
         VStack {
@@ -47,17 +48,21 @@ struct FirstScreen: View {
                         .padding(.bottom)
                     
                     Button(action: {
+                        // Вибрация всегда
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                        
+                        // Проверяем, был ли уже переход
+                        guard !isButtonTapped else { return }
+                        isButtonTapped = true
+                        
+                        // Переход на следующий экран
                         withAnimation {
                             currentPage += 1
                         }
                         
-                        // Вибрация
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.impactOccurred()
-                        
                         // Логируем нажатие
                         Analytics.logEvent("first_screen_get_started_tapped", parameters: nil)
-                        
                     }) {
                         Text("Get started")
                             .fontWeight(.bold)

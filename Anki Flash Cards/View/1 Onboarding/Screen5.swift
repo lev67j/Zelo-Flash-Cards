@@ -21,6 +21,8 @@ struct FifthScreen: View {
         animation: .default
     ) private var users: FetchedResults<User>
 
+    @State private var isButtonTapped = false
+ 
     var body: some View {
         VStack(spacing: 20) {
             Text("How old are you?")
@@ -35,6 +37,14 @@ struct FifthScreen: View {
                         ageRange: option.label,
                         color: option.color
                     ) {
+                        // Вибрация
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                       
+                        // Проверяем, был ли уже переход
+                        guard !isButtonTapped else { return }
+                        isButtonTapped = true
+                        
                         saveAge(option.value)
                         logSelection(option.label)
                         withAnimation {
@@ -93,7 +103,6 @@ struct FifthScreen: View {
         Analytics.logEvent("fifth_screen_next_page", parameters: [
             "new_page": currentPage + 1
         ])
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private var ageOptions: [(label: String, value: Int64, color: Color)] {

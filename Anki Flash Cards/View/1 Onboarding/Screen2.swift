@@ -82,6 +82,7 @@ private struct LanguageSelectionView: View {
     @Binding var currentPage: Int
     let viewContext: NSManagedObjectContext
     let user: User?
+    @State private var isButtonTapped = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -89,6 +90,13 @@ private struct LanguageSelectionView: View {
                 ForEach(languages.indices, id: \.self) { index in
                     let lang = languages[index]
                     Button(action: {
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                           
+                        // Проверяем, был ли уже переход
+                        guard !isButtonTapped else { return }
+                        isButtonTapped = true
+                     
                         selectedLanguage = lang
                         
                         Analytics.logEvent("language_selected", parameters: [
@@ -116,7 +124,7 @@ private struct LanguageSelectionView: View {
                                 print("Успешно подписались на топик allUsers")
                             }
                         }
-
+     
                         withAnimation {
                             currentPage += 1
                         }
@@ -124,10 +132,7 @@ private struct LanguageSelectionView: View {
                         Analytics.logEvent("second_screen_next_page", parameters: [
                             "new_page": currentPage
                         ])
-
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                        generator.impactOccurred()
-                    }) {
+                }) {
                         LanguageItemView(
                             language: lang,
                             isSelected: selectedLanguage == lang,

@@ -93,8 +93,8 @@ final class HomeVM: ObservableObject {
             let desiredOrder = [
                 "Personal Identity",
                 "Daily Routine",
-                "Food & Drink",
                 "Travel & Transportation",
+                "Food & Drink",
                 "Health & Body",
                 "Shopping & Money",
                 "Housing & Household",

@@ -15,6 +15,7 @@ struct NineScreen: View {
     @ObservedObject var vm: OnboardingVM
     
     @State private var startTime: Date?
+    @State private var isButtonTapped = false
     
     var body: some View {
         VStack(spacing: 24) {
@@ -58,6 +59,15 @@ struct NineScreen: View {
             
             // Кнопка "Continue" + запрос разрешения на уведомления
             Button(action: {
+                // Вибрация
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+                
+                // Проверяем, был ли уже переход
+                guard !isButtonTapped else { return }
+                isButtonTapped = true
+              
+                
                 // Логируем нажатие кнопки
                 Analytics.logEvent("nine_screen_continue_pressed", parameters: nil)
                 
@@ -77,12 +87,7 @@ struct NineScreen: View {
                         ])
                     }
                 }
-                
-                // Вибрация
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
-          
-            }) {
+                }) {
                 Text("Continue")
                     .fontWeight(.bold)
                     .foregroundColor(.white)

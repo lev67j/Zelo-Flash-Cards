@@ -123,26 +123,6 @@ struct HeaderView: View {
         VStack {
              if currentPage < 9 {
                 HStack {
-                    
-                    // Back Button
-                    if currentPage > 1 {
-                        VStack {
-                            Button {
-                                withAnimation {
-                                    currentPage -= 1
-                                }
-                                Analytics.logEvent("onboarding_back_button_tapped", parameters: [
-                                    "new_page": currentPage
-                                ])
-                            } label: {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(Color(hex: "#546a50"))
-                                    .bold()
-                            }
-                        }
-                        .padding(.trailing)
-                    }
-                    
                     VStack {
                         ProgressView(value: Float(currentPage + 1), total: 10)
                             .progressViewStyle(LinearProgressViewStyle())

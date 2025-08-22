@@ -14,6 +14,8 @@ struct SixthScreen: View {
     @ObservedObject var vm: OnboardingVM
     
     @State private var startTime: Date?
+    @State private var isButtonTapped = false
+ 
     
     var body: some View {
         VStack(spacing: 20) {
@@ -31,6 +33,15 @@ struct SixthScreen: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             Button(action: {
+               
+                // Вибрация
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+                
+                // Проверяем, был ли уже переход
+                guard !isButtonTapped else { return }
+                isButtonTapped = true
+                
                 // Логируем клик по кнопке
                 Analytics.logEvent("sixth_screen_button_pressed", parameters: nil)
                 
@@ -42,11 +53,6 @@ struct SixthScreen: View {
                 Analytics.logEvent("sixth_screen_next_page", parameters: [
                     "new_page": currentPage
                 ])
-                
-                // Вибрация
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
-                
             }) {
                 Text("Let's go")
                     .fontWeight(.bold)

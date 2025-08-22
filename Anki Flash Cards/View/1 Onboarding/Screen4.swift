@@ -17,6 +17,8 @@ struct FourthScreen: View {
     @ObservedObject var vm: OnboardingVM
     @State private var startTime: Date?
     
+    @State private var isButtonTapped = false
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("How much time do you want to study per day?")
@@ -62,7 +64,15 @@ struct FourthScreen: View {
     // MARK: - StudyTimeButton as inner view with logic
     private func StudyTimeButton(timeInMinutes: Int, label: String, emoji: String) -> some View {
         Button(action: {
-           Analytics.logEvent("study_time_selected", parameters: [
+            
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            
+            // Проверяем, был ли уже переход
+            guard !isButtonTapped else { return }
+            isButtonTapped = true
+            
+            Analytics.logEvent("study_time_selected", parameters: [
                 "time_minutes": timeInMinutes
             ])
             
@@ -78,17 +88,14 @@ struct FourthScreen: View {
             } else {
                 print("❌ No user found to save study time")
             }
-
+            
             withAnimation {
                 currentPage += 1
             }
-
+            
             Analytics.logEvent("fourth_screen_next_page", parameters: [
                 "new_page": currentPage
             ])
-            
-            let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
         }) {
             HStack {
                 HStack {

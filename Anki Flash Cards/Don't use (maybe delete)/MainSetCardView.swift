@@ -6,6 +6,54 @@
 //
 
 /*
+ 
+ /*
+ //MARK: - Main Set Card View
+ // Back View
+ @Published var color_back_mainset_view = Color(hex: "#ddead1")
+ // Header: back button + ellipsis
+ @Published var color_cancel_button_mainset = Color(hex: "#546a50")
+ @Published var color_ellipsis_button_mainset = Color(hex: "#546a50")
+ // Bars
+ @Published var color_back_bar_chart_mainset = Color(hex: "#546a50").opacity(0.1)
+ // Language name | number cards
+ @Published var color_language_name_mainset = Color.black
+ @Published var color_line_mainset = Color.black.opacity(0.3)
+ @Published var color_number_cards_mainset = Color.black
+ // Flash Card button
+ @Published var color_text_flash_cards_button_mainset = Color.black
+ @Published var color_back_flash_cards_button_mainset = Color(hex: "#546a50").opacity(0.1)
+ // Sheet Edit Collection
+ @Published var color_back_sheet_edit_collection_mainset = Color(hex: "#ddead1")
+ // Sheet Edit Collection | "image: pencil + text: edit set"
+ @Published var color_pencil_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ @Published var color_text_edit_set_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ // Sheet Edit Collection | "image: move + text: move cards"
+ @Published var color_image_move_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ @Published var color_text_move_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ // Sheet Edit Collection | "image: move + text: move cards"
+ @Published var color_image_trash_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ @Published var color_text_delete_sheet_edit_collection_mainset = Color(hex: "#546a50")
+ // Sheet Flash Card
+ @Published var color_back_sheet_flash_card_mainset = Color(hex: "#ddead1")
+ // Sheet Flash Card | Toggle Front and Back Sides
+ @Published var color_text_toggle_front_back_sheet_flash_card_mainset = Color(hex: "#546a50")
+ @Published var color_tint_toggle_front_back_sheet_flash_card_mainset = Color(hex: "#546a50").opacity(0.5)
+ @Published var color_back_toggle_front_back_sheet_flash_card_mainset = Color(hex: "#546a50").opacity(0.1)
+ // Sheet Flash Card | Start Custom Cards "5-10-15..."
+ @Published var color_text_start_custom_cards_sheet_flash_card_mainset = Color(hex: "#546a50")
+ @Published var color_back_start_custom_cards_sheet_flash_card_mainset = Color(hex: "#546a50").opacity(0.1)
+ // Sheet Flash Card | Sheet Start Custom Cards "5-10-15..."
+ @Published var color_back_sheet_start_custom_cards_mainset = Color(hex: "#ddead1")
+ @Published var color_text_select_number_cards_mainset = Color.black
+ @Published var color_text_number_cards_mainset = Color.black
+ @Published var color_text_button_start_mainset = Color.black
+ @Published var color_back_button_start_mainset = Color(hex: "FBDA4B")
+ // Sheet Flash Card | Start Button
+ @Published var color_main_text_button_start_mainset = Color.black
+ @Published var color_main_back_button_start_mainset = Color(hex: "FBDA4B")
+ */
+  
 import SwiftUI
 import CoreData
 import FirebaseAnalytics

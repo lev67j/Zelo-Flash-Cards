@@ -108,7 +108,7 @@ struct FlashCardView: View {
                                 .padding(.horizontal)
                                 .sheet(isPresented: $open_sheet_settings_flashcards) {
                                     ZStack {
-                                        vm.color_back_sheet_flash_card_mainset
+                                        Color(hex: "#ddead1")
                                             .ignoresSafeArea()
                                         
                                         VStack {
@@ -126,16 +126,16 @@ struct FlashCardView: View {
                                                         )) {
                                                             Text("Swap Front and Back Sides")
                                                                 .font(.headline)
-                                                                .foregroundColor(vm.color_text_toggle_front_back_sheet_flash_card_mainset)
+                                                                .foregroundColor(Color(hex: "#546a50"))
                                                         }
                                                         .onTapGesture {
                                                             let generator = UIImpactFeedbackGenerator(style: .soft)
                                                             generator.impactOccurred()
                                                             Analytics.logEvent("flashcard_toggle_swap_sides_tapped", parameters: nil)
                                                         }
-                                                        .tint(vm.color_tint_toggle_front_back_sheet_flash_card_mainset)
+                                                        .tint(Color(hex: "#546a50").opacity(0.5))
                                                         .padding()
-                                                        .background(vm.color_back_toggle_front_back_sheet_flash_card_mainset)
+                                                        .background(Color(hex: "#546a50").opacity(0.1))
                                                         .cornerRadius(12)
                                                     }
                                                     .padding(.horizontal)
@@ -154,11 +154,11 @@ struct FlashCardView: View {
                                                         HStack {
                                                             Text("Start")
                                                                 .font(.headline)
-                                                                .foregroundColor(vm.color_main_text_button_start_mainset)
+                                                                .foregroundColor(Color.black)
                                                         }
                                                         .padding()
                                                         .padding(.horizontal, 100)
-                                                        .background(vm.color_main_back_button_start_mainset)
+                                                        .background(Color(hex: "FBDA4B"))
                                                         .cornerRadius(12)
                                                         .shadow(radius: 5)
                                                     }
@@ -252,7 +252,8 @@ struct FlashCardView: View {
                 if !sessionCards.isEmpty {
                     VStack {
                         ZStack {
-                            ForEach(Array(sessionCards.enumerated().prefix(3)), id: \.element) { (index, card) in
+                            ForEach(Array(sessionCards.enumerated().prefix(3)), id: \.element.objectID) { (index, card) in
+
                                 let isTop = index == currentCardIndex
                                 
                                 CardView(
@@ -483,6 +484,7 @@ extension FlashCardView {
         return date
     }
     
+    // delete dublicaties added
     private func prepareSession() {
         Analytics.logEvent("flashcard_prepare_session_started", parameters: nil)
 
@@ -490,6 +492,7 @@ extension FlashCardView {
         let gradePriority: [CardGrade: Int] = [.new: 0, .again: 1, .hard: 2, .good: 3, .easy: 4]
         
         sessionCards = optionalCards ?? []
+        
         if sessionCards.isEmpty && optionalCards == nil {
             let today = Calendar.current.startOfDay(for: Date())
             let dueCards = allCards.filter { card in
@@ -512,12 +515,16 @@ extension FlashCardView {
             sessionCards.sort { (gradePriority[$0.lastGrade] ?? 5) < (gradePriority[$1.lastGrade] ?? 5) }
         }
 
+        // убираем дубликаты, потом чистим по front+back
+        sessionCards = sessionCards
+            .unique(by: { $0.objectID })
+            .unique(by: { ($0.frontText ?? "") + "|" + ($0.backText ?? "") })
+
         cardsSeen = 0
         totalCards = sessionCards.count
         currentCardIndex = 0
         completedCards = []
 
-        // Логируем старт сессии
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: sessionStartTimeKey)
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: lastCardTimeKey)
         
@@ -657,5 +664,13 @@ extension View {
         return self
             .offset(y: offset)
             .scaleEffect(scale)
+    }
+}
+
+// MARK: - Array Extension
+extension Array {
+    func unique<T: Hashable>(by key: (Element) -> T) -> [Element] {
+        var seen = Set<T>()
+        return filter { seen.insert(key($0)).inserted }
     }
 }

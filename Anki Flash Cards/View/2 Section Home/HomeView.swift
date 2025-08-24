@@ -26,7 +26,33 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                design.color_back_home_view.ignoresSafeArea()
+                Color.clear
+                    .background(design.color_background_zstack_in_home_view)
+                    .opacity(design.opacity_background_zstack_in_home_view)
+                    .blendMode(design.blend_mode_background_zstack_in_home_view)
+                    .cornerRadius(design.corner_radius_background_zstack_in_home_view)
+                    .shadow(
+                        color: design.shadow_color_background_zstack_in_home_view,
+                        radius: design.shadow_radius_background_zstack_in_home_view,
+                        x: design.shadow_x_offset_background_zstack_in_home_view,
+                        y: design.shadow_y_offset_background_zstack_in_home_view
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_background_zstack_in_home_view)
+                            .stroke(
+                                design.stroke_color_background_zstack_in_home_view,
+                                lineWidth: design.stroke_width_background_zstack_in_home_view
+                            )
+                    )
+                    .padding(.top, design.padding_top_background_zstack_in_home_view)
+                    .padding(.bottom, design.padding_bottom_background_zstack_in_home_view)
+                    .padding(.leading, design.padding_leading_background_zstack_in_home_view)
+                    .padding(.trailing, design.padding_trailing_background_zstack_in_home_view)
+                    .offset(
+                        x: design.offset_x_background_zstack_in_home_view,
+                        y: design.offset_y_background_zstack_in_home_view
+                    )
+                    .ignoresSafeArea()
                 mainContent
             }
             .sheet(isPresented: $vm.showingAddCollection) {
@@ -77,7 +103,7 @@ struct HomeView: View {
 
     // MARK: - Subviews
     private var mainContent: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: design.spacing_vstack_main_content_in_home_view) {
             topBar
             languageScroll
             divider
@@ -87,14 +113,35 @@ struct HomeView: View {
     }
 
     private var topBar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: design.spacing_hstack_top_bar_in_home_view) {
             languageButton
             pillStat(icon: "flame.fill", value: vm.currentStreak)
             pillStat(icon: "rectangle.on.rectangle.fill", value: vm.studiedCardsCount)
             pillStat(icon: "bolt.fill", value: vm.starsCount)
         }
-        .padding(.horizontal)
-        .padding(.bottom, 12)
+        .background(design.color_background_hstack_top_bar_in_home_view)
+        .opacity(design.opacity_hstack_top_bar_in_home_view)
+        .blendMode(design.blend_mode_hstack_top_bar_in_home_view)
+        .cornerRadius(design.corner_radius_hstack_top_bar_in_home_view)
+        .shadow(
+            color: design.shadow_color_hstack_top_bar_in_home_view,
+            radius: design.shadow_radius_hstack_top_bar_in_home_view,
+            x: design.shadow_x_offset_hstack_top_bar_in_home_view,
+            y: design.shadow_y_offset_hstack_top_bar_in_home_view
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: design.corner_radius_hstack_top_bar_in_home_view)
+                .stroke(
+                    design.stroke_color_hstack_top_bar_in_home_view,
+                    lineWidth: design.stroke_width_hstack_top_bar_in_home_view
+                )
+        )
+        .padding(.horizontal, design.padding_horizontal_hstack_top_bar_in_home_view)
+        .padding(.bottom, design.padding_bottom_hstack_top_bar_in_home_view)
+        .offset(
+            x: design.offset_x_hstack_top_bar_in_home_view,
+            y: design.offset_y_hstack_top_bar_in_home_view
+        )
     }
 
     private var languageButton: some View {
@@ -106,16 +153,68 @@ struct HomeView: View {
         } label: {
             pill {
                 Text(vm.flagForLanguage(vm.selectedLanguage))
-                    .font(.system(size: 18))
+                    .font(.system(size: design.font_size_flag_text_in_language_button))
+                    .fontWeight(design.font_weight_flag_text_in_language_button)
+                    .lineSpacing(design.line_spacing_flag_text_in_language_button)
+                    .foregroundColor(design.color_foreground_flag_text_in_language_button)
+                    .opacity(design.opacity_flag_text_in_language_button)
+                    .blendMode(design.blend_mode_flag_text_in_language_button)
+                    .cornerRadius(design.corner_radius_flag_text_in_language_button)
+                    .shadow(
+                        color: design.shadow_color_flag_text_in_language_button,
+                        radius: design.shadow_radius_flag_text_in_language_button,
+                        x: design.shadow_x_offset_flag_text_in_language_button,
+                        y: design.shadow_y_offset_flag_text_in_language_button
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_flag_text_in_language_button)
+                            .stroke(
+                                design.stroke_color_flag_text_in_language_button,
+                                lineWidth: design.stroke_width_flag_text_in_language_button
+                            )
+                    )
+                    .padding(.top, design.padding_top_flag_text_in_language_button)
+                    .padding(.bottom, design.padding_bottom_flag_text_in_language_button)
+                    .padding(.leading, design.padding_leading_flag_text_in_language_button)
+                    .padding(.trailing, design.padding_trailing_flag_text_in_language_button)
+                    .offset(
+                        x: design.offset_x_flag_text_in_language_button,
+                        y: design.offset_y_flag_text_in_language_button
+                    )
             }
         }
+        .background(design.color_background_language_button_in_top_bar)
+        .opacity(design.opacity_language_button_in_top_bar)
+        .blendMode(design.blend_mode_language_button_in_top_bar)
+        .cornerRadius(design.corner_radius_language_button_in_top_bar)
+        .shadow(
+            color: design.shadow_color_language_button_in_top_bar,
+            radius: design.shadow_radius_language_button_in_top_bar,
+            x: design.shadow_x_offset_language_button_in_top_bar,
+            y: design.shadow_y_offset_language_button_in_top_bar
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: design.corner_radius_language_button_in_top_bar)
+                .stroke(
+                    design.stroke_color_language_button_in_top_bar,
+                    lineWidth: design.stroke_width_language_button_in_top_bar
+                )
+        )
+        .frame(
+            width: design.frame_width_language_button_in_top_bar,
+            height: design.frame_height_language_button_in_top_bar
+        )
+        .offset(
+            x: design.offset_x_language_button_in_top_bar,
+            y: design.offset_y_language_button_in_top_bar
+        )
     }
 
     private var languageScroll: some View {
         Group {
             if showLanguageScroll {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: design.spacing_hstack_in_language_scroll) {
                         ForEach(vm.availableLanguages) { language in
                             Button {
                                 vm.switchLanguage(to: language.name)
@@ -124,22 +223,150 @@ struct HomeView: View {
                                     showLanguageScroll = false
                                 }
                             } label: {
-                                HStack(spacing: 6) {
-                                    Text(language.flag).font(.system(size: 22))
+                                HStack(spacing: design.spacing_hstack_in_language_button_in_language_scroll) {
+                                    Text(language.flag)
+                                        .font(.system(size: design.font_size_flag_text_in_language_button_in_language_scroll))
+                                        .fontWeight(design.font_weight_flag_text_in_language_button_in_language_scroll)
+                                        .lineSpacing(design.line_spacing_flag_text_in_language_button_in_language_scroll)
+                                        .foregroundColor(design.color_foreground_flag_text_in_language_button_in_language_scroll)
+                                        .opacity(design.opacity_flag_text_in_language_button_in_language_scroll)
+                                        .blendMode(design.blend_mode_flag_text_in_language_button_in_language_scroll)
+                                        .cornerRadius(design.corner_radius_flag_text_in_language_button_in_language_scroll)
+                                        .shadow(
+                                            color: design.shadow_color_flag_text_in_language_button_in_language_scroll,
+                                            radius: design.shadow_radius_flag_text_in_language_button_in_language_scroll,
+                                            x: design.shadow_x_offset_flag_text_in_language_button_in_language_scroll,
+                                            y: design.shadow_y_offset_flag_text_in_language_button_in_language_scroll
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: design.corner_radius_flag_text_in_language_button_in_language_scroll)
+                                                .stroke(
+                                                    design.stroke_color_flag_text_in_language_button_in_language_scroll,
+                                                    lineWidth: design.stroke_width_flag_text_in_language_button_in_language_scroll
+                                                )
+                                        )
+                                        .padding(.top, design.padding_top_flag_text_in_language_button_in_language_scroll)
+                                        .padding(.bottom, design.padding_bottom_flag_text_in_language_button_in_language_scroll)
+                                        .padding(.leading, design.padding_leading_flag_text_in_language_button_in_language_scroll)
+                                        .padding(.trailing, design.padding_trailing_flag_text_in_language_button_in_language_scroll)
+                                        .offset(
+                                            x: design.offset_x_flag_text_in_language_button_in_language_scroll,
+                                            y: design.offset_y_flag_text_in_language_button_in_language_scroll
+                                        )
                                     Text(language.name)
-                                        .font(.headline)
-                                        .foregroundColor(vm.selectedLanguage == language.name ? .white : .gray)
+                                        .font(.system(size: design.font_size_name_text_in_language_button_in_language_scroll))
+                                        .fontWeight(design.font_weight_name_text_in_language_button_in_language_scroll)
+                                        .lineSpacing(design.line_spacing_name_text_in_language_button_in_language_scroll)
+                                        .foregroundColor(vm.selectedLanguage == language.name ? design.color_foreground_selected_name_text_in_language_button_in_language_scroll : design.color_foreground_unselected_name_text_in_language_button_in_language_scroll)
+                                        .opacity(design.opacity_name_text_in_language_button_in_language_scroll)
+                                        .blendMode(design.blend_mode_name_text_in_language_button_in_language_scroll)
+                                        .cornerRadius(design.corner_radius_name_text_in_language_button_in_language_scroll)
+                                        .shadow(
+                                            color: design.shadow_color_name_text_in_language_button_in_language_scroll,
+                                            radius: design.shadow_radius_name_text_in_language_button_in_language_scroll,
+                                            x: design.shadow_x_offset_name_text_in_language_button_in_language_scroll,
+                                            y: design.shadow_y_offset_name_text_in_language_button_in_language_scroll
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: design.corner_radius_name_text_in_language_button_in_language_scroll)
+                                                .stroke(
+                                                    design.stroke_color_name_text_in_language_button_in_language_scroll,
+                                                    lineWidth: design.stroke_width_name_text_in_language_button_in_language_scroll
+                                                )
+                                        )
+                                        .padding(.top, design.padding_top_name_text_in_language_button_in_language_scroll)
+                                        .padding(.bottom, design.padding_bottom_name_text_in_language_button_in_language_scroll)
+                                        .padding(.leading, design.padding_leading_name_text_in_language_button_in_language_scroll)
+                                        .padding(.trailing, design.padding_trailing_name_text_in_language_button_in_language_scroll)
+                                        .offset(
+                                            x: design.offset_x_name_text_in_language_button_in_language_scroll,
+                                            y: design.offset_y_name_text_in_language_button_in_language_scroll
+                                        )
                                 }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 6)
-                                .background(vm.selectedLanguage == language.name ? Color.blue : Color.gray.opacity(0.2))
-                                .cornerRadius(12)
+                                .background(design.color_background_hstack_in_language_button_in_language_scroll)
+                                .opacity(design.opacity_hstack_in_language_button_in_language_scroll)
+                                .blendMode(design.blend_mode_hstack_in_language_button_in_language_scroll)
+                                .cornerRadius(design.corner_radius_hstack_in_language_button_in_language_scroll)
+                                .shadow(
+                                    color: design.shadow_color_hstack_in_language_button_in_language_scroll,
+                                    radius: design.shadow_radius_hstack_in_language_button_in_language_scroll,
+                                    x: design.shadow_x_offset_hstack_in_language_button_in_language_scroll,
+                                    y: design.shadow_y_offset_hstack_in_language_button_in_language_scroll
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: design.corner_radius_hstack_in_language_button_in_language_scroll)
+                                        .stroke(
+                                            design.stroke_color_hstack_in_language_button_in_language_scroll,
+                                            lineWidth: design.stroke_width_hstack_in_language_button_in_language_scroll
+                                        )
+                                )
                             }
+                            .background(vm.selectedLanguage == language.name ? design.color_background_selected_language_button_in_language_scroll : design.color_background_unselected_language_button_in_language_scroll)
+                            .opacity(design.opacity_language_button_in_language_scroll)
+                            .blendMode(design.blend_mode_language_button_in_language_scroll)
+                            .cornerRadius(design.corner_radius_language_button_in_language_scroll)
+                            .shadow(
+                                color: design.shadow_color_language_button_in_language_scroll,
+                                radius: design.shadow_radius_language_button_in_language_scroll,
+                                x: design.shadow_x_offset_language_button_in_language_scroll,
+                                y: design.shadow_y_offset_language_button_in_language_scroll
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: design.corner_radius_language_button_in_language_scroll)
+                                    .stroke(
+                                        design.stroke_color_language_button_in_language_scroll,
+                                        lineWidth: design.stroke_width_language_button_in_language_scroll
+                                    )
+                            )
+                            .padding(.horizontal, design.padding_horizontal_language_button_in_language_scroll)
+                            .padding(.vertical, design.padding_vertical_language_button_in_language_scroll)
+                            .offset(
+                                x: design.offset_x_language_button_in_language_scroll,
+                                y: design.offset_y_language_button_in_language_scroll
+                            )
                         }
                     }
-                    .padding(.horizontal)
+                    .background(design.color_background_hstack_in_language_scroll)
+                    .opacity(design.opacity_hstack_in_language_scroll)
+                    .blendMode(design.blend_mode_hstack_in_language_scroll)
+                    .cornerRadius(design.corner_radius_hstack_in_language_scroll)
+                    .shadow(
+                        color: design.shadow_color_hstack_in_language_scroll,
+                        radius: design.shadow_radius_hstack_in_language_scroll,
+                        x: design.shadow_x_offset_hstack_in_language_scroll,
+                        y: design.shadow_y_offset_hstack_in_language_scroll
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_hstack_in_language_scroll)
+                            .stroke(
+                                design.stroke_color_hstack_in_language_scroll,
+                                lineWidth: design.stroke_width_hstack_in_language_scroll
+                            )
+                    )
+                    .padding(.horizontal, design.padding_horizontal_hstack_in_language_scroll)
                 }
-                .frame(height: 70)
+                .background(design.color_background_scroll_view_in_language_scroll)
+                .opacity(design.opacity_scroll_view_in_language_scroll)
+                .blendMode(design.blend_mode_scroll_view_in_language_scroll)
+                .cornerRadius(design.corner_radius_scroll_view_in_language_scroll)
+                .shadow(
+                    color: design.shadow_color_scroll_view_in_language_scroll,
+                    radius: design.shadow_radius_scroll_view_in_language_scroll,
+                    x: design.shadow_x_offset_scroll_view_in_language_scroll,
+                    y: design.shadow_y_offset_scroll_view_in_language_scroll
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: design.corner_radius_scroll_view_in_language_scroll)
+                        .stroke(
+                            design.stroke_color_scroll_view_in_language_scroll,
+                            lineWidth: design.stroke_width_scroll_view_in_language_scroll
+                        )
+                )
+                .frame(height: design.frame_height_scroll_view_in_language_scroll)
+                .offset(
+                    x: design.offset_x_scroll_view_in_language_scroll,
+                    y: design.offset_y_scroll_view_in_language_scroll
+                )
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
@@ -147,30 +374,120 @@ struct HomeView: View {
 
     private var divider: some View {
         Rectangle()
-            .frame(height: 1)
-            .foregroundColor(design.color_line_cell_set_home.opacity(0.9))
-            .padding(.bottom, 15)
+            .fill(design.color_fill_divider_in_home_view)
+            .opacity(design.opacity_divider_in_home_view)
+            .blendMode(design.blend_mode_divider_in_home_view)
+            .cornerRadius(design.corner_radius_divider_in_home_view)
+            .shadow(
+                color: design.shadow_color_divider_in_home_view,
+                radius: design.shadow_radius_divider_in_home_view,
+                x: design.shadow_x_offset_divider_in_home_view,
+                y: design.shadow_y_offset_divider_in_home_view
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: design.corner_radius_divider_in_home_view)
+                    .stroke(
+                        design.stroke_color_divider_in_home_view,
+                        lineWidth: design.stroke_width_divider_in_home_view
+                    )
+            )
+            .frame(height: design.frame_height_divider_in_home_view)
+            .padding(.bottom, design.padding_bottom_divider_in_home_view)
+            .offset(
+                x: design.offset_x_divider_in_home_view,
+                y: design.offset_y_divider_in_home_view
+            )
     }
-  
+
     private var themeCard: some View {
         Group {
             if let currentTheme = vm.currentTheme {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Words \(currentTheme.cards.count)") // \(currentTheme.cards.count)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.black)
+                VStack(alignment: .leading, spacing: design.spacing_vstack_theme_card_in_home_view) {
+                    Text("Words \(currentTheme.cards.count)")
+                        .font(.system(size: design.font_size_words_text_in_theme_card))
+                        .fontWeight(design.font_weight_words_text_in_theme_card)
+                        .lineSpacing(design.line_spacing_words_text_in_theme_card)
+                        .foregroundColor(design.color_foreground_words_text_in_theme_card)
+                        .opacity(design.opacity_words_text_in_theme_card)
+                        .blendMode(design.blend_mode_words_text_in_theme_card)
+                        .cornerRadius(design.corner_radius_words_text_in_theme_card)
+                        .shadow(
+                            color: design.shadow_color_words_text_in_theme_card,
+                            radius: design.shadow_radius_words_text_in_theme_card,
+                            x: design.shadow_x_offset_words_text_in_theme_card,
+                            y: design.shadow_y_offset_words_text_in_theme_card
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: design.corner_radius_words_text_in_theme_card)
+                                .stroke(
+                                    design.stroke_color_words_text_in_theme_card,
+                                    lineWidth: design.stroke_width_words_text_in_theme_card
+                                )
+                        )
+                        .padding(.top, design.padding_top_words_text_in_theme_card)
+                        .padding(.bottom, design.padding_bottom_words_text_in_theme_card)
+                        .padding(.leading, design.padding_leading_words_text_in_theme_card)
+                        .padding(.trailing, design.padding_trailing_words_text_in_theme_card)
+                        .offset(
+                            x: design.offset_x_words_text_in_theme_card,
+                            y: design.offset_y_words_text_in_theme_card
+                        )
                     Text(currentTheme.title)
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: design.font_size_title_text_in_theme_card))
+                        .fontWeight(design.font_weight_title_text_in_theme_card)
+                        .lineSpacing(design.line_spacing_title_text_in_theme_card)
+                        .foregroundColor(design.color_foreground_title_text_in_theme_card)
+                        .opacity(design.opacity_title_text_in_theme_card)
+                        .blendMode(design.blend_mode_title_text_in_theme_card)
+                        .cornerRadius(design.corner_radius_title_text_in_theme_card)
+                        .shadow(
+                            color: design.shadow_color_title_text_in_theme_card,
+                            radius: design.shadow_radius_title_text_in_theme_card,
+                            x: design.shadow_x_offset_title_text_in_theme_card,
+                            y: design.shadow_y_offset_title_text_in_theme_card
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: design.corner_radius_title_text_in_theme_card)
+                                .stroke(
+                                    design.stroke_color_title_text_in_theme_card,
+                                    lineWidth: design.stroke_width_title_text_in_theme_card
+                                )
+                        )
+                        .padding(.top, design.padding_top_title_text_in_theme_card)
+                        .padding(.bottom, design.padding_bottom_title_text_in_theme_card)
+                        .padding(.leading, design.padding_leading_title_text_in_theme_card)
+                        .padding(.trailing, design.padding_trailing_title_text_in_theme_card)
+                        .offset(
+                            x: design.offset_x_title_text_in_theme_card,
+                            y: design.offset_y_title_text_in_theme_card
+                        )
                 }
-                .padding()
+                .padding(.horizontal, design.padding_horizontal_theme_card_in_home_view)
+                .padding(.vertical, design.padding_vertical_theme_card_in_home_view)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(hex: "#FBDA4B"))
-                        .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+                    RoundedRectangle(cornerRadius: design.corner_radius_theme_card_in_home_view)
+                        .fill(design.color_background_theme_card_in_home_view)
+                        .shadow(
+                            color: design.shadow_color_theme_card_in_home_view,
+                            radius: design.shadow_radius_theme_card_in_home_view,
+                            x: design.shadow_x_offset_theme_card_in_home_view,
+                            y: design.shadow_y_offset_theme_card_in_home_view
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: design.corner_radius_theme_card_in_home_view)
+                                .stroke(
+                                    design.stroke_color_theme_card_in_home_view,
+                                    lineWidth: design.stroke_width_theme_card_in_home_view
+                                )
+                        )
                 )
-                .padding(.horizontal)
-                .padding(.bottom, 10)
+                .padding(.horizontal, design.padding_horizontal_theme_card_in_home_view)
+                .padding(.bottom, design.padding_bottom_theme_card_in_home_view)
+                .offset(
+                    x: design.offset_x_theme_card_in_home_view,
+                    y: design.offset_y_theme_card_in_home_view
+                )
                 .background(
                     GeometryReader { proxy in
                         Color.clear
@@ -185,33 +502,157 @@ struct HomeView: View {
 
     private var levelsScroll: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(spacing: 30) {
+            LazyVStack(spacing: design.spacing_lazy_vstack_in_levels_scroll) {
                 ForEach(vm.themes.indices, id: \.self) { themeIndex in
                     let theme = vm.themes[themeIndex]
                     snakeLevels(for: theme, themeIndex: themeIndex)
                     separator(themeIndex: themeIndex)
                 }
             }
-            .padding(.top, 5)
-            .padding(.bottom, 70)
-            .onAppear {
-                Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
-            }
+            .background(design.color_background_lazy_vstack_in_levels_scroll)
+            .opacity(design.opacity_lazy_vstack_in_levels_scroll)
+            .blendMode(design.blend_mode_lazy_vstack_in_levels_scroll)
+            .cornerRadius(design.corner_radius_lazy_vstack_in_levels_scroll)
+            .shadow(
+                color: design.shadow_color_lazy_vstack_in_levels_scroll,
+                radius: design.shadow_radius_lazy_vstack_in_levels_scroll,
+                x: design.shadow_x_offset_lazy_vstack_in_levels_scroll,
+                y: design.shadow_y_offset_lazy_vstack_in_levels_scroll
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: design.corner_radius_lazy_vstack_in_levels_scroll)
+                    .stroke(
+                        design.stroke_color_lazy_vstack_in_levels_scroll,
+                        lineWidth: design.stroke_width_lazy_vstack_in_levels_scroll
+                    )
+            )
+            .padding(.top, design.padding_top_scroll_view_in_levels_scroll)
+            .padding(.bottom, design.padding_bottom_scroll_view_in_levels_scroll)
         }
+        .background(design.color_background_scroll_view_in_levels_scroll)
+        .opacity(design.opacity_scroll_view_in_levels_scroll)
+        .blendMode(design.blend_mode_scroll_view_in_levels_scroll)
+        .cornerRadius(design.corner_radius_scroll_view_in_levels_scroll)
+        .shadow(
+            color: design.shadow_color_scroll_view_in_levels_scroll,
+            radius: design.shadow_radius_scroll_view_in_levels_scroll,
+            x: design.shadow_x_offset_scroll_view_in_levels_scroll,
+            y: design.shadow_y_offset_scroll_view_in_levels_scroll
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: design.corner_radius_scroll_view_in_levels_scroll)
+                .stroke(
+                    design.stroke_color_scroll_view_in_levels_scroll,
+                    lineWidth: design.stroke_width_scroll_view_in_levels_scroll
+                )
+        )
+        .offset(
+            x: design.offset_x_scroll_view_in_levels_scroll,
+            y: design.offset_y_scroll_view_in_levels_scroll
+        )
         .coordinateSpace(name: "scrollSpace")
+        .onAppear {
+            Analytics.logEvent("ai_quest_scrollview_appear", parameters: nil)
+        }
     }
 
     private func separator(themeIndex: Int) -> some View {
-        HStack(spacing: 8) {
-            Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
+        HStack(spacing: design.spacing_hstack_separator_in_levels_scroll) {
+            Rectangle()
+                .fill(design.color_fill_rectangle_in_separator)
+                .opacity(design.opacity_rectangle_in_separator)
+                .blendMode(design.blend_mode_rectangle_in_separator)
+                .cornerRadius(design.corner_radius_rectangle_in_separator)
+                .shadow(
+                    color: design.shadow_color_rectangle_in_separator,
+                    radius: design.shadow_radius_rectangle_in_separator,
+                    x: design.shadow_x_offset_rectangle_in_separator,
+                    y: design.shadow_y_offset_rectangle_in_separator
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: design.corner_radius_rectangle_in_separator)
+                        .stroke(
+                            design.stroke_color_rectangle_in_separator,
+                            lineWidth: design.stroke_width_rectangle_in_separator
+                        )
+                )
+                .frame(height: design.frame_height_rectangle_in_separator)
+                .offset(
+                    x: design.offset_x_rectangle_in_separator,
+                    y: design.offset_y_rectangle_in_separator
+                )
             Image(systemName: vm.isThemeUnlocked(themeIndex: themeIndex) ? "lock.open.fill" : "lock.fill")
-                .resizable().scaledToFit()
-                .frame(width: 14, height: 14)
-                .foregroundColor(.gray)
-            Rectangle().fill(design.color_line_cell_set_home).frame(height: 1)
+                .resizable()
+                .scaledToFit()
+                .frame(width: design.frame_width_lock_icon_in_separator, height: design.frame_height_lock_icon_in_separator)
+                .foregroundColor(design.color_foreground_lock_icon_in_separator)
+                .opacity(design.opacity_lock_icon_in_separator)
+                .blendMode(design.blend_mode_lock_icon_in_separator)
+                .cornerRadius(design.corner_radius_lock_icon_in_separator)
+                .shadow(
+                    color: design.shadow_color_lock_icon_in_separator,
+                    radius: design.shadow_radius_lock_icon_in_separator,
+                    x: design.shadow_x_offset_lock_icon_in_separator,
+                    y: design.shadow_y_offset_lock_icon_in_separator
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: design.corner_radius_lock_icon_in_separator)
+                        .stroke(
+                            design.stroke_color_lock_icon_in_separator,
+                            lineWidth: design.stroke_width_lock_icon_in_separator
+                        )
+                )
+                .offset(
+                    x: design.offset_x_lock_icon_in_separator,
+                    y: design.offset_y_lock_icon_in_separator
+                )
+            Rectangle()
+                .fill(design.color_fill_rectangle_in_separator)
+                .opacity(design.opacity_rectangle_in_separator)
+                .blendMode(design.blend_mode_rectangle_in_separator)
+                .cornerRadius(design.corner_radius_rectangle_in_separator)
+                .shadow(
+                    color: design.shadow_color_rectangle_in_separator,
+                    radius: design.shadow_radius_rectangle_in_separator,
+                    x: design.shadow_x_offset_rectangle_in_separator,
+                    y: design.shadow_y_offset_rectangle_in_separator
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: design.corner_radius_rectangle_in_separator)
+                        .stroke(
+                            design.stroke_color_rectangle_in_separator,
+                            lineWidth: design.stroke_width_rectangle_in_separator
+                        )
+                )
+                .frame(height: design.frame_height_rectangle_in_separator)
+                .offset(
+                    x: design.offset_x_rectangle_in_separator,
+                    y: design.offset_y_rectangle_in_separator
+                )
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
+        .background(design.color_background_hstack_separator_in_levels_scroll)
+        .opacity(design.opacity_hstack_separator_in_levels_scroll)
+        .blendMode(design.blend_mode_hstack_separator_in_levels_scroll)
+        .cornerRadius(design.corner_radius_hstack_separator_in_levels_scroll)
+        .shadow(
+            color: design.shadow_color_hstack_separator_in_levels_scroll,
+            radius: design.shadow_radius_hstack_separator_in_levels_scroll,
+            x: design.shadow_x_offset_hstack_separator_in_levels_scroll,
+            y: design.shadow_y_offset_hstack_separator_in_levels_scroll
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: design.corner_radius_hstack_separator_in_levels_scroll)
+                .stroke(
+                    design.stroke_color_hstack_separator_in_levels_scroll,
+                    lineWidth: design.stroke_width_hstack_separator_in_levels_scroll
+                )
+        )
+        .padding(.horizontal, design.padding_horizontal_hstack_separator_in_levels_scroll)
+        .padding(.vertical, design.padding_vertical_hstack_separator_in_levels_scroll)
+        .offset(
+            x: design.offset_x_hstack_separator_in_levels_scroll,
+            y: design.offset_y_hstack_separator_in_levels_scroll
+        )
         .background(
             GeometryReader { proxy in
                 Color.clear
@@ -233,7 +674,6 @@ struct HomeView: View {
                     themeTitle: themeTitle,
                     level: level,
                     onLevelCompleted: {
-                        // after finishing session we re-check completion; if everything good - mark and update UI
                         vm.checkLevelCompletion(themeIndex: themeIndex, level: level)
                     }
                 )
@@ -247,20 +687,87 @@ struct HomeView: View {
 
     private func pill<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         content()
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Color.clear)
-            .cornerRadius(12)
+            .padding(.horizontal, design.padding_horizontal_hstack_pill_stat_in_top_bar)
+            .padding(.vertical, design.padding_vertical_hstack_pill_stat_in_top_bar)
+            .background(design.color_background_hstack_pill_stat_in_top_bar)
+            .opacity(design.opacity_hstack_pill_stat_in_top_bar)
+            .blendMode(design.blend_mode_hstack_pill_stat_in_top_bar)
+            .cornerRadius(design.corner_radius_hstack_pill_stat_in_top_bar)
+            .shadow(
+                color: design.shadow_color_hstack_pill_stat_in_top_bar,
+                radius: design.shadow_radius_hstack_pill_stat_in_top_bar,
+                x: design.shadow_x_offset_hstack_pill_stat_in_top_bar,
+                y: design.shadow_y_offset_hstack_pill_stat_in_top_bar
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: design.corner_radius_hstack_pill_stat_in_top_bar)
+                    .stroke(
+                        design.stroke_color_hstack_pill_stat_in_top_bar,
+                        lineWidth: design.stroke_width_hstack_pill_stat_in_top_bar
+                    )
+            )
     }
 
     private func pillStat(icon: String, value: Int) -> some View {
         pill {
-            HStack(spacing: 6) {
+            HStack(spacing: design.spacing_hstack_pill_stat_in_top_bar) {
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(icon == "flame.fill" ? .orange : icon == "bolt.fill" ? .yellow : .gray.opacity(0.4))
+                    .font(.system(size: design.font_size_icon_in_pill_stat))
+                    .fontWeight(design.font_weight_icon_in_pill_stat)
+                    .foregroundColor(
+                        icon == "flame.fill" ? design.color_foreground_flame_icon_in_pill_stat :
+                        icon == "bolt.fill" ? design.color_foreground_bolt_icon_in_pill_stat :
+                        design.color_foreground_rectangle_icon_in_pill_stat
+                    )
+                    .opacity(design.opacity_icon_in_pill_stat)
+                    .blendMode(design.blend_mode_icon_in_pill_stat)
+                    .cornerRadius(design.corner_radius_icon_in_pill_stat)
+                    .shadow(
+                        color: design.shadow_color_icon_in_pill_stat,
+                        radius: design.shadow_radius_icon_in_pill_stat,
+                        x: design.shadow_x_offset_icon_in_pill_stat,
+                        y: design.shadow_y_offset_icon_in_pill_stat
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_icon_in_pill_stat)
+                            .stroke(
+                                design.stroke_color_icon_in_pill_stat,
+                                lineWidth: design.stroke_width_icon_in_pill_stat
+                            )
+                    )
+                    .offset(
+                        x: design.offset_x_icon_in_pill_stat,
+                        y: design.offset_y_icon_in_pill_stat
+                    )
                 Text("\(value)")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: design.font_size_value_text_in_pill_stat))
+                    .fontWeight(design.font_weight_value_text_in_pill_stat)
+                    .lineSpacing(design.line_spacing_value_text_in_pill_stat)
+                    .foregroundColor(design.color_foreground_value_text_in_pill_stat)
+                    .opacity(design.opacity_value_text_in_pill_stat)
+                    .blendMode(design.blend_mode_value_text_in_pill_stat)
+                    .cornerRadius(design.corner_radius_value_text_in_pill_stat)
+                    .shadow(
+                        color: design.shadow_color_value_text_in_pill_stat,
+                        radius: design.shadow_radius_value_text_in_pill_stat,
+                        x: design.shadow_x_offset_value_text_in_pill_stat,
+                        y: design.shadow_y_offset_value_text_in_pill_stat
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_value_text_in_pill_stat)
+                            .stroke(
+                                design.stroke_color_value_text_in_pill_stat,
+                                lineWidth: design.stroke_width_value_text_in_pill_stat
+                            )
+                    )
+                    .padding(.top, design.padding_top_value_text_in_pill_stat)
+                    .padding(.bottom, design.padding_bottom_value_text_in_pill_stat)
+                    .padding(.leading, design.padding_leading_value_text_in_pill_stat)
+                    .padding(.trailing, design.padding_trailing_value_text_in_pill_stat)
+                    .offset(
+                        x: design.offset_x_value_text_in_pill_stat,
+                        y: design.offset_y_value_text_in_pill_stat
+                    )
             }
         }
         .onTapGesture {
@@ -300,6 +807,7 @@ struct LevelButton: View {
     let themeIndex: Int
     let level: Int
     @ObservedObject var vm: HomeVM
+    @ObservedObject private var design = DesignVM()
 
     private var isUnlocked: Bool { vm.isLevelUnlocked(themeIndex: themeIndex, level: level) }
     private var isCompleted: Bool { vm.isLevelCompleted(themeIndex: themeIndex, level: level) }
@@ -328,61 +836,100 @@ struct LevelButton: View {
                 if isCurrent {
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(Color.blue.opacity(0.8), style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                        .stroke(design.color_stroke_progress_circle_in_level_button, style: StrokeStyle(lineWidth: design.stroke_width_progress_circle_in_level_button, lineCap: .round))
                         .frame(width: 74, height: 74)
+                        .opacity(design.opacity_progress_circle_in_level_button)
+                        .blendMode(design.blend_mode_progress_circle_in_level_button)
+                        .shadow(
+                            color: design.shadow_color_progress_circle_in_level_button,
+                            radius: design.shadow_radius_progress_circle_in_level_button,
+                            x: design.shadow_x_offset_progress_circle_in_level_button,
+                            y: design.shadow_y_offset_progress_circle_in_level_button
+                        )
                         .rotationEffect(.degrees(-90))
                         .onChange(of: progress) { newValue in
-                            // if fully filled -> mark completed instantly (safety: only once)
                             if newValue >= 1.0 {
                                 vm.markLevelCompleted(themeIndex: themeIndex, level: level)
                             }
                         }
                 } else if isCompleted {
                     Circle()
-                        .stroke(Color(hex: "#FBDA4B"), lineWidth: 5)
+                        .stroke(design.color_stroke_completed_circle_in_level_button, lineWidth: design.stroke_width_completed_circle_in_level_button)
                         .frame(width: 74, height: 74)
+                        .opacity(design.opacity_completed_circle_in_level_button)
+                        .blendMode(design.blend_mode_completed_circle_in_level_button)
+                        .shadow(
+                            color: design.shadow_color_completed_circle_in_level_button,
+                            radius: design.shadow_radius_completed_circle_in_level_button,
+                            x: design.shadow_x_offset_completed_circle_in_level_button,
+                            y: design.shadow_y_offset_completed_circle_in_level_button
+                        )
                 }
                 Circle()
-                    .fill(circleFill(isCompleted: isCompleted))
+                    .fill(isCompleted ? design.color_fill_completed_main_circle_in_level_button : design.color_fill_uncompleted_main_circle_in_level_button)
                     .frame(width: 64, height: 64)
-                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .opacity(design.opacity_main_circle_in_level_button)
+                    .blendMode(design.blend_mode_main_circle_in_level_button)
+                    .cornerRadius(design.corner_radius_main_circle_in_level_button)
+                    .shadow(
+                        color: design.shadow_color_main_circle_in_level_button,
+                        radius: design.shadow_radius_main_circle_in_level_button,
+                        x: design.shadow_x_offset_main_circle_in_level_button,
+                        y: design.shadow_y_offset_main_circle_in_level_button
+                    )
                     .overlay(
                         Circle()
-                            .stroke(Color.white.opacity(isCompleted ? 0.35 : 0.15), lineWidth: 2)
+                            .stroke(design.stroke_color_main_circle_in_level_button.opacity(isCompleted ? 0.35 : 0.15), lineWidth: design.stroke_width_main_circle_in_level_button)
                     )
                 Image(systemName: icon)
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundColor(isCompleted ? .white : .white.opacity(0.9))
-                    .opacity(isUnlocked ? 1.0 : 0.45)
+                    .font(.system(size: design.font_size_icon_in_level_button))
+                    .fontWeight(design.font_weight_icon_in_level_button)
+                    .foregroundColor(
+                        isUnlocked ? (isCompleted ? design.color_foreground_completed_icon_in_level_button : design.color_foreground_uncompleted_icon_in_level_button) : design.color_foreground_locked_icon_in_level_button
+                    )
+                    .opacity(design.opacity_icon_in_level_button)
+                    .blendMode(design.blend_mode_icon_in_level_button)
+                    .cornerRadius(design.corner_radius_icon_in_level_button)
+                    .shadow(
+                        color: design.shadow_color_icon_in_level_button,
+                        radius: design.shadow_radius_icon_in_level_button,
+                        x: design.shadow_x_offset_icon_in_level_button,
+                        y: design.shadow_y_offset_icon_in_level_button
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: design.corner_radius_icon_in_level_button)
+                            .stroke(
+                                design.stroke_color_icon_in_level_button,
+                                lineWidth: design.stroke_width_icon_in_level_button
+                            )
+                    )
             }
         }
+        .background(design.color_background_level_button)
+        .opacity(design.opacity_level_button)
+        .blendMode(design.blend_mode_level_button)
+        .cornerRadius(design.corner_radius_level_button)
+        .shadow(
+            color: design.shadow_color_level_button,
+            radius: design.shadow_radius_level_button,
+            x: design.shadow_x_offset_level_button,
+            y: design.shadow_y_offset_level_button
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: design.corner_radius_level_button)
+                .stroke(
+                    design.stroke_color_level_button,
+                    lineWidth: design.stroke_width_level_button
+                )
+        )
         .disabled(!isUnlocked)
     }
-    /*
-     Color(hex: "#F4863E") // orange
-     Color(hex: "#83A5F2") // blue
-     Color(hex: "#ED9BBfd") // lavanda
 
-     Color(hex: "#ddead1") // soft green
-     Color(hex: "#546a50") // dark green
-     Color(hex: "#E6A7FA") // pink
-     
-     
-     // green - pink - yellow (palette 19)
-     #1E3309 // dark green
-     #849A28 // green
-     #E23260 // dark pink
-     #F2678E // cerise pink
-     #FCA9AA // soft pink
-     #FBDA4B // yellow
-     #FAE36F // soft yellow
-    */
     private func circleFill(isCompleted: Bool) -> LinearGradient {
         if isCompleted {
-            return LinearGradient(colors: [Color(hex: "#FBDA4B"), Color(hex: "#FBDA4B")], startPoint: .topLeading, endPoint: .bottomTrailing)
+            return design.color_fill_completed_main_circle_in_level_button
         } else {
-            return LinearGradient(colors: [Color.gray.opacity(0.7), Color.gray.opacity(0.45)],
-                                  startPoint: .topLeading, endPoint: .bottomTrailing)
+            return design.color_fill_uncompleted_main_circle_in_level_button
         }
     }
 }

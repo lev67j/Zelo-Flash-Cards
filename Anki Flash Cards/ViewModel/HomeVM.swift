@@ -262,11 +262,13 @@ final class HomeVM: ObservableObject {
 
     private func saveLevelCardMap(_ map: [String: [String]]) {
         let data = (try? JSONEncoder().encode(map)) ?? Data()
-        levelCardMapJSON = String(data: data, encoding: .utf8) ?? "{}"
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        
         DispatchQueue.main.async { [weak self] in
-            self?.objectWillChange.send()
+            self?.levelCardMapJSON = json
         }
     }
+
     
     /// Возвращает реальные CoreData Card объекты для themeIndex/level.
     /// Если createIfMissing == true — создаёт Card'ы и сохраняет их objectID'ы в levelCardMap.

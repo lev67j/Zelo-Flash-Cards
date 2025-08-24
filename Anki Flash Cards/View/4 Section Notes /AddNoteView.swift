@@ -16,7 +16,8 @@ struct AddNoteView: View {
     @State private var name: String = ""
 
     @State private var show_alert_add_name = false
-
+    @State private var show_alert_add_text = false
+  
     @State private var screenEnterTime: Date?
     @State private var lastActionTime: Date?
 
@@ -88,9 +89,13 @@ struct AddNoteView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             logSaveTap()
+                            
                             if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                 show_alert_add_name = true
+                                
                                 logAlertShown()
+                            } else if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                show_alert_add_text = true
                             } else {
                                 saveNote()
                             }
@@ -102,6 +107,13 @@ struct AddNoteView: View {
                         .alert(isPresented: $show_alert_add_name) {
                             Alert(
                                 title: Text("Please add name note"),
+                                message: Text(""),
+                                dismissButton: .cancel()
+                            )
+                        }
+                        .alert(isPresented: $show_alert_add_text) {
+                            Alert(
+                                title: Text("Please add text note"),
                                 message: Text(""),
                                 dismissButton: .cancel()
                             )

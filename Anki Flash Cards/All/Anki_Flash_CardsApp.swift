@@ -11,6 +11,8 @@ import FirebaseAnalytics
 
 @main
 struct Anki_Flash_CardsApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate // for work notify and firebase
+  
     @Environment(\.scenePhase) private var scenePhase
     
     let persistenceController = PersistenceController.shared
@@ -20,11 +22,7 @@ struct Anki_Flash_CardsApp: App {
     @AppStorage("totalTimeSpent") private var totalTimeSpent: Double = 0
     
     @State private var sessionStart: Date? = nil
-    
-    init() {
-        FirebaseApp.configure()
-    }
-    
+     
     var body: some Scene {
         WindowGroup {
             OnboardingView()

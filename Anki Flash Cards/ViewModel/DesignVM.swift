@@ -109,25 +109,6 @@ final class DesignVM: ObservableObject {
     @Published var color_main_text_button_start_mainset = Color.black
     @Published var color_main_back_button_start_mainset = Color(hex: "FBDA4B")
  
-    /*
-     Color(hex: "#F4863E") // orange
-     Color(hex: "#83A5F2") // blue
-     Color(hex: "#ED9BBfd") // lavanda
-
-     Color(hex: "#ddead1") // soft green
-     Color(hex: "#546a50") // dark green
-     Color(hex: "#E6A7FA") // pink
-     
-     // green - pink - yellow (palette 19)
-     #1E3309 // dark green
-     #849A28 // green
-     #E23260 // dark pink
-     #F2678E // cerise pink
-     #FCA9AA // soft pink
-     #FBDA4B // yellow
-     #FAE36F // soft yellow
-    */
-    
     //MARK: - AI Quest
     @Published var color_button_level_quest =   Color(hex: "#F2678E")
  

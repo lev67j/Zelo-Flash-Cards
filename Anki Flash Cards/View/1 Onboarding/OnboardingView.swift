@@ -181,3 +181,7 @@ struct LinearProgressViewStyle: ProgressViewStyle {
         }
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2db08fdcf7bf7676e74b5f5206c2121e678b085

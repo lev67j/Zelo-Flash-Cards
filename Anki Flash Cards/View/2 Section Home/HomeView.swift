@@ -684,7 +684,6 @@ struct HomeView: View {
     }
 
     // MARK: - Helpers (UI)
-
     private func pill<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         content()
             .padding(.horizontal, design.padding_horizontal_hstack_pill_stat_in_top_bar)
@@ -833,11 +832,18 @@ struct LevelButton: View {
             }
         } label: {
             ZStack {
+                // Background circle for progress (current level)
                 if isCurrent {
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(design.color_stroke_progress_circle_in_level_button, style: StrokeStyle(lineWidth: design.stroke_width_progress_circle_in_level_button, lineCap: .round))
-                        .frame(width: 74, height: 74)
+                        .stroke(
+                            design.color_stroke_progress_circle_in_level_button,
+                            style: StrokeStyle(
+                                lineWidth: design.stroke_width_progress_circle_in_level_button,
+                                lineCap: .round
+                            )
+                        )
+                        .frame(width: 64 + design.stroke_width_progress_circle_in_level_button * 2, height: 64 + design.stroke_width_progress_circle_in_level_button * 2)
                         .opacity(design.opacity_progress_circle_in_level_button)
                         .blendMode(design.blend_mode_progress_circle_in_level_button)
                         .shadow(
@@ -854,8 +860,11 @@ struct LevelButton: View {
                         }
                 } else if isCompleted {
                     Circle()
-                        .stroke(design.color_stroke_completed_circle_in_level_button, lineWidth: design.stroke_width_completed_circle_in_level_button)
-                        .frame(width: 74, height: 74)
+                        .stroke(
+                            design.color_stroke_completed_circle_in_level_button,
+                            lineWidth: design.stroke_width_completed_circle_in_level_button
+                        )
+                        .frame(width: 64 + design.stroke_width_completed_circle_in_level_button * 2, height: 64 + design.stroke_width_completed_circle_in_level_button * 2)
                         .opacity(design.opacity_completed_circle_in_level_button)
                         .blendMode(design.blend_mode_completed_circle_in_level_button)
                         .shadow(
@@ -865,8 +874,10 @@ struct LevelButton: View {
                             y: design.shadow_y_offset_completed_circle_in_level_button
                         )
                 }
+
+                // Main circle
                 Circle()
-                    .fill(isCompleted ? design.color_fill_completed_main_circle_in_level_button : design.color_fill_uncompleted_main_circle_in_level_button)
+                    .fill(circleFill(isCompleted: isCompleted))
                     .frame(width: 64, height: 64)
                     .opacity(design.opacity_main_circle_in_level_button)
                     .blendMode(design.blend_mode_main_circle_in_level_button)
@@ -879,13 +890,22 @@ struct LevelButton: View {
                     )
                     .overlay(
                         Circle()
-                            .stroke(design.stroke_color_main_circle_in_level_button.opacity(isCompleted ? 0.35 : 0.15), lineWidth: design.stroke_width_main_circle_in_level_button)
+                            .stroke(
+                                design.stroke_color_main_circle_in_level_button.opacity(isCompleted ? 0.35 : 0.15),
+                                lineWidth: design.stroke_width_main_circle_in_level_button
+                            )
                     )
+
+                // Icon
                 Image(systemName: icon)
                     .font(.system(size: design.font_size_icon_in_level_button))
                     .fontWeight(design.font_weight_icon_in_level_button)
                     .foregroundColor(
-                        isUnlocked ? (isCompleted ? design.color_foreground_completed_icon_in_level_button : design.color_foreground_uncompleted_icon_in_level_button) : design.color_foreground_locked_icon_in_level_button
+                        isUnlocked
+                            ? (isCompleted
+                                ? design.color_foreground_completed_icon_in_level_button
+                                : design.color_foreground_uncompleted_icon_in_level_button)
+                            : design.color_foreground_locked_icon_in_level_button
                     )
                     .opacity(design.opacity_icon_in_level_button)
                     .blendMode(design.blend_mode_icon_in_level_button)
@@ -904,24 +924,25 @@ struct LevelButton: View {
                             )
                     )
             }
+            .padding(design.stroke_width_progress_circle_in_level_button) // Add padding to prevent clipping
+            .background(design.color_background_level_button)
+            .opacity(design.opacity_level_button)
+            .blendMode(design.blend_mode_level_button)
+            .cornerRadius(design.corner_radius_level_button)
+            .shadow(
+                color: design.shadow_color_level_button,
+                radius: design.shadow_radius_level_button,
+                x: design.shadow_x_offset_level_button,
+                y: design.shadow_y_offset_level_button
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: design.corner_radius_level_button)
+                    .stroke(
+                        design.stroke_color_level_button,
+                        lineWidth: design.stroke_width_level_button
+                    )
+            )
         }
-        .background(design.color_background_level_button)
-        .opacity(design.opacity_level_button)
-        .blendMode(design.blend_mode_level_button)
-        .cornerRadius(design.corner_radius_level_button)
-        .shadow(
-            color: design.shadow_color_level_button,
-            radius: design.shadow_radius_level_button,
-            x: design.shadow_x_offset_level_button,
-            y: design.shadow_y_offset_level_button
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: design.corner_radius_level_button)
-                .stroke(
-                    design.stroke_color_level_button,
-                    lineWidth: design.stroke_width_level_button
-                )
-        )
         .disabled(!isUnlocked)
     }
 
@@ -933,7 +954,6 @@ struct LevelButton: View {
         }
     }
 }
-
 // MARK: - Preferences
 private struct ThemeSeparator: Equatable, Hashable {
     let index: Int

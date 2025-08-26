@@ -10,15 +10,18 @@ import FirebaseAnalytics
 
 struct InitialDataSetup {
     static func setupInitialData(context: NSManagedObjectContext) {
+        // Логируем старт и фиксируем время начала
         Analytics.logEvent("initial_data_setup_start", parameters: nil)
         let setupStartTime = Date()
         
-        // User
+        // --- USER ---
+        // Проверяем, есть ли пользователь в базе
         let userRequest: NSFetchRequest<User> = User.fetchRequest()
         userRequest.fetchLimit = 1
         do {
             let existingUsers = try context.fetch(userRequest)
             if existingUsers.isEmpty {
+                // Если нет — создаём нового пользователя с дефолтными значениями
                 let newUser = User(context: context)
                 newUser.age = 0
                 newUser.onboarding_select_language = ""
@@ -26,6 +29,7 @@ struct InitialDataSetup {
                 print("✅ User создан")
                 Analytics.logEvent("initial_data_setup_user_created", parameters: nil)
             } else {
+                // Если есть — просто логируем и пропускаем
                 print("ℹ️ User уже существует, пропускаем создание")
                 Analytics.logEvent("initial_data_setup_user_already_exists", parameters: nil)
             }
@@ -34,7 +38,8 @@ struct InitialDataSetup {
             Analytics.logEvent("initial_data_setup_user_error", parameters: ["error_description": error.localizedDescription])
         }
 
-        // JSONs
+        // --- JSON FILES ---
+        // Достаём все json-файлы из бандла
         guard let jsonFiles = Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: nil) else {
             print("❌ Не найдено JSON-файлов в бандле")
             Analytics.logEvent("initial_data_setup_no_json_files", parameters: nil)
@@ -43,7 +48,8 @@ struct InitialDataSetup {
         print("📁 Найдены JSON-файлы: \(jsonFiles.map { $0.lastPathComponent })")
         Analytics.logEvent("initial_data_setup_json_files_found", parameters: ["count": jsonFiles.count])
         
-        var processedCombinations = Set<String>()
+        // Служебные переменные для подсчёта и контроля
+        var processedCombinations = Set<String>()   // Чтобы избежать дублей
         let existingLanguages = fetchExistingLanguages(context: context)
         let existingCollections = fetchExistingCollections(context: context)
         var newLanguagesCount = 0
@@ -52,27 +58,29 @@ struct InitialDataSetup {
         var newQuestionsCount = 0
         var errorFiles = [String]()
         
-        // Динамическая проверка наличия сущности/атрибута для вопросов
+        // Проверяем, есть ли сущность ShopQuestion в Core Data
         let hasShopQuestionEntity = context.persistentStoreCoordinator?
             .managedObjectModel.entitiesByName["ShopQuestion"] != nil
         
-        // Проверим, есть ли у ShopCollection атрибут questionsJSON
+        // Проверяем, есть ли у ShopCollection атрибут questionsJSON
         let hasQuestionsJSONAttribute: Bool = {
             guard let entity = NSEntityDescription.entity(forEntityName: "ShopCollection", in: context) else { return false }
             return entity.attributesByName["questionsJSON"] != nil
         }()
 
+        // --- ОБРАБОТКА JSON-ФАЙЛОВ ---
         for fileURL in jsonFiles {
             let fileStartTime = Date()
             print("🔍 Начало обработки файла: \(fileURL.lastPathComponent)")
             do {
                 let data = try Data(contentsOf: fileURL)
                 
-                // Пытаемся как LanguageCourse
+                // --- Попытка декодировать как LanguageCourse ---
                 do {
                     let course = try JSONDecoder().decode(LanguageCourse.self, from: data)
                     print("📄 Успешно декодирован \(fileURL.lastPathComponent) как LanguageCourse")
                     
+                    // Проверка на дубли коллекций (ключ — язык + название)
                     let combinationKey = "\(course.language)|\(course.name)"
                     if processedCombinations.contains(combinationKey) {
                         print("ℹ️ Пропущена дублирующая коллекция: \(course.name)")
@@ -81,18 +89,20 @@ struct InitialDataSetup {
                     }
                     processedCombinations.insert(combinationKey)
                     
+                    // Если коллекция уже существует в базе — пропускаем
                     if existingCollections.contains(where: { $0.name == course.name && $0.language?.name_language == course.language }) {
                         print("ℹ️ Коллекция \(course.name) уже существует")
                         Analytics.logEvent("initial_data_setup_skipped_existing_collection", parameters: ["collection": course.name, "language": course.language])
                         continue
                     }
                     
-                    // Язык
+                    // --- ЯЗЫК ---
                     let language: ShopLanguages
                     if let foundLanguage = existingLanguages.first(where: { $0.name_language == course.language }) {
                         language = foundLanguage
                         print("🌐 Используется существующий язык: \(course.language)")
                     } else {
+                        // Если язык новый — создаём
                         language = ShopLanguages(context: context)
                         language.name_language = course.language
                         language.creationDate = Date()
@@ -102,7 +112,7 @@ struct InitialDataSetup {
                         Analytics.logEvent("initial_data_setup_new_language_created", parameters: ["language": course.language])
                     }
                     
-                    // Коллекции/темы
+                    // --- ТЕМЫ/КОЛЛЕКЦИИ ---
                     for theme in course.themes {
                         let collection = ShopCollection(context: context)
                         collection.name = theme.title
@@ -112,7 +122,7 @@ struct InitialDataSetup {
                         newCollectionsCount += 1
                         print("📚 Создана коллекция: \(theme.title) с \(theme.cards.count) карточками, вопросов: \(theme.questions?.count ?? 0)")
                         
-                        // Карточки
+                        // --- КАРТОЧКИ ---
                         for cardData in theme.cards {
                             let card = ShopCard(context: context)
                             card.frontText = cardData.front
@@ -124,8 +134,9 @@ struct InitialDataSetup {
                             newCardsCount += 1
                         }
                         
-                        // ВОПРОСЫ — стратегия 1: сущность ShopQuestion
+                        // --- ВОПРОСЫ ---
                         if hasShopQuestionEntity, let qs = theme.questions, !qs.isEmpty {
+                            // Стратегия 1: отдельная сущность ShopQuestion
                             for q in qs {
                                 if let questionEntity = NSEntityDescription.entity(forEntityName: "ShopQuestion", in: context) {
                                     let qObj = NSManagedObject(entity: questionEntity, insertInto: context)
@@ -136,8 +147,8 @@ struct InitialDataSetup {
                                 }
                             }
                         }
-                        // ВОПРОСЫ — стратегия 2: атрибут questionsJSON в ShopCollection
                         else if hasQuestionsJSONAttribute, let qs = theme.questions {
+                            // Стратегия 2: сохраняем список вопросов в JSON внутри коллекции
                             do {
                                 let data = try JSONEncoder().encode(qs)
                                 collection.setValue(data, forKey: "questionsJSON")
@@ -146,12 +157,14 @@ struct InitialDataSetup {
                                 print("⚠️ Не удалось закодировать questionsJSON для '\(theme.title)': \(error)")
                             }
                         } else {
+                            // Если вопросы есть, но структура в Core Data их не поддерживает
                             if let count = theme.questions?.count, count > 0 {
                                 print("⚠️ Вопросы есть (\(count)), но в Core Data нет ни ShopQuestion, ни questionsJSON — пропускаем сохранение.")
                             }
                         }
                     }
                     
+                    // Логируем обработку файла
                     let fileDuration = Date().timeIntervalSince(fileStartTime)
                     Analytics.logEvent("initial_data_setup_file_processed", parameters: [
                         "file": fileURL.lastPathComponent,
@@ -162,11 +175,12 @@ struct InitialDataSetup {
                         "duration_sec": fileDuration
                     ])
                 } catch {
-                    // как CardModel (обратная совместимость)
+                    // --- Попытка декодировать как CardModel (старый формат) ---
                     print("⚠️ Не удалось декодировать \(fileURL.lastPathComponent) как LanguageCourse: \(error)")
                     let cardModel = try JSONDecoder().decode(CardModel.self, from: data)
                     print("📄 Успешно декодирован \(fileURL.lastPathComponent) как CardModel")
                     
+                    // Проверка на дубли
                     let combinationKey = "\(cardModel.language)|\(cardModel.name)"
                     if processedCombinations.contains(combinationKey) {
                         print("ℹ️ Пропущена дублирующая коллекция: \(cardModel.name)")
@@ -181,7 +195,7 @@ struct InitialDataSetup {
                         continue
                     }
                     
-                    // Язык
+                    // --- ЯЗЫК ---
                     let language: ShopLanguages
                     if let foundLanguage = existingLanguages.first(where: { $0.name_language == cardModel.language }) {
                         language = foundLanguage
@@ -196,7 +210,7 @@ struct InitialDataSetup {
                         Analytics.logEvent("initial_data_setup_new_language_created", parameters: ["language": cardModel.language])
                     }
                     
-                    // Коллекция
+                    // --- КОЛЛЕКЦИЯ ---
                     let collection = ShopCollection(context: context)
                     collection.name = cardModel.name
                     collection.creationDate = Date()
@@ -205,6 +219,7 @@ struct InitialDataSetup {
                     newCollectionsCount += 1
                     print("📚 Создана коллекция: \(cardModel.name) с \(cardModel.cards.count) карточками")
                     
+                    // --- КАРТОЧКИ ---
                     for cardData in cardModel.cards {
                         let card = ShopCard(context: context)
                         card.frontText = cardData.front
@@ -216,6 +231,7 @@ struct InitialDataSetup {
                         newCardsCount += 1
                     }
                     
+                    // Логируем обработку файла (старый формат)
                     let fileDuration = Date().timeIntervalSince(fileStartTime)
                     Analytics.logEvent("initial_data_setup_file_processed", parameters: [
                         "file": fileURL.lastPathComponent,
@@ -226,6 +242,7 @@ struct InitialDataSetup {
                     ])
                 }
             } catch {
+                // Ошибка при чтении файла
                 print("❌ Ошибка при обработке файла \(fileURL.lastPathComponent): \(error)")
                 Analytics.logEvent("initial_data_setup_file_error", parameters: [
                     "file": fileURL.lastPathComponent,
@@ -235,7 +252,7 @@ struct InitialDataSetup {
             }
         }
         
-        // Save
+        // --- СОХРАНЕНИЕ ВСЕХ ДАННЫХ ---
         do {
             try context.save()
             print("💾 Данные сохранены: \(newLanguagesCount) языков, \(newCollectionsCount) коллекций, \(newCardsCount) карточек, \(newQuestionsCount) вопросов")
@@ -250,13 +267,14 @@ struct InitialDataSetup {
             Analytics.logEvent("initial_data_setup_save_error", parameters: ["error_description": error.localizedDescription])
         }
         
-        // Отладка
+        // --- ОТЛАДКА: печатаем все коллекции из базы ---
         let allCollections = fetchExistingCollections(context: context)
         print("📋 Все коллекции в Core Data (\(allCollections.count)):")
         for collection in allCollections {
             print("Коллекция: \(collection.name ?? "N/A"), Язык: \(collection.language?.name_language ?? "N/A"), Карточек: \((collection.cards?.count ?? 0))")
         }
         
+        // --- Финальный лог: сколько заняла вся инициализация ---
         let setupDuration = Date().timeIntervalSince(setupStartTime)
         Analytics.logEvent("initial_data_setup_complete", parameters: [
             "duration_sec": setupDuration,
@@ -269,6 +287,8 @@ struct InitialDataSetup {
     }
     
     // MARK: helpers
+    
+    // Получаем все существующие языки
     private static func fetchExistingLanguages(context: NSManagedObjectContext) -> [ShopLanguages] {
         let request: NSFetchRequest<ShopLanguages> = ShopLanguages.fetchRequest()
         do {
@@ -283,6 +303,7 @@ struct InitialDataSetup {
         }
     }
     
+    // Получаем все существующие коллекции
     private static func fetchExistingCollections(context: NSManagedObjectContext) -> [ShopCollection] {
         let request: NSFetchRequest<ShopCollection> = ShopCollection.fetchRequest()
         do {
@@ -297,6 +318,7 @@ struct InitialDataSetup {
         }
     }
     
+    // Приоритеты для языков (для сортировки или порядка)
     private static func priorityForLanguage(_ language: String) -> Int64 {
         switch language {
         case "Spanish": return 100
@@ -321,4 +343,3 @@ struct CardModel: Decodable {
     let name: String
     let cards: [CardData]
 }
-

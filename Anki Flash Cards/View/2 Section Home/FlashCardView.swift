@@ -231,7 +231,7 @@ struct FlashCardView: View {
                         }
                     }
                 } else {
-                    // Simplified header for chat: only exit button
+                    // header: exit button
                     HStack {
                         Button {
                             Analytics.logEvent("flashcard_dismiss_button_tapped", parameters: nil)
@@ -359,10 +359,11 @@ struct CardView: View {
     let onSwiped: (FlashCardView.SwipeDirection) -> Void
     let onTapFlip: () -> Void
     
-    @State private var flipped = false
-    @State private var offset = CGSize.zero
-    @State private var rotation: Double = 0
+    @State private var flipped = false          // Отслеживает, перевернута ли карточка (лицо/оборот)
+    @State private var offset = CGSize.zero     // Смещение карточки при свайпе (drag gesture)
+    @State private var rotation: Double = 0     // Угол поворота карточки при свайпе
     
+    // Цвет рамки карточки зависит от свайпа (право = зелёный, влево = оранжевый, по центру = белый)
     private var cardBackgroundColor: Color {
         if offset.width > 0 {
             return Color.green
@@ -378,7 +379,8 @@ struct CardView: View {
         let frontText = swapSides ? (card.backText ?? "") : (card.frontText ?? "")
         let backText = swapSides ? (card.frontText ?? "") : (card.backText ?? "")
         let displayText = flipped ? backText : frontText
-        GeometryReader { geometry in
+        
+       GeometryReader { geometry in
             VStack {
                 ZStack {
                     VStack {
@@ -390,23 +392,28 @@ struct CardView: View {
                             )
                             .padding()
                             .padding(.bottom)
+                            // geometry.size.width → ширина карточки равна доступной ширине контейнера
+                            // geometry.size.height * 1.5 → карточка делается выше самой области, где она лежит
+                            // это создаёт ощущение "карточной колоды"
                             .frame(width: geometry.size.width,
                                    height: geometry.size.height * 1.5)
                     }
                     
+                    // В зависимости от свайпа выводим разные подписи
                     if offset.width > 0 {
-                        Text("Know")
+                        Text("Know") // свайп вправо = знаю карточку
                             .font(.title)
                             .multilineTextAlignment(.center)
                             .foregroundColor(cardBackgroundColor)
                             .padding()
                     } else if offset.width < 0 {
-                        Text("Still learning")
+                        Text("Still learning") // свайп влево = ещё учу
                             .font(.title)
                             .multilineTextAlignment(.center)
                             .foregroundColor(cardBackgroundColor)
                             .padding()
                     } else {
+                        // если свайпа нет — показываем текст карточки
                         Text(displayText)
                             .font(.title)
                             .multilineTextAlignment(.center)
@@ -415,21 +422,28 @@ struct CardView: View {
                     }
                 }
             }
+            // offset и rotation применяются к карточке, чтобы двигать и вращать её во время свайпа
             .offset(offset)
             .rotationEffect(.degrees(rotation))
+            
+            // Если это верхняя карточка (isTop), то разрешаем свайпы
             .gesture(
                 isTop ? DragGesture()
                     .onChanged { gesture in
+                        // offset — текущее смещение пальца
                         offset = gesture.translation
+                        // rotation зависит от горизонтального смещения
                         rotation = Double(gesture.translation.width / 20)
                     }
                     .onEnded { gesture in
                         let horizontal = gesture.translation.width
-                        let threshold: CGFloat = 100
+                        let threshold: CGFloat = 100 // порог, чтобы карточка улетела
                         
                         if abs(horizontal) > threshold {
+                            // Определяем сторону свайпа
                             let direction: FlashCardView.SwipeDirection = horizontal > 0 ? .right : .left
                             
+                            // Анимация "вылета" карточки за экран
                             withAnimation(.easeOut) {
                                 switch direction {
                                 case .left:
@@ -441,10 +455,12 @@ struct CardView: View {
                                 }
                             }
                             
+                            // Через 0.3 секунды вызываем коллбэк onSwiped, чтобы удалить карточку из стека
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 onSwiped(direction)
                             }
                         } else {
+                            // Если свайп слишком маленький — возвращаем карточку на место
                             withAnimation(.spring()) {
                                 offset = .zero
                                 rotation = 0
@@ -453,48 +469,75 @@ struct CardView: View {
                     }
                 : nil
             )
+            
+            // тап по карточке — переворот
             .onTapGesture {
                 withAnimation {
                     flipped.toggle()
                     onTapFlip()
                 }
             }
+            
+            // плавная анимация переворота
             .animation(.easeInOut, value: flipped)
         }
     }
 }
 
-// MARK: - Spaced Repetition Logic (FULL ANALYTICS VERSION)
+
+// MARK: - Spaced Repetition Logic
 extension FlashCardView {
-    // Время старта сессии
+    // Ключи для сохранения данных в UserDefaults (локальное хранилище на устройстве)
     private var sessionStartTimeKey: String { "flashcard_session_start_time" }
     private var lastCardTimeKey: String { "flashcard_last_card_time" }
     
+    /// Возвращает дату следующего показа карточки, если юзер нажал "Hard"
     private func nextScheduleDateForHard() -> Date {
+        // → прибавляем 30 минут к текущему времени
         let date = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!
-        Analytics.logEvent("flashcard_next_schedule_date_for_hard", parameters: ["nextDate": date.timeIntervalSince1970])
+        
+        Analytics.logEvent("flashcard_next_schedule_date_for_hard", parameters: [
+            "nextDate": date.timeIntervalSince1970 // .timeIntervalSince1970 → Double секунд от 1 января 1970
+        ])
         return date
     }
 
+    /// Возвращает дату следующего показа карточки, если юзер нажал "Good"
     private func nextScheduleDateForGood() -> Date {
+        // Прибавляем 1 день к сегодняшней дате
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        
+        // startOfDay(for:) → округляем до 00:00 завтрашнего дня
         let startOfTomorrow = Calendar.current.startOfDay(for: tomorrow)
+        
+        // потом прибавляем 1 минуту (чтобы не было ровно 00:00)
         let date = Calendar.current.date(byAdding: .minute, value: 1, to: startOfTomorrow)!
-        Analytics.logEvent("flashcard_next_schedule_date_for_good", parameters: ["nextDate": date.timeIntervalSince1970])
+        
+        Analytics.logEvent("flashcard_next_schedule_date_for_good", parameters: [
+            "nextDate": date.timeIntervalSince1970
+        ])
         return date
     }
     
-    // delete dublicaties added
+    /// Подготавливает колоду для новой сессии
     private func prepareSession() {
         Analytics.logEvent("flashcard_prepare_session_started", parameters: nil)
 
+        // allCards — все карточки в коллекции (CoreData → allObjects → каст к [Card])
         allCards = (collection.cards?.allObjects as? [Card]) ?? []
-        let gradePriority: [CardGrade: Int] = [.new: 0, .again: 1, .hard: 2, .good: 3, .easy: 4]
+        
+        // приоритет сортировки по grade (чем меньше число — тем раньше пойдёт)
+        let gradePriority: [CardGrade: Int] = [
+            .new: 0, .again: 1, .hard: 2, .good: 3, .easy: 4
+        ]
         
         sessionCards = optionalCards ?? []
         
         if sessionCards.isEmpty && optionalCards == nil {
+            // отрезаем время, оставляем только дату
             let today = Calendar.current.startOfDay(for: Date())
+            
+            // filter → отбираем только те карточки, что "должны" быть показаны
             let dueCards = allCards.filter { card in
                 if card.isNew && card.lastGrade == .new {
                     return true
@@ -503,19 +546,27 @@ extension FlashCardView {
                 case .again:
                     return true
                 case .hard:
+                    // .map { $0 <= Date() } → проверяем, настало ли время показа
                     return card.nextScheduleDate.map { $0 <= Date() } ?? false
                 case .good, .easy:
+                    // startOfDay для обеих дат → сравнение по дню, а не по часу
                     return card.nextScheduleDate.map { Calendar.current.startOfDay(for: $0) <= today } ?? false
                 default:
                     return false
                 }
             }
-            sessionCards = dueCards.sorted { (gradePriority[$0.lastGrade] ?? 5) < (gradePriority[$1.lastGrade] ?? 5) }
+            
+            // sorted { … } → сортировка по gradePriority
+            sessionCards = dueCards.sorted {
+                (gradePriority[$0.lastGrade] ?? 5) < (gradePriority[$1.lastGrade] ?? 5)
+            }
         } else {
-            sessionCards.sort { (gradePriority[$0.lastGrade] ?? 5) < (gradePriority[$1.lastGrade] ?? 5) }
+            sessionCards.sort {
+                (gradePriority[$0.lastGrade] ?? 5) < (gradePriority[$1.lastGrade] ?? 5)
+            }
         }
 
-        // убираем дубликаты, потом чистим по front+back
+        // unique(by:) — убираем дубликаты сначала по objectID, потом по front+back
         sessionCards = sessionCards
             .unique(by: { $0.objectID })
             .unique(by: { ($0.frontText ?? "") + "|" + ($0.backText ?? "") })
@@ -525,6 +576,7 @@ extension FlashCardView {
         currentCardIndex = 0
         completedCards = []
 
+        // UserDefaults.standard.set → сохраняем время старта и последней карточки
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: sessionStartTimeKey)
         UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: lastCardTimeKey)
         
@@ -535,9 +587,10 @@ extension FlashCardView {
         ])
     }
     
+    /// Переключает на следующую карточку
     private func nextCard() {
         let now = Date().timeIntervalSince1970
-        let lastTime = UserDefaults.standard.double(forKey: lastCardTimeKey)
+        let lastTime = UserDefaults.standard.double(forKey: lastCardTimeKey) // double → по дефолту 0.0
         let timeBetween = now - lastTime
         UserDefaults.standard.set(now, forKey: lastCardTimeKey)
         
@@ -552,6 +605,7 @@ extension FlashCardView {
             return
         }
 
+        // если не последняя карта → идём вперёд, иначе обнуляем
         if currentCardIndex < sessionCards.count - 1 {
             currentCardIndex += 1
         } else {
@@ -563,6 +617,7 @@ extension FlashCardView {
         ])
     }
 
+    /// Обработка, если юзер нажал "Hard"
     private func handleHard(_ card: Card) {
         hard_cards += 1
 
@@ -579,21 +634,25 @@ extension FlashCardView {
         
         completedCards.append(card)
         
-        card.nextScheduleDate = nextScheduleDateForHard()
+        card.nextScheduleDate = nextScheduleDateForHard() // ставим время повторения
         card.lastGrade = .hard
         card.isNew = false
-        saveCard(card)
+        saveCard(card) // сохраняем изменения в CoreData
         
         sessionCards.remove(at: currentCardIndex)
         cardsSeen += 1
         totalCards = cardsSeen + sessionCards.count
         
+        // если удалили последнюю карту → сброс индекса
         if !sessionCards.isEmpty && currentCardIndex >= sessionCards.count {
             currentCardIndex = 0
-            Analytics.logEvent("flashcard_handle_hard_reset_index", parameters: ["currentIndex": currentCardIndex])
+            Analytics.logEvent("flashcard_handle_hard_reset_index", parameters: [
+                "currentIndex": currentCardIndex
+            ])
         }
     }
     
+    /// Обработка, если юзер нажал "Good"
     private func handleGood(_ card: Card) {
         good_cards += 1
 
@@ -621,16 +680,19 @@ extension FlashCardView {
         
         if !sessionCards.isEmpty && currentCardIndex >= sessionCards.count {
             currentCardIndex = 0
-            Analytics.logEvent("flashcard_handle_good_reset_index", parameters: ["currentIndex": currentCardIndex])
+            Analytics.logEvent("flashcard_handle_good_reset_index", parameters: [
+                "currentIndex": currentCardIndex
+            ])
         }
     }
     
+    /// Сохраняем карточку в CoreData
     private func saveCard(_ card: Card) {
         Analytics.logEvent("flashcard_save_card", parameters: [
-            "cardId": card.objectID.uriRepresentation().absoluteString,
+            "cardId": card.objectID.uriRepresentation().absoluteString, // objectID.uriRepresentation() → уникальный URI
             "frontText": card.frontText ?? "",
             "backText": card.backText ?? "",
-            "lastGrade": card.lastGrade.rawValue,
+            "lastGrade": card.lastGrade.rawValue, // rawValue → строковое/числовое представление enum
             "nextScheduleDate": card.nextScheduleDate?.timeIntervalSince1970 ?? 0
         ])
         
@@ -638,11 +700,13 @@ extension FlashCardView {
             try viewContext.save()
         } catch {
             print("Error saving card: \(error)")
-            Analytics.logEvent("flashcard_save_card_failed", parameters: ["error": error.localizedDescription])
+            Analytics.logEvent("flashcard_save_card_failed", parameters: [
+                "error": error.localizedDescription
+            ])
         }
     }
     
-    /// Вызывать при выходе из сессии (например, при закрытии экрана)
+    /// Вызывать при выходе из сессии
     private func finishSession() {
         let start = UserDefaults.standard.double(forKey: sessionStartTimeKey)
         let duration = Date().timeIntervalSince1970 - start
@@ -652,13 +716,15 @@ extension FlashCardView {
             "hard_cards": hard_cards,
             "good_cards": good_cards
         ])
-        onLevelCompleted?()
+        onLevelCompleted?() // замыкание, если нужно вызвать коллбэк
     }
 }
 
 // MARK: - Stack Modifier
 extension View {
+    /// stacked — кастомный модификатор, чтобы имитировать стопку карт
     func stacked(at position: Int, in total: Int) -> some View {
+        // Каждая следующая карта чуть сдвигается вниз (8pt) и уменьшается по scale
         let offset = CGFloat(position) * 8
         let scale = max(1.0 - CGFloat(position) * 0.05, 0.8)
         return self
@@ -669,8 +735,10 @@ extension View {
 
 // MARK: - Array Extension
 extension Array {
+    /// Убирает дубликаты по заданному ключу
     func unique<T: Hashable>(by key: (Element) -> T) -> [Element] {
-        var seen = Set<T>()
+        var seen = Set<T>() // Set хранит только уникальные значения
+        // filter → возвращает только те элементы, для которых insert(...) → true (вставка прошла впервые)
         return filter { seen.insert(key($0)).inserted }
     }
 }

@@ -32,6 +32,7 @@ struct TabBarElements: View {
                     }
                 }
                 
+                // Если таббар включён, рисуем его
                 if appNavVM.isTabBarVisible {
                     VStack {
                         Spacer()
@@ -39,6 +40,7 @@ struct TabBarElements: View {
                         CustomTabBar(selectedTab: $appNavVM.selectedTab)
                             .frame(width: vm.frame_width_background_tabbar_in_tabbar_elements ?? 400)
                             .background(
+                                // фоновая форма таббара со стилями
                                 Rectangle()
                                     .foregroundStyle(vm.color_background_tabbar_in_tabbar_elements)
                                     .opacity(vm.opacity_background_tabbar_in_tabbar_elements)
@@ -71,10 +73,12 @@ struct TabBarElements: View {
                 }
             }
             .onAppear {
+                // Когда экран появляется — запоминаем время
                 startTime = Date()
                 Analytics.logEvent("tabbar_elements_appear", parameters: nil)
             }
             .onDisappear {
+                // Когда экран скрывается — логируем время
                 Analytics.logEvent("tabbar_elements_disappear", parameters: nil)
                 if let start = startTime {
                     let duration = Date().timeIntervalSince(start)
@@ -84,7 +88,7 @@ struct TabBarElements: View {
                 }
             }
         }
-        .environmentObject(appNavVM)
+        .environmentObject(appNavVM) // пробрасываем VM в дочерние вьюхи
     }
 }
 

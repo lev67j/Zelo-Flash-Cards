@@ -14,6 +14,7 @@ Zelo AI — приложение для изучения языков.
 По архитектуре решил делать на MVVM — мне кажется, это самая удобная архитектура для приложений среднего размера.
 
 Стек: SwiftUI, CoreData, Firebase, Notifications, StoreKit, DeepSeek.
+
 ---
 
 ## 2. Core Data Models

@@ -14,8 +14,8 @@ final class ChatViewModel: ObservableObject {
     @Published var systemPrompt: String = ""
     @Published var isLoading: Bool = false
     
-    private let apiKey = "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"
-    private let model = "deepseek/deepseek-r1-0528:free"
+    private let apiKey = "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"
+    private let model = "deepseek/deepseek-chat-v3.1:free"
     
     var managedObjectContext: NSManagedObjectContext?
     var currentUser: User?
@@ -84,7 +84,10 @@ final class ChatViewModel: ObservableObject {
     }
 
     private func generateResponse() async -> String? {
-        guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else { return nil }
+        guard let url = URL(string: "https://openrouter.ai/api/v1/chat/completions") else {
+            print("❌ Invalid URL")
+            return nil
+        }
         
         var messageHistory: [[String: String]] = []
         if !systemPrompt.isEmpty {
@@ -97,28 +100,49 @@ final class ChatViewModel: ObservableObject {
             "messages": messageHistory
         ]
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         do {
             let data = try JSONSerialization.data(withJSONObject: payload)
+            print("📤 Payload JSON: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = data
             
-            let (responseData, _) = try await URLSession.shared.data(for: request)
-            if let json = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-               let choices = json["choices"] as? [[String: Any]],
-               let message = choices.first?["message"] as? [String: Any],
-               let content = message["content"] as? String {
-                return content
+            print("🌐 Sending request to: \(url.absoluteString)")
+            
+            let (responseData, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResp = response as? HTTPURLResponse {
+                print("✅ Received HTTP status: \(httpResp.statusCode)")
+            }
+            
+            if let jsonString = String(data: responseData, encoding: .utf8) {
+                print("📥 Response JSON: \(jsonString)")
+            } else {
+                print("❌ Failed to decode response as string")
+            }
+            
+            if let json = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any] {
+                if let choices = json["choices"] as? [[String: Any]],
+                   let message = choices.first?["message"] as? [String: Any],
+                   let content = message["content"] as? String {
+                    print("💬 Assistant reply: \(content)")
+                    return content
+                } else {
+                    print("⚠️ JSON does not contain 'choices' or 'message'")
+                }
+            } else {
+                print("❌ Failed to parse response JSON")
             }
         } catch {
-            print("Error: \(error)")
+            print("❌ Network or serialization error: \(error)")
         }
         
         return nil
     }
+
 }
 
 struct ChatMessage: Identifiable {

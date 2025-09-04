@@ -484,7 +484,6 @@ struct CardView: View {
     }
 }
 
-
 // MARK: - Spaced Repetition Logic
 extension FlashCardView {
     // Ключи для сохранения данных в UserDefaults (локальное хранилище на устройстве)

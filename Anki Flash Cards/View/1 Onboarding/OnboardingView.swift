@@ -31,7 +31,6 @@ struct OnboardingView: View {
     @AppStorage("isOnboardingCompletedKey") private var isOnboardingCompleted = false
     
     @ObservedObject private var vm = OnboardingVM()
-    
     @StateObject private var appNavVM = AppNavigationVM()
     
     var body: some View {

@@ -14,7 +14,7 @@ final class ChatViewModel: ObservableObject {
     @Published var systemPrompt: String = ""
     @Published var isLoading: Bool = false
     
-    private let apiKey = "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"
+    private let apiKey = "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"
     private let model = "deepseek/deepseek-chat-v3.1:free"
     
     var managedObjectContext: NSManagedObjectContext?
@@ -97,7 +97,10 @@ final class ChatViewModel: ObservableObject {
         
         let payload: [String: Any] = [
             "model": model,
-            "messages": messageHistory
+            "messages": messageHistory,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "max_tokens": 100000
         ]
         
         do {

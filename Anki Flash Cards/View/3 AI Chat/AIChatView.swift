@@ -100,11 +100,13 @@ struct AIChatView: View {
             .padding(.bottom, isTextFieldFocused ? 0 : 70)
         }
         .onAppear {
+            if isFirstOpenChat == true {
                 viewModel.systemPrompt = "You are helping a friend learn a language \(selectedLanguage). You can chat with the user on any topic that interests them. You don't need to constantly focus on learning the language, you should weave language learning into a normal conversation with your friend. At the beginning of the message, indicate where the user made a mistake, and just ask questions one at a time. Don't write: Next Question: … Ask a question from yourself without a preface, like to a friend, you don't say: my next question is…, the user shouldn't understand that you have a list of questions. Please don't formatted your messages write defoult text without any formatting"
                 
                 isFirstOpenChat = false
                 print(viewModel.systemPrompt)
-           
+            }
+                
             let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "username == %@", "AIChatUser")
             

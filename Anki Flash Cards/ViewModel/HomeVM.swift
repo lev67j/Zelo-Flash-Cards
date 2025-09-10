@@ -269,7 +269,6 @@ final class HomeVM: ObservableObject {
         }
     }
 
-    
     /// Возвращает реальные CoreData Card объекты для themeIndex/level.
     /// Если createIfMissing == true — создаёт Card'ы и сохраняет их objectID'ы в levelCardMap.
     func getCardsForLevel(themeIndex: Int, level: Int, createIfMissing: Bool = false) -> [Card] {
